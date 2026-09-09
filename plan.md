@@ -226,6 +226,7 @@ Each phase lists deliverables, who it depends on, and whether it can be done in 
 **Team allocation:** 1–2 people.
 
 #### B.1 NBA API Integration
+- **▶ Fully designed & implemented — see [`docs/statistics.md`](docs/statistics.md) and `src/data_ingestion/`.**
 - Use the `nba_api` Python package to pull current season or historical player stats.
 - Extract per-player: FG%, 3P%, FT%, rebounds, assists, turnovers, steals, blocks, usage rate.
 - Extract per-team: pace, offensive rating, defensive rating.
