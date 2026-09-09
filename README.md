@@ -8,8 +8,9 @@ understanding the project.
 ## Project scope (where things stand)
 
 - **Goal:** single-elimination NBA-style tournaments simulated in-browser
-  (Streamlit UI), driven by a possession-level state machine + XGBoost
-  outcome prediction, with optional LLM narration and 2D court playback.
+  (Streamlit UI), driven by a possession-level state machine whose outcomes are
+  resolved **heuristically from real player statistics** (no ML), with optional
+  LLM narration and 2D court playback.
 - **Status:** Phase A (schemas) and **Phase B (data ingestion) are done** — the
   pipeline described below produces the full 2025-26 player/team dataset.
   Engine, ML, and UI phases (C–J in `plan.md`) are not built yet.
