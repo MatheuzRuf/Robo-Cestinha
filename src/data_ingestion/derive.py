@@ -17,7 +17,6 @@ from . import config
 from . import bballref
 from .normalize import (
     ascii_slug,
-    league_possessions_per_game,
     parse_height_inches,
     safe_div,
 )
@@ -197,12 +196,11 @@ def _team_lookup(raw: dict) -> pd.DataFrame:
 
 # ── 2. Attribute derivation ─────────────────────────────────────────────────
 
-def _derive_attributes(master: pd.DataFrame, teams: pd.DataFrame, player_totals: pd.DataFrame, team_games: int) -> pd.DataFrame:
+def _derive_attributes(master: pd.DataFrame, teams: pd.DataFrame, player_totals: pd.DataFrame) -> pd.DataFrame:
     m = master.copy()
     K = config.SHRINKAGE_K
 
     # League context
-    poss_pg = league_possessions_per_game(player_totals, team_games)
     avg2 = safe_div(float((player_totals["FGM"] - player_totals["FG3M"]).sum()),
                     float((player_totals["FGA"] - player_totals["FG3A"]).sum()))
     avg3 = safe_div(float(player_totals["FG3M"].sum()), float(player_totals["FG3A"].sum()))
@@ -217,6 +215,7 @@ def _derive_attributes(master: pd.DataFrame, teams: pd.DataFrame, player_totals:
     m["team_id"] = m["team_id"].fillna(m["team_abv"].str.lower())
     # Players whose stat team isn't in team_stats (rare): use league averages.
     m["makes_pg"] = m["makes_pg"].fillna(t["makes_pg"].mean())
+    m["pace"] = m["pace"].fillna(t["pace"].mean())
 
     m["min_pg"] = m["MIN"] / m["GP"]
     m["min_frac"] = np.clip(m["min_pg"] / 48.0, 0.0, 1.0)
@@ -239,7 +238,7 @@ def _derive_attributes(master: pd.DataFrame, teams: pd.DataFrame, player_totals:
     m["usage_rate"] = np.clip(m["USG_PCT"], 0.0, 1.0)
 
     # Defensive rates: fouls / steals / blocks per defended possession.
-    m["def_poss_pg"] = poss_pg * m["min_frac"]
+    m["def_poss_pg"] = m["pace"] * m["min_frac"]
     m["foul_rate"] = (m["PF"] / m["GP"] / m["def_poss_pg"]).fillna(0.0).clip(0.0, 1.0)
     m["steal_rate"] = (m["STL"] / m["GP"] / m["def_poss_pg"]).fillna(0.0).clip(0.0, 1.0)
     m["block_rate"] = (m["BLK"] / m["GP"] / m["def_poss_pg"]).fillna(0.0).clip(0.0, 1.0)
@@ -372,10 +371,9 @@ def derive(raw: dict) -> None:
         (player_totals["MIN"] > 0)
     ].copy().reset_index(drop=True)
 
-    team_games = int(raw["team_stats"]["base"]["GP"].sum())
     master = _build_master(raw)
     teams = _team_lookup(raw)
-    master = _derive_attributes(master, teams, player_totals, team_games)
+    master = _derive_attributes(master, teams, player_totals)
 
     players_json = _build_players_json(master)
     teams_json = _build_teams_json(master, teams, raw["rosters"])
