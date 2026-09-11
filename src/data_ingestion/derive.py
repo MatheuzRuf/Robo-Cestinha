@@ -371,9 +371,10 @@ def derive(raw: dict) -> None:
         (player_totals["MIN"] > 0)
     ].copy().reset_index(drop=True)
 
+    team_games = int(raw["team_stats"]["base"]["GP"].sum())
     master = _build_master(raw)
     teams = _team_lookup(raw)
-    master = _derive_attributes(master, teams, player_totals)
+    master = _derive_attributes(master, teams, player_totals, team_games)
 
     players_json = _build_players_json(master)
     teams_json = _build_teams_json(master, teams, raw["rosters"])

@@ -10,6 +10,7 @@ import sys
 from . import config
 from .derive import derive
 from .fetch import fetch_all, load_raw_from_disk
+from .schemas import SchemaValidationError
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -26,7 +27,12 @@ def main(argv: list[str] | None = None) -> int:
     else:
         raw = fetch_all(refresh=args.refresh)
 
-    derive(raw)
+    try:
+        derive(raw)
+    except SchemaValidationError as err:
+        print(f"[error] derive output failed schema validation, nothing was written:\n{err}", file=sys.stderr)
+        return 1
+
     print(f"[ok] outputs under {config.PROCESSED_DIR}")
     return 0
 
