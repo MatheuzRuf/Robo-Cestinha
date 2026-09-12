@@ -151,24 +151,88 @@ These JSON schemas are the **contract** between components. They must be finaliz
 }
 ```
 
-### 2.2 State Machine Definition (Engine Core)
+### 2.2 Spatial State Machine & Court Model (Engine Core)
+
+#### 2.2.1 Discretized Court: 50-Cell Grid ($10 \times 5$)
+The basketball court is discretized into 50 rectangular cells ($10 \times 5$, ratio 2:1 matching the official 94×50 ft NBA court). There is **no out-of-bounds**; movements are clamped strictly within $[0, 9] \times [0, 4]$:
 
 ```
-States:            Transitions:
-┌──────────┐       ┌──────────┐       ┌──────────┐
-│ POSSESS  │──────►│ TEAMMATE │──────►│ OPPONENT │
-│ (ball    │ pass  │ (receives│ shot  │ (defense │
-│  handler)│       │  ball)   │       │  reacts) │
-└──────────┘       └──────────┘       └──────────┘
-     ▲                                       │
-     │         turnover / miss               │
-     └───────────────────────────────────────┘
-
-Sub-states within POSSESS:
-  DRIBBLE ──► PASS ──► (teammate state)
-           ──► SHOOT ──► (shot resolution ──► made/miss ──► opponent state)
-           ──► TURNOVER ──► opponent state
+    Y (Width: 0..4)
+    ▲
+  4 │ [0,4] [1,4] [2,4] [3,4] [4,4] │ [5,4] [6,4] [7,4] [8,4] [9,4]
+  3 │ [0,3] [1,3] [2,3] [3,3] [4,3] │ [5,3] [6,3] [7,3] [8,3] [9,3]
+RimA│ (O)   [1,2] [2,2] [3,2] [4,2] │ [5,2] [6,2] [7,2] [8,2]   (O) Rim B
+  1 │ [0,1] [1,1] [2,1] [3,1] [4,1] │ [5,1] [6,1] [7,1] [8,1] [9,1]
+  0 │ [0,0] [1,0] [2,0] [3,0] [4,0] │ [5,0] [6,0] [7,0] [8,0] [9,0]
+    └───────────────────────────────┴───────────────────────────────► X (Length: 0..9)
+       0     1     2     3     4        5     6     7     8     9
+               Team A Half                    Team B Half
 ```
+- **Rims / Baskets:**
+  - Team A defends Rim A at `(0, 2)` and attacks Rim B at `(9, 2)`.
+  - Team B defends Rim B at `(9, 2)` and attacks Rim A at `(0, 2)`.
+- **3-Point Line Boundary:** Determined dynamically by Euclidean distance to target rim:
+  - Euclidean distance $\ge 3.0$ cells $\to$ 3-pointer.
+  - Euclidean distance $< 3.0$ cells $\to$ 2-pointer (inside the arc / paint).
+- **Match Start Positions:** At tip-off, all 10 on-court players start clustered near mid-court (columns 4 and 5).
+
+#### 2.2.2 State Graph Topography
+
+```
+                       [ Tip-off / Ball Dispute ]
+                                   │
+                    ┌──────────────┴──────────────┐
+                    ▼ (p_A)                       ▼ (p_B)
+             [ POSSESSION: TEAM A ]        [ POSSESSION: TEAM B ]
+            (A attacks, B defends)        (B attacks, A defends)
+                    │                               │
+                    └───────────────┬───────────────┘
+                                    │ (Active Handler)
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+                < PASS >         < MOVE >        < SHOOT >
+                /   |   \           │               │
+       Teammates 1, 2, 3, 4         │               ├─► [ Made ] (2pt or 3pt)
+               │                    │               │    Score updated
+               ├─► [ Completed ]    │               │    Possession flips
+               │    New handler     │               │
+               │    Clock advances  │               └─► [ Missed ]
+               │    Possession kept │                     │
+               │                    │                     ▼
+               └─► [ Intercepted ]  │            < Rebound Dispute >
+                    Steal by def.   │            (All 10 players contest)
+                    Possession flips│               /                  \
+                                    │         (Offensive)          (Defensive)
+                                    │              ▼                    ▼
+                                    │       Possession kept      Possession flips
+                                    │       Reset shot clock 14s
+                                    │
+           ┌────────────────────────┴────────────────────────┐
+           ▼                                                 ▼
+   [ 8 Directions: N, NE, E, SE, S, SW, W, NW ]          [ Idle / Parado ]
+           │                                                 │
+           ├─► [ Moves Successfully ]                        ├─► [ Holds Ball ]
+           │    Update (x, y) clamped                        │    Clock ticks 2-4s
+           │    Possession kept                              │    Possession kept
+           │                                                 │
+           └─► [ Stripped / Turnover ]                       ├─► [ Defensive Foul ]
+                Turnover committed                           │    Personal foul added
+                Possession flips                             │    Reset clock / Free throws
+                                                             │
+                                                             └─► [ Stripped / Turnover ]
+                                                                  Possession flips
+```
+
+#### 2.2.3 Two-Phase Evolution Strategy
+- **Phase 1 (MVP Scaffolding & Graph Integrity):**
+  - Other 9 players remain static on court while ball handler moves.
+  - Transition probabilities across graph edges use uniform or simple attribute-weighted baselines to verify that 48-minute games run without deadlock, clock rules trigger properly, and `match_log.json` schemas are valid.
+- **Phase 2 (Spatial Dynamics & Advanced Heuristics):**
+  - **Offensive Spacing:** Teammates dynamically reposition each step to maximize the convex hull area / geometric distance between them.
+  - **Man-to-Man Defense:** Each defender tracks an assigned matchup, maintaining tight positioning between their matchup and the rim.
+  - **Trajectory-Based Interceptions:** Passes trace a line segment between passer and receiver. The distance of each defender to that line segment determines interception probability, scaled by defender `steal_rate` vs passer `turnover_rate`.
+  - **Contested Shooting:** Nearest defender distance acts as a defensive modifier on shooter's base `two_pt_pct` / `three_pt_pct`.
+  - **Position-Weighted Rebounding:** Player distance to the rim exponentially weights their base `rebound_rate`.
 
 ---
 
