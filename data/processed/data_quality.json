@@ -1,0 +1,91 @@
+{
+  "season": "2025-26",
+  "players_with_stats": 582,
+  "teams": 30,
+  "position_distribution": {
+    "G": 212,
+    "F": 162,
+    "C": 57,
+    "X": 57,
+    "G-F": 38,
+    "F-C": 28,
+    "C-F": 17,
+    "F-G": 11
+  },
+  "position5_distribution": {
+    "SG": 162,
+    "SF": 111,
+    "C": 107,
+    "PF": 105,
+    "PG": 97
+  },
+  "position5_missing": 0,
+  "starters": 216,
+  "bench_players": 366,
+  "small_sample_lt10gp": 76,
+  "players_with_clutch_minutes": 413,
+  "usage_missing_defaulted": 0,
+  "attribute_stats": {
+    "two_pt_pct": {
+      "min": 0.3276,
+      "mean": 0.5446,
+      "max": 0.7718
+    },
+    "three_pt_pct": {
+      "min": 0.1635,
+      "mean": 0.3452,
+      "max": 0.5331
+    },
+    "ft_pct": {
+      "min": 0.441,
+      "mean": 0.7684,
+      "max": 0.9294
+    },
+    "turnover_rate": {
+      "min": 0.0,
+      "mean": 0.1266,
+      "max": 0.4892
+    },
+    "foul_rate": {
+      "min": 0.0,
+      "mean": 0.0384,
+      "max": 0.1291
+    },
+    "rebound_rate": {
+      "min": 0.0,
+      "mean": 0.0485,
+      "max": 0.208
+    },
+    "assist_rate": {
+      "min": 0.0,
+      "mean": 0.0577,
+      "max": 0.3189
+    },
+    "steal_rate": {
+      "min": 0.0,
+      "mean": 0.0152,
+      "max": 0.0703
+    },
+    "block_rate": {
+      "min": 0.0,
+      "mean": 0.0087,
+      "max": 0.0605
+    },
+    "stamina": {
+      "min": 0.5593,
+      "mean": 0.782,
+      "max": 1.0
+    },
+    "clutch_factor": {
+      "min": 0.1066,
+      "mean": 0.4831,
+      "max": 0.7743
+    },
+    "usage_rate": {
+      "min": 0.048,
+      "mean": 0.1779,
+      "max": 0.368
+    }
+  },
+  "rostered_but_zero_minutes_excluded": 0
+}
