@@ -24,4 +24,4 @@ src/
 - **Routing:** React Router.
 - **Before adding a new component:** search the codebase for an existing one that does the same job. Extending > duplicating.
 - **Tone/copy:** no marketing language anywhere in the UI. Plain, functional text only.
-- **i18n:** all user-facing strings go through the i18n layer (e.g. react-i18next) — never hardcode text in components. Locales: en-US, pt-BR. Keys organized per page/feature (home.create_session.title, match_broadcast.play_by_play.title), not one flat file. New copy must be added to both locale files in the same change — no English-only strings left behind. Use snake case for the keys.
+- **i18n:** all user-facing strings go through the i18n layer (e.g. react-i18next) — never hardcode text in components. Locales: en-US, pt-BR. Keys organized per page/feature (home.create_session.title, match_broadcast.play_by_play.title), not one flat file. New copy must be added to both locale files in the same change — no English-only strings left behind. Use snake_case for the keys.
