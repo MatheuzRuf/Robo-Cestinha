@@ -4,8 +4,8 @@
 from __future__ import annotations
 
 import random
-from src.engine.entities import GameState
-from src.engine.heuristics import (
+from app.engine.entities import GameState
+from app.engine.heuristics import (
     decide_handler_action,
     resolve_pass_teammate,
     resolve_pass_outcome,
@@ -13,7 +13,7 @@ from src.engine.heuristics import (
     resolve_move_outcome,
     resolve_shot,
 )
-from src.engine.schemas import ActionLog, PossessionLog
+from app.engine.schemas import ActionLog, PossessionLog
 
 
 class StateMachine:

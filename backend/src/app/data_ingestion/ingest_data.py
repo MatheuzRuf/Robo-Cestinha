@@ -1,6 +1,6 @@
 """Backward-compatible entry point for the data ingestion pipeline.
 
-Usage:  python -m src.data_ingestion.ingest_data [--refresh] [--no-fetch]
+Usage:  python -m app.data_ingestion.ingest_data [--refresh] [--no-fetch]
 
 (Previously a one-off script; the pipeline now lives in this package — see
 docs/statistics.md.)

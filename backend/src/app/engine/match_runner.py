@@ -4,9 +4,9 @@
 from __future__ import annotations
 
 import random
-from src.engine.entities import GameState, LiveTeam
-from src.engine.state_machine import StateMachine
-from src.engine.schemas import MatchLog, QuarterLog, FinalScore
+from app.engine.entities import GameState, LiveTeam
+from app.engine.state_machine import StateMachine
+from app.engine.schemas import MatchLog, QuarterLog, FinalScore
 
 class MatchRunner:
     def __init__(self, home_team: LiveTeam, away_team: LiveTeam, seed: int = 42):
