@@ -1,0 +1,20 @@
+.page { display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-8); max-width: 1200px; margin: 0 auto; }
+.heroSection { text-align: center; display: flex; flex-direction: column; gap: var(--space-4); padding-top: var(--space-8); }
+.heroTitle { margin: 0; display: flex; flex-direction: column; align-items: center; font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 4rem); line-height: 0.9; font-weight: 900; letter-spacing: -0.05em; }
+.heroTitle span:last-child { color: var(--color-primary); }
+.heroSubtitle { margin: 0; color: var(--color-text-muted); font-size: 1.05rem; }
+.actionsSection { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); }
+.cardStack { display: flex; flex-direction: column; gap: var(--space-4); }
+.cardTitleRow { display: flex; align-items: center; gap: var(--space-2); }
+.cardTitleRow h2 { margin: 0; font-size: 1.15rem; }
+.cardDescription { margin: 0; color: var(--color-text-muted); }
+.featuredRow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.featuredLabel { color: var(--color-text-muted); }
+.recentSection { display: flex; flex-direction: column; gap: var(--space-6); }
+.recentHeadingRow { display: flex; justify-content: space-between; gap: var(--space-4); align-items: end; }
+.eyebrow { color: var(--color-primary); font-size: 0.85rem; font-weight: 800; letter-spacing: 0.08em; }
+.recentHeadingRow h2 { margin: 0; font-family: var(--font-display); font-size: clamp(1.6rem, 3vw, 2.6rem); }
+.savedNote { color: var(--color-text-muted); }
+.recentGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+.modalStack { display: flex; flex-direction: column; gap: var(--space-4); }
+@media (max-width: 768px) { .actionsSection, .recentGrid { grid-template-columns: 1fr; } .recentHeadingRow { align-items: start; flex-direction: column; } }
