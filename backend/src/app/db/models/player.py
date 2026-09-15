@@ -8,6 +8,8 @@ from app.db.base import Base
 
 
 class Player(Base):
+    """A player belonging to a catalog team."""
+
     __tablename__ = "players"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

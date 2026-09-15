@@ -8,6 +8,8 @@ from app.db.base import Base
 
 
 class Team(Base):
+    """A catalog team that can be assigned to a bracket."""
+
     __tablename__ = "teams"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

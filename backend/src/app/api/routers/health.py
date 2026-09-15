@@ -10,5 +10,14 @@ router = APIRouter()
 
 @router.get("/health")
 async def health_check(db: AsyncSession = Depends(get_db)):
+    """Check that the API can reach the database.
+
+    Args:
+        db: Active async database session.
+
+    Returns:
+        A simple JSON status payload.
+    """
+
     await db.execute(text("SELECT 1"))
     return {"status": "ok"}

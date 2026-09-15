@@ -22,3 +22,4 @@ backend/src/app/
 - **Migrations:** every model change ships with an Alembic migration in the same change. Never hand-edit the DB schema outside a migration.
 - **Before adding a new table or endpoint:** check if an existing model/router already covers it. Extending > duplicating.
 - **Comments:** Avoid using comments in the code. Docstrings are acceptable, but the code should be self explainable.
+- **Docstrings:** every class, every function/method in domain/, db/, and core/, and every route handler gets a Google-style docstring (Args/Returns/Raises). Skip only trivial one-liners with nothing to add beyond the signature. Should not be too verbose.

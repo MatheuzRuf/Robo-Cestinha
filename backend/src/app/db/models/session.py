@@ -8,6 +8,8 @@ from app.db.base import Base
 
 
 class Session(Base):
+    """A tournament session that owns users and bracket matches."""
+
     __tablename__ = "sessions"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

@@ -10,6 +10,20 @@ from app.domain.bracket.service import seed_bracket
 
 
 async def create_session(db: AsyncSession, owner_name: str, num_teams: int = 8) -> tuple[Session, User]:
+    """Create a new session, owner user, and seeded bracket.
+
+    Args:
+        db: Active async database session.
+        owner_name: Display name for the session owner.
+        num_teams: Number of catalog teams to seed into the bracket.
+
+    Returns:
+        The created session and owner user.
+
+    Raises:
+        ValueError: If the catalog does not contain enough teams.
+    """
+
     session = Session(id=uuid.uuid4(), hash=generate_session_hash())
     db.add(session)
     await db.flush()

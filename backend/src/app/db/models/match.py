@@ -8,6 +8,8 @@ from app.db.base import Base
 
 
 class Match(Base):
+    """A single bracket match and its progression metadata."""
+
     __tablename__ = "matches"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

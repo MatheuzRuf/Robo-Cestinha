@@ -8,6 +8,8 @@ from app.db.base import Base
 
 
 class User(Base):
+    """A participant registered in a session."""
+
     __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

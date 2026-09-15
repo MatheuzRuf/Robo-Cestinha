@@ -7,6 +7,14 @@ from app.db.models import Match
 
 
 async def seed_bracket(db: AsyncSession, session_id: uuid.UUID, team_ids: list[uuid.UUID]) -> None:
+    """Create and persist a seeded elimination bracket for a session.
+
+    Args:
+        db: Active async database session.
+        session_id: Session that owns the bracket matches.
+        team_ids: Ordered list of teams to place into the first round.
+    """
+
     num_teams = len(team_ids)
     num_rounds = int(math.log2(num_teams))
 
