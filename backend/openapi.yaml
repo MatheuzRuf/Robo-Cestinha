@@ -1,0 +1,68 @@
+openapi: 3.0.3
+info:
+  title: Robô Cestinha API
+  version: 0.1.0
+servers:
+  - url: http://localhost:8000
+paths:
+  /health:
+    get:
+      summary: Check API health
+      responses:
+        '200':
+          description: API is healthy and can reach the database.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse'
+  /sessions:
+    post:
+      summary: Create a new session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        '200':
+          description: Session created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSessionResponse'
+        '422':
+          description: Validation error.
+components:
+  schemas:
+    HealthCheckResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          example: ok
+    CreateSessionRequest:
+      type: object
+      required:
+        - owner_name
+      properties:
+        owner_name:
+          type: string
+          description: Display name for the session owner.
+          example: Alice
+    CreateSessionResponse:
+      type: object
+      required:
+        - session_hash
+        - owner_user_id
+      properties:
+        session_hash:
+          type: string
+          description: Public session identifier.
+          example: ABCDEFGH
+        owner_user_id:
+          type: string
+          format: uuid
+          description: Database ID of the owner user.
