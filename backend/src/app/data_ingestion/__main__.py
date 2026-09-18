@@ -1,4 +1,4 @@
-"""CLI: python -m src.data_ingestion [--refresh] [--no-fetch]
+"""CLI: python -m app.data_ingestion [--refresh] [--no-fetch]
 
   --refresh   force re-fetch of every raw dataset from stats.nba.com
   --no-fetch  derive only, from the local raw cache (fails if cache missing)

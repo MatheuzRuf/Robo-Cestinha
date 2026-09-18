@@ -7,10 +7,10 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 import random
 
-from src.data_ingestion.schemas import Player, PlayerAttributes, Team
-from src.engine.clock import GameClock
-from src.engine.grid import CourtPosition, get_initial_center_positions
-from src.engine.schemas import PlayerBoxScore
+from app.data_ingestion.schemas import Player, PlayerAttributes, Team
+from app.engine.clock import GameClock
+from app.engine.grid import CourtPosition, get_initial_center_positions
+from app.engine.schemas import PlayerBoxScore
 
 
 @dataclass

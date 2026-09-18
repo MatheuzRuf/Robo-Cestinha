@@ -1,7 +1,7 @@
 import json
-from src.data_ingestion.schemas import validate_processed_output
-from src.engine.entities import LiveTeam
-from src.engine.match_runner import MatchRunner
+from app.data_ingestion.schemas import validate_processed_output
+from app.engine.entities import LiveTeam
+from app.engine.match_runner import MatchRunner
 
 def load_data():
     with open("data/processed/players.json", "r") as f:

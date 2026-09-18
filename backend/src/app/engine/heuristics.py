@@ -11,8 +11,8 @@ from __future__ import annotations
 import random
 from typing import Tuple
 
-from src.engine.entities import GameState, LivePlayer, LiveTeam
-from src.engine.grid import CourtPosition, Direction, is_three_pointer
+from app.engine.entities import GameState, LivePlayer, LiveTeam
+from app.engine.grid import CourtPosition, Direction, is_three_pointer
 
 
 def decide_handler_action(state: GameState, rng: random.Random) -> str:
