@@ -12,7 +12,8 @@ Call plan (see docs/statistics.md):
   1 × LeagueDashPlayerClutch    -> player_clutch_totals.csv
   2 × LeagueDashPlayerStats SB  -> player_stats_{starters,bench}_totals.csv
   2 × LeagueDashTeamStats B+A   -> team_stats_*_totals.csv
-  1 × Basketball-Reference (optional, manual save) -> bballref_*.html
+  1 × Basketball-Reference (manual save, required; --refresh re-parses the
+      saved page instead of re-downloading — it is Cloudflare-protected) -> bballref_*.html
 """
 
 import time
@@ -165,6 +166,8 @@ def load_raw_from_disk() -> dict:
         "player_base": config.RAW_DIR / "player_stats_base_totals.csv",
         "player_advanced": config.RAW_DIR / "player_stats_advanced_totals.csv",
         "clutch": config.RAW_DIR / "player_clutch_totals.csv",
+        "starter": config.RAW_DIR / "player_stats_starters_totals.csv",
+        "bench": config.RAW_DIR / "player_stats_bench_totals.csv",
         "team_base": config.RAW_DIR / "team_stats_base_totals.csv",
         "team_advanced": config.RAW_DIR / "team_stats_advanced_totals.csv",
     }

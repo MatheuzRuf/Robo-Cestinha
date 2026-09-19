@@ -87,5 +87,8 @@
       "max": 0.368
     }
   },
-  "rostered_but_zero_minutes_excluded": 0
+  "rostered_but_zero_minutes_excluded": 0,
+  "zero_minute_roster_players_excluded": 5,
+  "stats_players_not_on_active_roster": 57,
+  "roster_entries": 582
 }

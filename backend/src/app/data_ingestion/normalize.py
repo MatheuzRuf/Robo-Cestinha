@@ -51,7 +51,8 @@ def league_possessions_per_game(player_totals: pd.DataFrame, team_games: int) ->
 
     Summing (FGA + .44*FTA + TOV) over all players counts each team's
     possessions exactly once per game; divide by the true number of team-games
-    (from team stats), NOT by player-games.
+    (from team stats), NOT by player-games. Used as the uniform defensive
+    possession denominator for every player's foul/steal/block rates.
     """
     total_poss = float(
         (player_totals["FGA"]

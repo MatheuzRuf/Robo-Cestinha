@@ -11,7 +11,25 @@ SEASON = "2025-26"          # NBA season id (forward slash form for nba_api)
 SEASON_TYPE = "Regular Season"
 
 # ── Paths ───────────────────────────────────────────────────────────────────
-ROOT = Path(__file__).resolve().parents[2]
+
+def _repo_root() -> Path:
+    """Locate the repo root: the ancestor holding both pyproject.toml and data/.
+
+    This module lives at backend/src/app/data_ingestion/ while the raw/processed
+    data directories live at the repo root, so a fixed parents[] offset is
+    brittle. Requiring both markers keeps the search unambiguous even if a
+    nested pyproject.toml is added later (e.g. backend/).
+    """
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        if (parent / "pyproject.toml").is_file() and (parent / "data").is_dir():
+            return parent
+    raise RuntimeError(
+        "cannot locate repo root: no ancestor of "
+        f"{here} contains both pyproject.toml and a data/ directory"
+    )
+
+ROOT = _repo_root()
 RAW_DIR = ROOT / "data" / "raw" / SEASON.replace("-", "_")
 ROSTER_DIR = RAW_DIR / "rosters"
 PROCESSED_DIR = ROOT / "data" / "processed"
@@ -28,7 +46,7 @@ CLUTCH_SPREAD = 2.0           # sensitivity of clutch_factor to clutch FG% delta
 STAMINA_BASE = 0.55           # stamina floor for a zero-minute player
 STAMINA_RANGE = 0.45          # additional stamina up to min_pg = STAMINA_MIN_PG
 STAMINA_MIN_PG = 38.0         # minutes/game that saturates the stamina bonus
-STAMINA_AGE_PENALTY = 0.05    # per season above 34
+STAMINA_AGE_PENALTY = 0.05    # × ((age − 34) / 10), i.e. 0.005 per year above 34, capped (see statistics.md §6)
 STAMINA_AGE_KNEE = 34.0
 
 # Guards

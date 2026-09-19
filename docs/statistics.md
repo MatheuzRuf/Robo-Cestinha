@@ -201,10 +201,14 @@ Basketball-Reference's league totals page lists **every** player with the classi
    `data/raw/2025_26/bballref_nba_2026_totals.html`
 3. Re-run the pipeline:
    ```bash
-   .venv/bin/python -m src.data_ingestion --no-fetch
+   .venv/bin/python -m app.data_ingestion --no-fetch
    ```
 
-The parser (`src/data_ingestion/bballref.py`, stdlib-only) reads the `Player`/`Pos` columns and joins to our 582 players by normalized name (diacritics stripped, parenthetical suffixes like `(TW)` and generational suffixes like `III`/`Jr.` ignored, initial periods collapsed so `A.J.` = `AJ`). A tiny explicit alias map covers the remaining nickname/extras variants (`Trevon Scott`→`Tre Scott`, `Ronald Holland II`→`Ron Holland`, `Adama Bal`→`Adama Alpha Bal`). The parse result is cached to `data/raw/2025_26/bballref_positions.json` so offline re-derives never need the HTML again. **All 582 players currently match (0 missing).**
+   (The ingestion package lives at `backend/src/app/data_ingestion/`; after
+   `uv sync` it is importable as `app.data_ingestion`. Details in
+   docs/data_ingestion.md.)
+
+The parser (`backend/src/app/data_ingestion/bballref.py`, stdlib-only) reads the `Player`/`Pos` columns and joins to our 582 players by normalized name (diacritics stripped, parenthetical suffixes like `(TW)` and generational suffixes like `III`/`Jr.` ignored, initial periods collapsed so `A.J.` = `AJ`). A tiny explicit alias map covers the remaining nickname/extras variants (`Trevon Scott`→`Tre Scott`, `Ronald Holland II`→`Ron Holland`, `Adama Bal`→`Adama Alpha Bal`). The parse result is cached to `data/raw/2025_26/bballref_positions.json` so offline re-derives never need the HTML again. **`--refresh` re-parses the local page** — the HTML is Cloudflare-protected and never re-downloaded by scripts; the network fallback only runs when no local copy exists. **All 582 players currently match (0 missing).**
 
 ## 8. Starters vs bench
 
@@ -229,3 +233,38 @@ is_starter = starter minutes ≥ bench minutes
 5. All rates use **season totals** and standard NBA possession math (`FGA + 0.44·FTA + TOV`), not per-play-by-play possession events — good enough to be 0–1 probabilities; true possession counts would come from play-by-play (Phase D scope).
 6. `clutch_factor`, `stamina`, and `position5` cleanly separate from the purely statistical rates — recalibrate those two directly in the simulator without touching the data pipeline (position5 is data-sourced).
 7. Raw (un-shrunken) rates live in `attributes_table.csv` (`two_pt_pct_raw`, `three_pt_pct_raw`, `ft_pct_raw`, plus every endpoint column) if you ever want the true percentages for league-average simulations.
+
+## 10. Pipeline contract & validation gates
+
+`data/processed/players.json` and `data/processed/teams.json` are the contract
+between the ingestion pipeline and every downstream module (plan.md §2.1).
+They are enforced by `backend/src/app/data_ingestion/schemas.py`: Pydantic
+models with field validators (0–1 attribute ranges, known position codes, slug
+shapes, unique ids, non-empty rosters) plus cross-table referential-integrity
+checks:
+
+- every `player.team_id` must name a team in `teams.json`;
+- every `team.roster` entry must reference a player that exists in `players.json`;
+- membership must agree **both ways** (a player must also appear on his own team's roster).
+
+`derive()` calls `validate_processed_output()` on the in-memory data **before**
+writing anything to disk, so a malformed run fails loudly (all problems listed
+at once) and never overwrites last known-good output. The CLI turns it into
+`[error] … nothing was written` with exit code 1. This gate is what converts
+§2.1 from a docstring into an executable single source of truth.
+
+**Roster policy.** `players.json` holds everyone with ≥1 minute played (582 in
+2025-26). `teams.json` rosters are exactly that set grouped by each player's
+**season team** — the club he logged his minutes for — so the two files agree
+by construction:
+
+- ~5 current-roster players who logged **zero minutes** (injured, two-way)
+  appear in neither file;
+- ~57 players waived mid-season keep their season team (the club they played
+  for), so every player with stats belongs to exactly one roster and every
+  roster entry has attributes.
+
+The roster files (`CommonTeamRoster`) are used only for the official G/F/C
+`position`, `height`, and name slugs — not for membership. See
+`data_quality.json` → `zero_minute_roster_players_excluded` (5) and
+`stats_players_not_on_active_roster` (57).

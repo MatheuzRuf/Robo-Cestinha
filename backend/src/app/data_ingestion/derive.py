@@ -15,8 +15,10 @@ import pandas as pd
 
 from . import config
 from . import bballref
+from . import schemas
 from .normalize import (
     ascii_slug,
+    league_possessions_per_game,
     parse_height_inches,
     safe_div,
 )
@@ -59,14 +61,13 @@ def _build_master(raw: dict) -> pd.DataFrame:
     # Drop players with literally zero minutes (injured all season, etc.)
     played = base[base["MIN"] > 0].copy()
 
-    # Roster-provided identity: slug/name/team come from CommonAllPlayers,
-    # position from CommonTeamRoster.
+    # Name/slug identity comes from CommonAllPlayers (covers every rostered
+    # player); position/height from CommonTeamRoster. Team membership is NOT
+    # taken from here (see the canonical-team note below).
     id_cols = {
         "PERSON_ID": "PLAYER_ID",
         "DISPLAY_FIRST_LAST": "NAME",
         "PLAYER_SLUG": "SLUG",
-        "TEAM_ABBREVIATION": "TEAM_ID_ROSTER",
-        "TEAM_NAME": "TEAM_NAME_ROSTER",
     }
     ids = all_players.rename(columns=id_cols)[list(id_cols.values())]
     ids = ids.drop_duplicates("PLAYER_ID", keep="first")
@@ -113,9 +114,15 @@ def _build_master(raw: dict) -> pd.DataFrame:
     merged["BE_MIN"] = merged["PLAYER_ID"].map(_split_min("bench")).fillna(0.0)
     merged["is_starter"] = merged["ST_MIN"] >= merged["BE_MIN"]
 
+    # Canonical team = the club the player logged his season minutes for
+    # (player_stats TEAM_ABBREVIATION). Some players were waived mid-season and
+    # have no current-roster row; the stats team keeps them attached to a team
+    # and makes teams.json rosters mirror players.json exactly. The roster
+    # files are still used for POSITION / HEIGHT / SLUG, just not membership.
+    merged["TEAM_ID_ROSTER"] = merged["TEAM_ABBREVIATION"]
+
     # Identity fallbacks for players not on a current roster (waived mid-season).
     merged["NAME"] = merged["NAME"].fillna(merged["PLAYER_NAME"])
-    merged["TEAM_ID_ROSTER"] = merged["TEAM_ID_ROSTER"].fillna(merged["TEAM_ABBREVIATION"])
     merged["SLUG"] = (
         merged["SLUG"].fillna(merged["ROSTER_SLUG"]).fillna(merged["NAME"])
     )
@@ -205,17 +212,21 @@ def _derive_attributes(master: pd.DataFrame, teams: pd.DataFrame, player_totals:
                     float((player_totals["FGA"] - player_totals["FG3A"]).sum()))
     avg3 = safe_div(float(player_totals["FG3M"].sum()), float(player_totals["FG3A"].sum()))
     avgf = safe_div(float(player_totals["FTM"].sum()), float(player_totals["FTA"].sum()))
+    # Every player is rated against the same league-wide possessions per game
+    # (see docs/statistics.md §4), so the defensive rates are comparable
+    # across teams and players regardless of team tempo.
+    team_games = int(teams["GP"].sum())
+    team_poss_pg = league_possessions_per_game(player_totals, team_games)
 
     t = teams.set_index("team_abv")
     m["team_abv"] = m["TEAM_ID_ROSTER"].str.upper()
     m = m.merge(
-        t[["team_name", "pace", "OFF_RATING", "DEF_RATING", "makes_pg"]],
+        t[["makes_pg"]],
         on="team_abv", how="left",
     )
     m["team_id"] = m["team_id"].fillna(m["team_abv"].str.lower())
     # Players whose stat team isn't in team_stats (rare): use league averages.
     m["makes_pg"] = m["makes_pg"].fillna(t["makes_pg"].mean())
-    m["pace"] = m["pace"].fillna(t["pace"].mean())
 
     m["min_pg"] = m["MIN"] / m["GP"]
     m["min_frac"] = np.clip(m["min_pg"] / 48.0, 0.0, 1.0)
@@ -237,8 +248,10 @@ def _derive_attributes(master: pd.DataFrame, teams: pd.DataFrame, player_totals:
     m["turnover_rate"] = (m["TOV"] / m["own_poss"]).fillna(0.0).clip(upper=0.5)
     m["usage_rate"] = np.clip(m["USG_PCT"], 0.0, 1.0)
 
-    # Defensive rates: fouls / steals / blocks per defended possession.
-    m["def_poss_pg"] = m["pace"] * m["min_frac"]
+    # Defensive rates: fouls / steals / blocks per defended possession. While
+    # on court a player faces the opponent's whole possession flow, so the
+    # denominator is league possessions-per-game scaled by his minutes share.
+    m["def_poss_pg"] = team_poss_pg * m["min_frac"]
     m["foul_rate"] = (m["PF"] / m["GP"] / m["def_poss_pg"]).fillna(0.0).clip(0.0, 1.0)
     m["steal_rate"] = (m["STL"] / m["GP"] / m["def_poss_pg"]).fillna(0.0).clip(0.0, 1.0)
     m["block_rate"] = (m["BLK"] / m["GP"] / m["def_poss_pg"]).fillna(0.0).clip(0.0, 1.0)
@@ -300,30 +313,27 @@ def _build_players_json(m: pd.DataFrame) -> list[dict]:
     return players
 
 
-def _build_teams_json(m: pd.DataFrame, t: pd.DataFrame, rosters: pd.DataFrame) -> list[dict]:
-    id_to_slug = dict(zip(m["PLAYER_ID"], m["player_id"]))
+def _build_teams_json(m: pd.DataFrame, t: pd.DataFrame) -> list[dict]:
+    """Rosters = every player with season stats, grouped by his team.
+
+    Built from the players table (not the roster files) so referential
+    integrity holds by construction: each roster entry is a real player_id and
+    every player_id appears on exactly one roster. Zero-minute roster players
+    (never logged a minute) are absent from players.json and therefore from
+    rosters, matching the "players with >= 1 minute" scope of the pipeline.
+    """
     teams = []
-    if len(rosters):
-        roster_slug = {
-            r["PLAYER_ID"]: r["PLAYER_SLUG"] for r in rosters.to_dict("records")
-        }
-    else:
-        roster_slug = {}
     for _, team in t.sort_values("team_abv").iterrows():
         abv = team["team_abv"].upper()
-        rosters_ids = rosters.loc[rosters["TEAM_ABBREVIATION"] == abv, "PLAYER_ID"] if len(rosters) else pd.Series(dtype="int64")
-        player_ids = [
-            id_to_slug.get(pid, ascii_slug(roster_slug.get(pid, str(pid))))
-            for pid in rosters_ids
-        ]
+        player_ids = sorted(
+            m.loc[m["TEAM_ID_ROSTER"] == abv, "player_id"].tolist()
+        )
         teams.append(
             {
                 "team_id": str(team["team_id"]),
                 "name": str(team["team_name"]),
                 "abbreviation": abv,
-                "roster": sorted(player_ids) if player_ids else sorted(
-                    m.loc[m["TEAM_ID_ROSTER"].str.upper() == abv, "player_id"].tolist()
-                ),
+                "roster": player_ids,
                 "team_stats": {
                     "pace": round(float(team.get("pace", 0.0)), 2),
                     "off_rtg": round(float(team.get("OFF_RATING", 0.0)), 1),
@@ -360,10 +370,18 @@ def _quality_report(m: pd.DataFrame, raw: dict) -> dict:
     played_ids = set(m["PLAYER_ID"])
     roster_ids = set(raw["all_players"]["PERSON_ID"])
     report["rostered_but_zero_minutes_excluded"] = int(len(roster_ids - played_ids))
+    roster_file_ids = set(raw["rosters"]["PLAYER_ID"]) if len(raw["rosters"]) else set()
+    report["zero_minute_roster_players_excluded"] = int(
+        len(roster_file_ids - played_ids)
+    )
+    report["stats_players_not_on_active_roster"] = int(
+        len(played_ids - roster_file_ids)
+    )
+    report["roster_entries"] = int(len(m))
     return report
 
 
-def derive(raw: dict) -> None:
+def derive(raw: dict) -> tuple[list[dict], list[dict], dict]:
     config.PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
     player_totals = raw["player_stats"]["base"].copy()
@@ -371,13 +389,18 @@ def derive(raw: dict) -> None:
         (player_totals["MIN"] > 0)
     ].copy().reset_index(drop=True)
 
-    team_games = int(raw["team_stats"]["base"]["GP"].sum())
     master = _build_master(raw)
     teams = _team_lookup(raw)
-    master = _derive_attributes(master, teams, player_totals, team_games)
+    master = _derive_attributes(master, teams, player_totals)
 
     players_json = _build_players_json(master)
-    teams_json = _build_teams_json(master, teams, raw["rosters"])
+    teams_json = _build_teams_json(master, teams)
+
+    # Contract gate (plan.md §2.1 / docs/data_ingestion.md): schemas.py is the
+    # single source of truth for every downstream module, so a malformed row
+    # must fail here, before anything overwrites the last known-good output.
+    schemas.validate_processed_output(players_json, teams_json)
+
     report = _quality_report(master, raw)
 
     with open(config.PROCESSED_DIR / "players.json", "w") as fh:

@@ -153,14 +153,17 @@ def parse_positions(html: str) -> dict[str, dict]:
 
 # ── Fetch + cache handling ──────────────────────────────────────────────────
 
-def fetch_positions_html(refresh: bool = False) -> Path | None:
+def fetch_positions_html() -> Path | None:
     """Return a local copy of the bball-ref page, or None.
 
-    Prefers the manually-saved file. Tries the network as a best effort
-    (the page is Cloudflare-protected and will usually fail with 403).
+    The page is Cloudflare-protected, so the canonical copy is saved once from
+    a browser (Ctrl+S) and read from disk. A scripted GET is only attempted
+    when no local copy exists (it usually fails with 403). --refresh never
+    re-downloads this artifact: for a manually-saved page, refresh semantics
+    are "re-parse and rebuild the JSON cache" (see load()).
     """
     target = config.RAW_DIR / config.BBALLREF_HTML_NAME
-    if target.exists() and not refresh:
+    if target.exists():
         return target
     try:
         import requests
@@ -188,12 +191,14 @@ def load(refresh: bool = False) -> dict[str, dict]:
     """Positions dict {normalized_name: entry} or {} when unavailable.
 
     Parses the local HTML page and caches the result as JSON so offline
-    re-derives never need the HTML again.
+    re-derives never need the HTML again. refresh=True skips the cache and
+    re-parses the (manually saved, never re-downloaded) HTML page, rebuilding
+    the cache.
     """
     cache = config.RAW_DIR / config.BBALLREF_CACHE_NAME
     if cache.exists() and not refresh:
         return json.loads(cache.read_text())
-    html_path = fetch_positions_html(refresh=refresh)
+    html_path = fetch_positions_html()
     if html_path is None:
         return {}
     positions = parse_positions(html_path.read_text(encoding="utf-8", errors="replace"))
