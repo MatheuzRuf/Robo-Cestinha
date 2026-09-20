@@ -1,8 +1,8 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { Card } from '../../../../components/Card';
-import styles from './BroadcastLogPanel.module.css';
+import { Card } from '../Card';
+import styles from './LogPanel.module.css';
 
-type BroadcastLogPanelProps = {
+type LogPanelProps = {
   title: string;
   entriesKey: string;
   children: ReactNode;
@@ -10,7 +10,7 @@ type BroadcastLogPanelProps = {
   footer?: ReactNode;
 };
 
-export function BroadcastLogPanel({ title, entriesKey, children, headerAction, footer }: BroadcastLogPanelProps) {
+export function LogPanel({ title, entriesKey, children, headerAction, footer }: LogPanelProps) {
   const logRef = useRef<HTMLDivElement>(null);
   const shouldScrollToBottom = useRef(true);
 
