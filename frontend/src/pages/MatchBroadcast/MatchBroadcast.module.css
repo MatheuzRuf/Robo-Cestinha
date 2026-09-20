@@ -1,0 +1,418 @@
+.page {
+  width: min(1600px, calc(100% - var(--space-8)));
+  height: calc(100svh - 126px);
+  min-width: 0;
+  min-height: 0;
+  margin: 0 auto;
+  padding: var(--space-6) 0 var(--space-4);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: var(--space-4);
+  overflow: hidden;
+}
+
+.broadcastHeader,
+.playCall,
+.timeline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.headerIdentity,
+.headerControls,
+.teamStats,
+.timelineLabels,
+.timelineButtons,
+.momentumLegend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.headerIdentity > span,
+.latency,
+.teamStats,
+.seed,
+.teamMeta,
+.shotClock,
+.timelineLabels,
+.voice,
+.panelHeading > span {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.headerControls :global(.root) {
+  display: block;
+}
+
+.headerControls :global(.label) {
+  display: none;
+}
+
+.scoreboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+}
+
+.teamSummary {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas: 'copy score' 'stats stats';
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+}
+
+.awaySummary {
+  grid-template-areas: 'score copy' 'stats stats';
+  text-align: right;
+}
+
+.teamCopy {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.teamCopy {
+  grid-area: copy;
+  min-width: 0;
+}
+
+.teamCopy strong {
+  display: block;
+  overflow: hidden;
+  font-size: 1.05rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score {
+  color: var(--color-primary);
+  font: 700 4rem/1 var(--font-mono);
+}
+
+.teamSummary .score {
+  grid-area: score;
+}
+
+.teamStats {
+  grid-area: stats;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-1);
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+
+.teamStats b {
+  color: var(--color-text);
+}
+
+.clockPanel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.quarter,
+.runLabel {
+  color: var(--color-primary);
+  font: 700 0.75rem var(--font-mono);
+  letter-spacing: 0.12em;
+}
+
+.gameClock {
+  font: 700 3.5rem/1 var(--font-mono);
+}
+
+.shotClock b {
+  color: var(--color-warning);
+  font-size: 1rem;
+}
+
+.playCall {
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-primary);
+  background: var(--color-surface);
+  padding: var(--space-3) var(--space-4);
+  font: 700 0.8rem var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.playCall b {
+  color: var(--color-primary);
+}
+
+.playCall em {
+  color: var(--color-success);
+  font-style: normal;
+  margin-left: var(--space-3);
+}
+
+.timeline {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.timeline {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+}
+
+.timelineTrack {
+  height: 5px;
+  background: var(--color-border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.timelineTrack span {
+  display: block;
+  width: 87%;
+  height: 100%;
+  background: var(--color-primary);
+}
+
+.timelineButtons button {
+  border: 0;
+  color: var(--color-text-muted);
+  background: transparent;
+  opacity: 0.45;
+}
+
+.broadcastMainGrid {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(210px, 240px) minmax(0, 1fr) minmax(210px, 240px);
+  align-items: stretch;
+  gap: var(--space-4);
+}
+
+.centerColumn {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  grid-template-rows: minmax(0, 1fr) auto auto auto;
+  gap: var(--space-4);
+  overflow: hidden;
+}
+
+.sideColumn {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
+
+.sideColumn > :global(.card) {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panelHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.panelHeading h2 {
+  margin: 0;
+  font: 700 1rem var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.log {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  overflow-y: auto;
+}
+
+.logEntry {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: 'event time' 'description description';
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-3);
+}
+
+.logEntry p {
+  min-width: 0;
+  grid-area: description;
+  margin: var(--space-1) 0 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.logClock {
+  color: var(--color-text-muted);
+  font: 0.7rem var(--font-mono);
+  white-space: nowrap;
+}
+
+.logEntry .logClock {
+  grid-area: time;
+}
+
+.eventTag {
+  grid-area: event;
+  color: var(--color-warning);
+  font: 700 0.65rem var(--font-mono);
+  white-space: nowrap;
+}
+
+.eventTag.foul {
+  color: var(--color-live);
+}
+
+.eventTag.made {
+  color: var(--color-success);
+}
+
+.panelLink {
+  display: block;
+  color: var(--color-primary);
+  margin-top: var(--space-4);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.commentaryList {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: var(--space-4);
+  overflow-y: auto;
+}
+
+.commentaryEntry {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-3);
+}
+
+.commentaryEntry p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text);
+  font-size: 1rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.voice {
+  display: block;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-3);
+}
+
+.runDelta {
+  color: var(--color-success) !important;
+  font: 700 0.8rem var(--font-mono);
+}
+
+.momentumBar {
+  height: 18px;
+  margin: var(--space-3) 0 var(--space-2);
+  background: var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.momentumBar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-warning));
+}
+
+.momentumLegend {
+  justify-content: space-between;
+  color: var(--color-text-muted);
+  font: 0.7rem var(--font-mono);
+}
+
+.momentumStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.momentumStats span {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.momentumStats b {
+  color: var(--color-text);
+  font: 1.3rem var(--font-mono);
+}
+@media (max-width: 1100px) {
+  .page {
+    width: calc(100% - var(--space-4));
+  }
+  .scoreboard {
+    grid-template-columns: 1fr;
+  }
+  .clockPanel {
+    order: -1;
+    flex-wrap: wrap;
+  }
+  .broadcastMainGrid {
+    grid-template-columns: minmax(180px, 220px) minmax(0, 1fr) minmax(180px, 220px);
+  }
+}
+@media (max-width: 800px) {
+  .page {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+  .broadcastMainGrid {
+    grid-template-columns: 1fr;
+  }
+  .sideColumn {
+    min-height: 320px;
+  }
+  .sideColumn > :global(.card) {
+    height: 360px;
+  }
+  .centerColumn {
+    overflow: visible;
+  }
+}

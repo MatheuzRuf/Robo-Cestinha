@@ -13,10 +13,7 @@ export const CORNER_THREE_SIDELINE_GAP_FT = 3;
 
 export const THREE_POINT_CORNER_X_FT =
   HOOP_DISTANCE_FROM_BASELINE_FT +
-  Math.sqrt(
-    THREE_POINT_RADIUS_FT ** 2 -
-      (COURT_HEIGHT_FT / 2 - CORNER_THREE_SIDELINE_GAP_FT) ** 2
-  );
+  Math.sqrt(THREE_POINT_RADIUS_FT ** 2 - (COURT_HEIGHT_FT / 2 - CORNER_THREE_SIDELINE_GAP_FT) ** 2);
 
 export function gameToSvg(x: number, y: number) {
   return { cx: x * SCALE, cy: y * SCALE };

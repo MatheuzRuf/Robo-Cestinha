@@ -15,7 +15,8 @@ export const enUS = {
     online_teams: '{count}/{total} TEAMS ONLINE',
     session_code: '{code}',
     ticker_label: 'BROADCAST TICKER',
-    ticker_text: 'COURT 1: BROOKLYN BREAKERS LEAD AUSTIN ARMADILLOS 74-71 (Q4 01:24) // COURT 2: CHICAGO STEEL HOLD 104-98',
+    ticker_text:
+      'COURT 1: BROOKLYN BREAKERS LEAD AUSTIN ARMADILLOS 74-71 (Q4 01:24) // COURT 2: CHICAGO STEEL HOLD 104-98',
   },
   home: {
     hero: {
@@ -34,7 +35,8 @@ export const enUS = {
     },
     join: {
       title: 'JOIN ARENA',
-      description: 'Enter your tournament hash or full invite link to claim an unclaimed regional franchise or spectate hardwood live action.',
+      description:
+        'Enter your tournament hash or full invite link to claim an unclaimed regional franchise or spectate hardwood live action.',
       input_label: 'SESSION PASSCODE OR URL',
       input_hint: 'FORMAT: #RC-XXXX-MET',
       input_placeholder: 'E.G. #RC-8812-BKN',
@@ -57,5 +59,25 @@ export const enUS = {
       placeholder: 'E.G. ALEX',
       cta: 'SAVE AND CONTINUE',
     },
+  },
+  match_broadcast: {
+    header: {
+      live_label: 'LIVE FEED // COURT 01',
+      game_meta: 'DIVISION A CHAMPIONSHIP SERIES · GAME 7',
+      mode_live: 'LIVE SIM',
+      mode_replay: 'REPLAY-BOX',
+      latency_label: 'LATENCY: {value}ms',
+    },
+    scoreboard: { fouls_label: 'FOULS', timeouts_label: 'TIMEOUTS' },
+    clock: { speed_label: 'SIMULATION SPEED', shot_clock: 'SHOT CLOCK', pause: 'PAUSE SIM', resume: 'RESUME SIM' },
+    play_call: { label: 'PLAY CALL', probability_label: 'SHOT PROBABILITY', defense_label: 'DEFENSE' },
+    timeline: { label: 'Q4 TIMELINE', previous: 'Previous play', play: 'Play timeline', next: 'Next play' },
+    play_by_play: { title: 'PLAY-BY-PLAY', showing_last: 'SHOWING LAST {count}', full_log_link: 'VIEW FULL LOG' },
+    commentary: {
+      title: 'COMMENTARY',
+      voice_label: 'VOICE SYNTH: CHUCK "CLUTCH" HARLAN',
+      synth_active: 'SYNTH ACTIVE',
+    },
+    momentum: { title: 'MOMENTUM SHIFT ENGINE' },
   },
 } as const;

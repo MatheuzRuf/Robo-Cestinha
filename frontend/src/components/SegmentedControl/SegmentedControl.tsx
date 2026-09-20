@@ -5,9 +5,10 @@ interface SegmentedControlProps {
   options: { value: string; label: string }[];
   value: string;
   onChange: (value: string) => void;
+  disabledValues?: string[];
 }
 
-export function SegmentedControl({ label, options, value, onChange }: SegmentedControlProps) {
+export function SegmentedControl({ label, options, value, onChange, disabledValues = [] }: SegmentedControlProps) {
   return (
     <div className={styles.root}>
       <div className={styles.label}>{label}</div>
@@ -18,6 +19,7 @@ export function SegmentedControl({ label, options, value, onChange }: SegmentedC
             type="button"
             className={`${styles.option} ${option.value === value ? styles.active : ''}`.trim()}
             onClick={() => onChange(option.value)}
+            disabled={disabledValues.includes(option.value)}
           >
             {option.label}
           </button>

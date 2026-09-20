@@ -16,8 +16,25 @@
   border-color: var(--color-primary-hover);
 }
 
-.primary { background: var(--color-primary); color: var(--color-text-inverse); }
-.secondary { background: var(--color-cream-button); color: var(--color-text-inverse); }
-.outline { background: var(--color-surface-raised); color: var(--color-text); }
-.fullWidth { width: 100%; }
-.icon { display: inline-flex; }
+.primary {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.secondary {
+  background: var(--color-cream-button);
+  color: var(--color-text-inverse);
+}
+
+.outline {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.icon {
+  display: inline-flex;
+}

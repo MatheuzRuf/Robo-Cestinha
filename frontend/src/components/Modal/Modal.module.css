@@ -1,3 +1,23 @@
-.backdrop { position: fixed; inset: 0; background: rgba(20, 16, 13, 0.8); display: grid; place-items: center; padding: var(--space-6); }
-.dialog { width: min(100%, 42rem); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); }
-.titleRow { display: flex; justify-content: space-between; gap: var(--space-4); align-items: center; }
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 16, 13, 0.8);
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+}
+
+.dialog {
+  width: min(100%, 42rem);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  align-items: center;
+}

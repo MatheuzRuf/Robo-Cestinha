@@ -127,13 +127,19 @@ export default function Home() {
               <p className={styles.cardDescription}>{t('home.host.description')}</p>
               <SegmentedControl
                 label={t('home.host.sim_speed_label')}
-                options={[{ value: 'normal', label: 'NORMAL 1X' }, { value: 'blitz', label: 'BLITZ 2X' }]}
+                options={[
+                  { value: 'normal', label: 'NORMAL 1X' },
+                  { value: 'blitz', label: 'BLITZ 2X' },
+                ]}
                 value={simSpeed}
                 onChange={(value) => setSimSpeed(value as 'normal' | 'blitz')}
               />
               <SegmentedControl
                 label={t('home.host.quarter_length_label')}
-                options={[{ value: '3', label: '3 MINS' }, { value: '5', label: '5 MINS' }]}
+                options={[
+                  { value: '3', label: '3 MINS' },
+                  { value: '5', label: '5 MINS' },
+                ]}
                 value={quarterLength}
                 onChange={(value) => setQuarterLength(value as '3' | '5')}
               />
@@ -162,10 +168,14 @@ export default function Home() {
                 placeholder={t('home.join.input_placeholder')}
                 value={sessionCode}
                 onChange={setSessionCode}
-                trailingAction={{ icon: '📋', label: t('common.paste'), onClick: async () => {
-                  const text = await navigator.clipboard.readText();
-                  setSessionCode(text);
-                } }}
+                trailingAction={{
+                  icon: '📋',
+                  label: t('common.paste'),
+                  onClick: async () => {
+                    const text = await navigator.clipboard.readText();
+                    setSessionCode(text);
+                  },
+                }}
               />
               <div className={styles.featuredRow}>
                 <span className={styles.featuredLabel}>{t('home.join.featured_label')}</span>
@@ -201,7 +211,11 @@ export default function Home() {
                   secondaryStat={session.secondaryStat}
                   footerLeft={session.footerLeft}
                   footerRight={session.footerRight}
-                  cta={{ label: t(`home.session_card.${session.ctaKey}`), variant: session.ctaVariant, onClick: () => {} }}
+                  cta={{
+                    label: t(`home.session_card.${session.ctaKey}`),
+                    variant: session.ctaVariant,
+                    onClick: () => {},
+                  }}
                 />
               ))}
             </div>
@@ -209,9 +223,19 @@ export default function Home() {
         ) : null}
       </div>
 
-      <Modal title={t('home.name_modal.title')} open={nameModalOpen} onClose={() => setNameModalOpen(false)} closeLabel={t('common.close')}>
+      <Modal
+        title={t('home.name_modal.title')}
+        open={nameModalOpen}
+        onClose={() => setNameModalOpen(false)}
+        closeLabel={t('common.close')}
+      >
         <div className={styles.modalStack}>
-          <TextInput label={t('home.name_modal.label')} placeholder={t('home.name_modal.placeholder')} value={nameDraft} onChange={setNameDraft} />
+          <TextInput
+            label={t('home.name_modal.label')}
+            placeholder={t('home.name_modal.placeholder')}
+            value={nameDraft}
+            onChange={setNameDraft}
+          />
           <Button variant="primary" onClick={submitName} fullWidth>
             {t('home.name_modal.cta')}
           </Button>

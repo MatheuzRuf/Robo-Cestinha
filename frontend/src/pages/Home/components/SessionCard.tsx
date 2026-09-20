@@ -15,7 +15,17 @@ interface SessionCardProps {
   cta: { label: string; variant: 'primary' | 'secondary' | 'outline'; onClick: () => void };
 }
 
-export function SessionCard({ sessionCode, sessionName, status, detailLine, primaryStat, secondaryStat, footerLeft, footerRight, cta }: SessionCardProps) {
+export function SessionCard({
+  sessionCode,
+  sessionName,
+  status,
+  detailLine,
+  primaryStat,
+  secondaryStat,
+  footerLeft,
+  footerRight,
+  cta,
+}: SessionCardProps) {
   return (
     <Card>
       <div className={styles.root}>
@@ -30,7 +40,11 @@ export function SessionCard({ sessionCode, sessionName, status, detailLine, prim
             <div className={styles.statLabel}>{primaryStat.label}</div>
             <div className={styles.statValue}>{primaryStat.value}</div>
           </div>
-          {secondaryStat ? <div className={`${styles.secondaryStat} ${secondaryStat.highlight ? styles.highlight : ''}`.trim()}>{secondaryStat.value}</div> : null}
+          {secondaryStat ? (
+            <div className={`${styles.secondaryStat} ${secondaryStat.highlight ? styles.highlight : ''}`.trim()}>
+              {secondaryStat.value}
+            </div>
+          ) : null}
         </div>
         <div className={styles.footerRow}>
           <span>{footerLeft}</span>

@@ -14,7 +14,12 @@ export function Modal({ title, children, open, onClose, closeLabel = 'Close' }: 
   return (
     <div className={styles.backdrop} onClick={onClose}>
       <div className={styles.dialog} onClick={(event) => event.stopPropagation()}>
-        <div className={styles.titleRow}><h2>{title}</h2><button type="button" onClick={onClose}>{closeLabel}</button></div>
+        <div className={styles.titleRow}>
+          <h2>{title}</h2>
+          <button type="button" onClick={onClose}>
+            {closeLabel}
+          </button>
+        </div>
         {children}
       </div>
     </div>
