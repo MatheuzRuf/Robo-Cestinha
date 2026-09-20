@@ -5,7 +5,7 @@
 }
 
 .trajectory {
-  stroke: #ffc21a;
+  stroke: var(--trajectory-color);
   stroke-width: 2.25;
   stroke-dasharray: 7 6;
   stroke-linecap: round;

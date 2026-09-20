@@ -2,7 +2,7 @@ import type { Frame, PlayerState } from '../types/game';
 import { COURT_WIDTH_FT, COURT_HEIGHT_FT } from '../config/court';
 
 const BALL_OFFSET_FT = 2.5;
-const PASS_CHANCE_PER_TICK = 0.15;
+const PASS_CHANCE_PER_TICK = 0.35;
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
@@ -79,6 +79,7 @@ export function startMockEngine(onFrame: (frame: Frame) => void, intervalMs = 80
     let trajectory: Frame['trajectory'];
 
     if (Math.random() < PASS_CHANCE_PER_TICK) {
+      const sourceOwner = players.find((p) => p.id === ownerId)!;
       const candidates = players.filter((p) => p.id !== ownerId);
       ownerId = candidates[Math.floor(Math.random() * candidates.length)].id;
       const nextOwner = players.find((p) => p.id === ownerId)!;
@@ -88,6 +89,8 @@ export function startMockEngine(onFrame: (frame: Frame) => void, intervalMs = 80
         type: 'pass',
         from: lastBallPosition,
         to: ball,
+        fromTeam: sourceOwner.team,
+        toTeam: nextOwner.team,
       };
 
       onFrame({ players, ball, trajectory });

@@ -40,12 +40,6 @@ export function AppShell({ activeNavItem, onlineCount, sessionCode, tickerText, 
           </button>
         </div>
       </header>
-      {tickerText ? (
-        <div className={styles.ticker}>
-          <span>{t('shell.ticker_label')}</span>
-          <span>{tickerText}</span>
-        </div>
-      ) : null}
       {children}
     </div>
   );

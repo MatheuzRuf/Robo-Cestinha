@@ -102,11 +102,7 @@ export default function Home() {
   };
 
   return (
-    <AppShell
-      activeNavItem="home"
-      onlineCount={{ current: 8, total: 8 }}
-      sessionCode="#RC-7842-OAK"
-    >
+    <AppShell activeNavItem="home" onlineCount={{ current: 8, total: 8 }} sessionCode="#RC-7842-OAK">
       <div className={styles.page}>
         <section className={styles.heroSection}>
           <h1 className={styles.heroTitle}>

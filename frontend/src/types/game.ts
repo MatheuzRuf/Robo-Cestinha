@@ -19,6 +19,8 @@ export interface BallTrajectory {
   type: 'pass' | 'shot';
   from: BallState;
   to: BallState;
+  fromTeam: Team;
+  toTeam: Team;
 }
 
 export interface Frame {
