@@ -1,11 +1,15 @@
-import { useGameFrames } from '../../../../hooks/useGameFrames';
+import type { Frame } from '../../../../types/game';
 import styles from './CourtStage.module.css';
 import { Ball } from './Ball';
 import { Court } from './Court';
 import { Player } from './Player';
 
-export function CourtStage() {
-  const { frame, transitionDurationMs } = useGameFrames();
+interface CourtStageProps {
+  frame: Frame | null;
+  transitionDurationMs: number;
+}
+
+export function CourtStage({ frame, transitionDurationMs }: CourtStageProps) {
   const transitionDuration = transitionDurationMs / 1000;
 
   return (

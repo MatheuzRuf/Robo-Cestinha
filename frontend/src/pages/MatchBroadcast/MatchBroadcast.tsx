@@ -217,11 +217,6 @@ function PlayByPlayColumn({ entries }: { entries: PlayByPlayLogEntry[] }) {
     <BroadcastLogPanel
       title={t('match_broadcast.play_by_play.title')}
       entriesKey={entries.at(-1)?.id ?? ''}
-      footer={
-        <a href="#play-by-play" className={styles.panelLink}>
-          {t('match_broadcast.play_by_play.full_log_link')}
-        </a>
-      }
     >
       {entries.map((entry) => (
         <div className={styles.logEntry} key={entry.id}>
@@ -244,10 +239,8 @@ function CommentaryColumn({ entries, isPaused }: { entries: CommentaryEntry[]; i
     <BroadcastLogPanel
       title={t('match_broadcast.commentary.title')}
       entriesKey={entries.at(-1)?.id ?? ''}
-      headerAction={<StatusBadge tone="complete">{t('match_broadcast.commentary.synth_active')}</StatusBadge>}
       footer={
         <span className={styles.voice}>
-          {t('match_broadcast.commentary.voice_label')}
           {isPaused ? ' · PAUSED' : ''}
         </span>
       }
@@ -293,7 +286,15 @@ function MomentumShiftEngine() {
 }
 
 export default function MatchBroadcast() {
-  const { speed, setSpeed, isPaused, pause, resume } = useGameFrames();
+  const {
+    frame,
+    transitionDurationMs,
+    speed,
+    setSpeed,
+    isPaused,
+    pause,
+    resume,
+  } = useGameFrames();
   const [playByPlay, setPlayByPlay] = useState(mockMatchData.playByPlay);
   const [commentary, setCommentary] = useState(mockMatchData.commentary);
   useEffect(() => {
@@ -340,7 +341,7 @@ export default function MatchBroadcast() {
             <PlayByPlayColumn entries={playByPlay} />
           </section>
           <section className={styles.centerColumn}>
-            <CourtStage />
+            <CourtStage frame={frame} transitionDurationMs={transitionDurationMs} />
             <PlayCallStrip />
             <TimelineScrubber />
             <MomentumShiftEngine />
