@@ -32,7 +32,16 @@ export function Court() {
 
   return (
     <g>
+      <defs>
+        <pattern id="court-wood" width="120" height="24" patternUnits="userSpaceOnUse">
+          <rect width="120" height="24" fill="#713713" />
+          <path d="M0 1H120M0 23H120" stroke="#9a4d1b" strokeWidth="1" opacity=".7" />
+          <path d="M40 0V24M80 0V24" stroke="#4f250f" strokeWidth="1" opacity=".55" />
+        </pattern>
+      </defs>
       <rect x={0} y={0} width={w} height={h} className={styles.court} />
+      <rect x={0} y={0} width={w} height={h} fill="url(#court-wood)" opacity=".9" />
+      <rect x={0} y={0} width={w} height={h} className={styles.boundary} />
       <line x1={w / 2} y1={0} x2={w / 2} y2={h} className={styles.line} />
       <circle cx={w / 2} cy={midY} r={centerR} className={styles.line} />
       <rect x={0} y={midY - keyHalfWidth} width={keyLength} height={keyHalfWidth * 2} className={styles.line} />
@@ -45,6 +54,8 @@ export function Court() {
         className={styles.line}
       />
       <circle cx={w - keyLength} cy={midY} r={freeThrowR} className={styles.line} />
+      <path d={`M ${keyLength - 1} ${midY - keyHalfWidth} V ${midY + keyHalfWidth}`} className={styles.line} />
+      <path d={`M ${w - keyLength + 1} ${midY - keyHalfWidth} V ${midY + keyHalfWidth}`} className={styles.line} />
       <path
         d={`M 0 ${cornerY} L ${cornerX} ${cornerY} A ${threeR} ${threeR} 0 0 1 ${cornerX} ${cornerYBottom} L 0 ${cornerYBottom}`}
         className={styles.line}
@@ -55,6 +66,8 @@ export function Court() {
       />
       <circle cx={hoopX} cy={midY} r={hoopR} className={styles.hoop} />
       <circle cx={hoopXRight} cy={midY} r={hoopR} className={styles.hoop} />
+      <line x1={hoopX - 8} y1={midY - 8} x2={hoopX - 8} y2={midY + 8} className={styles.backboard} />
+      <line x1={hoopXRight + 8} y1={midY - 8} x2={hoopXRight + 8} y2={midY + 8} className={styles.backboard} />
     </g>
   );
 }

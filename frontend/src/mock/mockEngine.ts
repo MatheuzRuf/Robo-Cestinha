@@ -14,16 +14,37 @@ function randomStep(current: number, min: number, max: number, maxDelta = 4) {
 }
 
 function createInitialPlayers(): PlayerState[] {
+  const homeRoster = [
+    ['Miller', 7, 'PG'],
+    ['Walker', 33, 'PF'],
+    ['King', 55, 'C'],
+    ['Wash', 24, 'SF'],
+    ['Johnson', 11, 'PF'],
+  ] as const;
+  const awayRoster = [
+    ['Dinwiddie', 8, 'PG'],
+    ['Bridges', 1, 'SG'],
+    ['Claxton', 33, 'C'],
+    ['Finney', 10, 'SF'],
+    ['Vance', 4, 'SG'],
+  ] as const;
+
   return [
     ...Array.from({ length: 5 }, (_, i) => ({
       id: `home-${i}`,
       team: 'home' as const,
+      name: homeRoster[i][0],
+      number: homeRoster[i][1],
+      position: homeRoster[i][2],
       x: 20 + i * 10,
       y: 10 + i * 8,
     })),
     ...Array.from({ length: 5 }, (_, i) => ({
       id: `away-${i}`,
       team: 'away' as const,
+      name: awayRoster[i][0],
+      number: awayRoster[i][1],
+      position: awayRoster[i][2],
       x: 60 + i * 10,
       y: 10 + i * 8,
     })),

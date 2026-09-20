@@ -5,6 +5,9 @@ export interface PlayerState {
   team: Team;
   x: number; // feet
   y: number; // feet
+  name: string;
+  number: number;
+  position: string;
 }
 
 export interface BallState {

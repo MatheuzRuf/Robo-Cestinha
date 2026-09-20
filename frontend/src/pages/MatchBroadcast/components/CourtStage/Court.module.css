@@ -1,17 +1,30 @@
 .court {
-  fill: #c9924a;
-  stroke: #fff;
+  fill: #713713;
+  stroke: #351708;
   stroke-width: 2;
+}
+
+.boundary {
+  fill: none;
+  stroke: #f7ead8;
+  stroke-width: 2.5;
 }
 
 .line {
   fill: none;
-  stroke: #fff;
-  stroke-width: 2;
+  stroke: #f7ead8;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .hoop {
   fill: #ff8c00;
   stroke: #1a1a1a;
   stroke-width: 1;
+}
+
+.backboard {
+  stroke: #f7ead8;
+  stroke-width: 3;
 }

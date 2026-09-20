@@ -53,17 +53,23 @@ export function useGameFrames() {
     return () => {
       stopEngine();
       if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = undefined;
+      queueRef.current = [];
+      isPlayingRef.current = false;
     };
   }, []);
 
   useEffect(() => {
     if (!isPaused && !isPlayingRef.current && queueRef.current.length > 0) {
       const next = queueRef.current.shift();
+
       if (next) {
         setFrame(next);
         isPlayingRef.current = true;
+
         window.setTimeout(() => {
           isPlayingRef.current = false;
+
           if (queueRef.current.length > 0 && !pausedRef.current) {
             setFrame(queueRef.current.shift()!);
             isPlayingRef.current = true;
