@@ -58,10 +58,13 @@ function ballPositionFor(owner: PlayerState) {
 export function startMockEngine(onFrame: (frame: Frame) => void, intervalMs = 800) {
   let players = createInitialPlayers();
   let ownerId = players[0].id;
+  let lastBallPosition = ballPositionFor(players[0]);
 
   const emit = () => {
     const owner = players.find((p) => p.id === ownerId)!;
-    onFrame({ players, ball: ballPositionFor(owner) });
+    const ball = ballPositionFor(owner);
+    onFrame({ players, ball });
+    lastBallPosition = ball;
   };
 
   emit();
@@ -73,9 +76,23 @@ export function startMockEngine(onFrame: (frame: Frame) => void, intervalMs = 80
       y: randomStep(p.y, 0, COURT_HEIGHT_FT),
     }));
 
+    let trajectory: Frame['trajectory'];
+
     if (Math.random() < PASS_CHANCE_PER_TICK) {
       const candidates = players.filter((p) => p.id !== ownerId);
       ownerId = candidates[Math.floor(Math.random() * candidates.length)].id;
+      const nextOwner = players.find((p) => p.id === ownerId)!;
+      const ball = ballPositionFor(nextOwner);
+
+      trajectory = {
+        type: 'pass',
+        from: lastBallPosition,
+        to: ball,
+      };
+
+      onFrame({ players, ball, trajectory });
+      lastBallPosition = ball;
+      return;
     }
 
     emit();

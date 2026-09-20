@@ -106,7 +106,6 @@ export default function Home() {
       activeNavItem="home"
       onlineCount={{ current: 8, total: 8 }}
       sessionCode="#RC-7842-OAK"
-      tickerText={t('shell.ticker_text')}
     >
       <div className={styles.page}>
         <section className={styles.heroSection}>

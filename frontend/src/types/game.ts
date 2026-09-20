@@ -15,7 +15,14 @@ export interface BallState {
   y: number;
 }
 
+export interface BallTrajectory {
+  type: 'pass' | 'shot';
+  from: BallState;
+  to: BallState;
+}
+
 export interface Frame {
   players: PlayerState[];
   ball: BallState;
+  trajectory?: BallTrajectory;
 }
