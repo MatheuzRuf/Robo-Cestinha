@@ -4,10 +4,16 @@
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .stage svg {
   display: block;
   width: 100%;
   height: auto;
+  /* Keep the court inside its allocated row: never taller than the stage,
+     so it scales down instead of being clipped by overflow: hidden. */
+  max-height: 100%;
 }

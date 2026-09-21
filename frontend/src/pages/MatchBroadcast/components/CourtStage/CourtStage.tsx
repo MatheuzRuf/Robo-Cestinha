@@ -48,7 +48,7 @@ export function CourtStage({ frame, transitionDurationMs }: CourtStageProps) {
 
   return (
     <div className={styles.stage}>
-      <svg viewBox="0 0 940 500" role="img" aria-label="Animated basketball court">
+      <svg viewBox="0 0 940 500" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Animated basketball court">
         <Court />
         {start && end ? (
           <line
