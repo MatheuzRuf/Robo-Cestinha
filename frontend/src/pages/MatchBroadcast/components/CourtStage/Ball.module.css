@@ -1,0 +1,20 @@
+.ball {
+  fill: var(--ball-color);
+  stroke: #ffe5a3;
+  stroke-width: 2;
+}
+
+.trajectory {
+  stroke: var(--trajectory-color);
+  stroke-width: 2.25;
+  stroke-dasharray: 7 6;
+  stroke-linecap: round;
+  opacity: 0.9;
+  animation: trajectory 700ms linear infinite;
+}
+
+@keyframes trajectory {
+  to {
+    stroke-dashoffset: -26;
+  }
+}

@@ -17,7 +17,12 @@ const LocaleContext = createContext<{ locale: Locale; setLocale: (locale: Locale
 });
 
 function getByPath(source: unknown, path: string): string | undefined {
-  return path.split('.').reduce<unknown>((value, key) => (value && typeof value === 'object' ? (value as Record<string, unknown>)[key] : undefined), source) as string | undefined;
+  return path
+    .split('.')
+    .reduce<unknown>(
+      (value, key) => (value && typeof value === 'object' ? (value as Record<string, unknown>)[key] : undefined),
+      source,
+    ) as string | undefined;
 }
 
 function format(template: string, values?: Record<string, string | number>) {

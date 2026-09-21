@@ -11,7 +11,11 @@ interface ButtonProps {
 
 export function Button({ variant, icon, fullWidth, onClick, children }: ButtonProps) {
   return (
-    <button className={`${styles.button} ${styles[variant]} ${fullWidth ? styles.fullWidth : ''}`.trim()} onClick={onClick} type="button">
+    <button
+      className={`${styles.button} ${styles[variant]} ${fullWidth ? styles.fullWidth : ''}`.trim()}
+      onClick={onClick}
+      type="button"
+    >
       {icon ? <span className={styles.icon}>{icon}</span> : null}
       <span>{children}</span>
     </button>

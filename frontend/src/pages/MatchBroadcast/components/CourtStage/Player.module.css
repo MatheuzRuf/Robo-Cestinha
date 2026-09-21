@@ -1,0 +1,29 @@
+.player {
+  fill: var(--team-color);
+  stroke: #f8ead7;
+  stroke-width: 1.5;
+}
+
+.playerRing {
+  fill: none;
+  stroke: var(--team-color);
+  stroke-width: 2;
+  opacity: 0.55;
+}
+
+.number,
+.labelText {
+  fill: #fff7e9;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+.labelBackground {
+  fill: #171311;
+  stroke: var(--team-color);
+  stroke-width: 1;
+  opacity: 0.94;
+}

@@ -15,7 +15,8 @@ export const ptBR = {
     online_teams: '{count}/{total} TIMES ONLINE',
     session_code: '{code}',
     ticker_label: 'TICKER DA TRANSMISSÃO',
-    ticker_text: 'QUADRA 1: BROOKLYN BREAKERS NA FRENTE DOS AUSTIN ARMADILLOS 74-71 (Q4 01:24) // QUADRA 2: CHICAGO STEEL 104-98',
+    ticker_text:
+      'QUADRA 1: BROOKLYN BREAKERS NA FRENTE DOS AUSTIN ARMADILLOS 74-71 (Q4 01:24) // QUADRA 2: CHICAGO STEEL 104-98',
   },
   home: {
     hero: {
@@ -34,7 +35,8 @@ export const ptBR = {
     },
     join: {
       title: 'ENTRAR NA ARENA',
-      description: 'Digite o hash do torneio ou o link completo do convite para reivindicar uma franquia regional não ocupada ou assistir ao vivo.',
+      description:
+        'Digite o hash do torneio ou o link completo do convite para reivindicar uma franquia regional não ocupada ou assistir ao vivo.',
       input_label: 'CÓDIGO OU URL DA SESSÃO',
       input_hint: 'FORMATO: #RC-XXXX-MET',
       input_placeholder: 'EX.: #RC-8812-BKN',
@@ -57,5 +59,39 @@ export const ptBR = {
       placeholder: 'EX.: ALEX',
       cta: 'SALVAR E CONTINUAR',
     },
+  },
+  match_broadcast: {
+    header: {
+      live_label: 'TRANSMISSÃO AO VIVO // QUADRA 01',
+      game_meta: 'SÉRIE DO CAMPEONATO DIVISÃO A · JOGO 7',
+      mode_live: 'SIM AO VIVO',
+      mode_replay: 'REPLAY-BOX',
+      latency_label: 'LATÊNCIA: {value}ms',
+    },
+    scoreboard: { fouls_label: 'FALTAS', timeouts_label: 'TEMPOS' },
+    clock: {
+      speed_label: 'VELOCIDADE DA SIMULAÇÃO',
+      shot_clock: 'RELÓGIO DE ATAQUE',
+      pause: 'PAUSAR SIM',
+      resume: 'RETOMAR SIM',
+    },
+    play_call: { label: 'JOGADA', probability_label: 'PROBABILIDADE DE ARREMESSO', defense_label: 'DEFESA' },
+    timeline: {
+      label: 'LINHA DO TEMPO Q4',
+      previous: 'Jogada anterior',
+      play: 'Reproduzir linha do tempo',
+      next: 'Próxima jogada',
+    },
+    play_by_play: {
+      title: 'JOGADA A JOGADA',
+      showing_last: 'EXIBINDO AS ÚLTIMAS {count}',
+      full_log_link: 'VER LOG COMPLETO',
+    },
+    commentary: {
+      title: 'COMENTÁRIOS',
+      voice_label: 'VOZ SINTÉTICA: CHUCK "CLUTCH" HARLAN',
+      synth_active: 'SÍNTESE ATIVA',
+    },
+    momentum: { title: 'MOTOR DE MOMENTO' },
   },
 } as const;

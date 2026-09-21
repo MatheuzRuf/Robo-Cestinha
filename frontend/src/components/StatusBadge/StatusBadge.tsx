@@ -8,5 +8,10 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ tone, icon, children }: StatusBadgeProps) {
-  return <span className={`${styles.badge} ${styles[tone]}`.trim()}>{icon ? <span className={styles.icon}>{icon}</span> : null}{children}</span>;
+  return (
+    <span className={`${styles.badge} ${styles[tone]}`.trim()}>
+      {icon ? <span className={styles.icon}>{icon}</span> : null}
+      {children}
+    </span>
+  );
 }

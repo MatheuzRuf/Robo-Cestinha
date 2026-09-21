@@ -20,9 +20,19 @@ export function TextInput({ label, hint, placeholder, value, onChange, trailingA
         </div>
       )}
       <div className={styles.field}>
-        <input className={styles.input} placeholder={placeholder} value={value} onChange={(event) => onChange(event.target.value)} />
+        <input
+          className={styles.input}
+          placeholder={placeholder}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
         {trailingAction ? (
-          <button className={styles.trailing} type="button" onClick={trailingAction.onClick} aria-label={trailingAction.label}>
+          <button
+            className={styles.trailing}
+            type="button"
+            onClick={trailingAction.onClick}
+            aria-label={trailingAction.label}
+          >
             {trailingAction.icon}
           </button>
         ) : null}

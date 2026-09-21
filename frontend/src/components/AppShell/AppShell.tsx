@@ -10,7 +10,7 @@ interface AppShellProps {
   children: ReactNode;
 }
 
-export function AppShell({ activeNavItem, onlineCount, sessionCode, tickerText, children }: AppShellProps) {
+export function AppShell({ activeNavItem, onlineCount, sessionCode, children }: AppShellProps) {
   const { t } = useTranslation();
   return (
     <div className={styles.shell} data-active-nav-item={activeNavItem}>
@@ -26,13 +26,14 @@ export function AppShell({ activeNavItem, onlineCount, sessionCode, tickerText, 
           <span data-active={activeNavItem === 'liveBroadcast'}>{t('shell.nav_live_broadcast')}</span>
         </nav>
         <div className={styles.utilityRow}>
-          {onlineCount ? <span className={styles.pill}>◉ {t('shell.online_teams', { count: onlineCount.current, total: onlineCount.total })}</span> : null}
+          {onlineCount ? (
+            <span className={styles.pill}>
+              ◉ {t('shell.online_teams', { count: onlineCount.current, total: onlineCount.total })}
+            </span>
+          ) : null}
           {sessionCode ? <span className={styles.pill}>{t('shell.session_code', { code: sessionCode })}</span> : null}
-          <button className={styles.iconButton} type="button" aria-label={t('common.sound')}>🔊</button>
-          <button className={styles.iconButton} type="button" aria-label={t('common.profile')}>☺</button>
         </div>
       </header>
-      {tickerText ? <div className={styles.ticker}><span>{t('shell.ticker_label')}</span><span>{tickerText}</span></div> : null}
       {children}
     </div>
   );

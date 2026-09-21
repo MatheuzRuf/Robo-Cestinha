@@ -12,22 +12,19 @@ import {
   THREE_POINT_CORNER_X_FT,
   CORNER_THREE_SIDELINE_GAP_FT,
   ft,
-} from '../../config/court';
+} from '../../../../config/court';
 
 export function Court() {
   const w = ft(COURT_WIDTH_FT);
   const h = ft(COURT_HEIGHT_FT);
   const midY = h / 2;
-
   const keyHalfWidth = ft(KEY_WIDTH_FT) / 2;
   const keyLength = ft(KEY_LENGTH_FT);
   const freeThrowR = ft(FREE_THROW_RADIUS_FT);
   const centerR = ft(CENTER_CIRCLE_RADIUS_FT);
   const hoopR = ft(HOOP_RADIUS_FT);
-
   const hoopX = ft(HOOP_DISTANCE_FROM_BASELINE_FT);
   const hoopXRight = w - hoopX;
-
   const threeR = ft(THREE_POINT_RADIUS_FT);
   const cornerX = ft(THREE_POINT_CORNER_X_FT);
   const cornerY = ft(CORNER_THREE_SIDELINE_GAP_FT);
@@ -35,22 +32,20 @@ export function Court() {
 
   return (
     <g>
+      <defs>
+        <pattern id="court-wood" width="120" height="24" patternUnits="userSpaceOnUse">
+          <rect width="120" height="24" fill="#713713" />
+          <path d="M0 1H120M0 23H120" stroke="#9a4d1b" strokeWidth="1" opacity=".7" />
+          <path d="M40 0V24M80 0V24" stroke="#4f250f" strokeWidth="1" opacity=".55" />
+        </pattern>
+      </defs>
       <rect x={0} y={0} width={w} height={h} className={styles.court} />
-
+      <rect x={0} y={0} width={w} height={h} fill="url(#court-wood)" opacity=".9" />
+      <rect x={0} y={0} width={w} height={h} className={styles.boundary} />
       <line x1={w / 2} y1={0} x2={w / 2} y2={h} className={styles.line} />
       <circle cx={w / 2} cy={midY} r={centerR} className={styles.line} />
-
-      {/* left key + free-throw circle */}
-      <rect
-        x={0}
-        y={midY - keyHalfWidth}
-        width={keyLength}
-        height={keyHalfWidth * 2}
-        className={styles.line}
-      />
+      <rect x={0} y={midY - keyHalfWidth} width={keyLength} height={keyHalfWidth * 2} className={styles.line} />
       <circle cx={keyLength} cy={midY} r={freeThrowR} className={styles.line} />
-
-      {/* right key + free-throw circle */}
       <rect
         x={w - keyLength}
         y={midY - keyHalfWidth}
@@ -59,21 +54,20 @@ export function Court() {
         className={styles.line}
       />
       <circle cx={w - keyLength} cy={midY} r={freeThrowR} className={styles.line} />
-
-      {/* left three-point line */}
+      <path d={`M ${keyLength - 1} ${midY - keyHalfWidth} V ${midY + keyHalfWidth}`} className={styles.line} />
+      <path d={`M ${w - keyLength + 1} ${midY - keyHalfWidth} V ${midY + keyHalfWidth}`} className={styles.line} />
       <path
         d={`M 0 ${cornerY} L ${cornerX} ${cornerY} A ${threeR} ${threeR} 0 0 1 ${cornerX} ${cornerYBottom} L 0 ${cornerYBottom}`}
         className={styles.line}
       />
-
-      {/* right three-point line */}
       <path
         d={`M ${w} ${cornerY} L ${w - cornerX} ${cornerY} A ${threeR} ${threeR} 0 0 0 ${w - cornerX} ${cornerYBottom} L ${w} ${cornerYBottom}`}
         className={styles.line}
       />
-
       <circle cx={hoopX} cy={midY} r={hoopR} className={styles.hoop} />
       <circle cx={hoopXRight} cy={midY} r={hoopR} className={styles.hoop} />
+      <line x1={hoopX - 8} y1={midY - 8} x2={hoopX - 8} y2={midY + 8} className={styles.backboard} />
+      <line x1={hoopXRight + 8} y1={midY - 8} x2={hoopXRight + 8} y2={midY + 8} className={styles.backboard} />
     </g>
   );
 }
