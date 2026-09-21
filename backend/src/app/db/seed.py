@@ -37,7 +37,9 @@ async def seed_catalog() -> None:
         for entry in players_raw:
             team_id = team_id_to_db_id.get(entry["team_id"])
             if team_id is None:
-                print(f"Skipping player {entry.get('name')!r} - unknown team {entry.get('team_id')!r}")
+                print(
+                    f"Skipping player {entry.get('name')!r} - unknown team {entry.get('team_id')!r}"
+                )
                 skipped_players += 1
                 continue
 
@@ -51,7 +53,9 @@ async def seed_catalog() -> None:
             )
 
         await db.commit()
-        print(f"Seeded {len(team_id_to_db_id)} teams and {len(players_raw) - skipped_players} players.")
+        print(
+            f"Seeded {len(team_id_to_db_id)} teams and {len(players_raw) - skipped_players} players."
+        )
 
 
 if __name__ == "__main__":

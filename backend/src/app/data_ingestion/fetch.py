@@ -63,6 +63,7 @@ def _save(df: pd.DataFrame, path) -> bool:
 
 # ── Endpoint fetchers (each cached as a file) ───────────────────────────────
 
+
 def fetch_all_players(refresh: bool) -> pd.DataFrame:
     path = config.RAW_DIR / "all_players.csv"
     if path.exists() and not refresh:
@@ -187,11 +188,15 @@ def load_raw_from_disk() -> dict:
         "rosters": rosters,
         "player_stats": {
             "base": pd.read_csv(config.RAW_DIR / "player_stats_base_totals.csv"),
-            "advanced": pd.read_csv(config.RAW_DIR / "player_stats_advanced_totals.csv"),
+            "advanced": pd.read_csv(
+                config.RAW_DIR / "player_stats_advanced_totals.csv"
+            ),
         },
         "clutch": pd.read_csv(config.RAW_DIR / "player_clutch_totals.csv"),
         "starter_bench": {
-            "starters": pd.read_csv(config.RAW_DIR / "player_stats_starters_totals.csv"),
+            "starters": pd.read_csv(
+                config.RAW_DIR / "player_stats_starters_totals.csv"
+            ),
             "bench": pd.read_csv(config.RAW_DIR / "player_stats_bench_totals.csv"),
         },
         "bballref_positions": bballref.load(refresh=False),
@@ -203,6 +208,7 @@ def load_raw_from_disk() -> dict:
 
 
 # ── Orchestrator ────────────────────────────────────────────────────────────
+
 
 def fetch_all(refresh: bool = False) -> dict:
     """Pull every raw dataset (or read the local cache). Returns raw frames."""

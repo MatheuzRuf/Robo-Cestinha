@@ -10,6 +10,7 @@ from . import config
 
 # ── Text normalization ──────────────────────────────────────────────────────
 
+
 def ascii_slug(value: str) -> str:
     """Normalize a player slug to plain ascii with underscores.
 
@@ -55,8 +56,10 @@ def league_possessions_per_game(player_totals: pd.DataFrame, team_games: int) ->
     possession denominator for every player's foul/steal/block rates.
     """
     total_poss = float(
-        (player_totals["FGA"]
-         + config.FTA_POSSESSION_FACTOR * player_totals["FTA"]
-         + player_totals["TOV"]).sum()
+        (
+            player_totals["FGA"]
+            + config.FTA_POSSESSION_FACTOR * player_totals["FTA"]
+            + player_totals["TOV"]
+        ).sum()
     )
     return safe_div(total_poss, team_games, default=100.0)

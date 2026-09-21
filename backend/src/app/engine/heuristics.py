@@ -36,7 +36,9 @@ def decide_handler_action(state: GameState, rng: random.Random) -> str:
     p_pass = remaining_prob * 0.52
     p_move = remaining_prob * 0.48
 
-    choice = rng.choices(["SHOOT", "PASS", "MOVE"], weights=[p_shoot, p_pass, p_move], k=1)[0]
+    choice = rng.choices(
+        ["SHOOT", "PASS", "MOVE"], weights=[p_shoot, p_pass, p_move], k=1
+    )[0]
     return choice
 
 
@@ -44,7 +46,11 @@ def resolve_pass_teammate(
     attacking_team: LiveTeam, current_handler_id: str, rng: random.Random
 ) -> LivePlayer:
     """Selects one of the other 4 teammates on court."""
-    teammates = [p for p in attacking_team.get_on_court_players() if p.player_id != current_handler_id]
+    teammates = [
+        p
+        for p in attacking_team.get_on_court_players()
+        if p.player_id != current_handler_id
+    ]
     weights = [max(0.05, p.attributes.usage_rate) for p in teammates]
     return rng.choices(teammates, weights=weights, k=1)[0]
 
@@ -56,8 +62,13 @@ def resolve_pass_outcome(
     rng: random.Random,
 ) -> Tuple[bool, LivePlayer | None]:
     """Returns (success, intercepting_defender_or_none)."""
-    avg_steal = sum(p.attributes.steal_rate for p in defending_team.get_on_court_players()) / 5.0
-    p_turnover = min(0.35, max(0.04, passer.attributes.turnover_rate * 0.7 + avg_steal * 1.5))
+    avg_steal = (
+        sum(p.attributes.steal_rate for p in defending_team.get_on_court_players())
+        / 5.0
+    )
+    p_turnover = min(
+        0.35, max(0.04, passer.attributes.turnover_rate * 0.7 + avg_steal * 1.5)
+    )
 
     if rng.random() < p_turnover:
         # Intercepted
@@ -77,8 +88,14 @@ def decide_move_direction(
     Slightly biases movement toward the opponent's rim (Phase 1 court awareness).
     """
     directions = [
-        Direction.N, Direction.NE, Direction.E, Direction.SE,
-        Direction.S, Direction.SW, Direction.W, Direction.NW,
+        Direction.N,
+        Direction.NE,
+        Direction.E,
+        Direction.SE,
+        Direction.S,
+        Direction.SW,
+        Direction.W,
+        Direction.NW,
         Direction.IDLE,
     ]
 
@@ -94,7 +111,10 @@ def decide_move_direction(
 
 
 def resolve_move_outcome(
-    handler: LivePlayer, defending_team: LiveTeam, direction: Direction, rng: random.Random
+    handler: LivePlayer,
+    defending_team: LiveTeam,
+    direction: Direction,
+    rng: random.Random,
 ) -> Tuple[str, LivePlayer | None]:
     """Resolves MOVE action: 'SUCCESS', 'STRIPPED', 'FOUL_DRAWN', or 'HOLDS_BALL'."""
     if direction == Direction.IDLE:
@@ -114,7 +134,10 @@ def resolve_move_outcome(
             return "HOLDS_BALL", None
 
     # Active directional movement: risk of turnover
-    avg_steal = sum(p.attributes.steal_rate for p in defending_team.get_on_court_players()) / 5.0
+    avg_steal = (
+        sum(p.attributes.steal_rate for p in defending_team.get_on_court_players())
+        / 5.0
+    )
     p_strip = min(0.25, max(0.03, handler.attributes.turnover_rate * 0.5 + avg_steal))
     if rng.random() < p_strip:
         defenders = defending_team.get_on_court_players()
@@ -140,7 +163,9 @@ def resolve_shot(
     points = 3 if is_three else 2
 
     # Base shooting percentage
-    base_pct = shooter.attributes.three_pt_pct if is_three else shooter.attributes.two_pt_pct
+    base_pct = (
+        shooter.attributes.three_pt_pct if is_three else shooter.attributes.two_pt_pct
+    )
 
     # Fatigue modifier: below 0.4 stamina degrades up to 10%
     if shooter.current_stamina < 0.40:
@@ -170,11 +195,14 @@ def resolve_rebound(
 
     # Offensive rebound rates from data; defense gets standard advantage (~75% league norm)
     off_weights = [max(0.02, p.attributes.rebound_rate * 1.0) for p in off_players]
-    def_weights = [max(0.05, (0.15 + (1.0 - p.attributes.rebound_rate * 0.5)) * 1.8) for p in def_players]
+    def_weights = [
+        max(0.05, (0.15 + (1.0 - p.attributes.rebound_rate * 0.5)) * 1.8)
+        for p in def_players
+    ]
 
     all_players = off_players + def_players
     all_weights = off_weights + def_weights
 
     rebounder = rng.choices(all_players, weights=all_weights, k=1)[0]
-    is_offensive = (rebounder.team_id == game_state.attacking_team.team_id)
+    is_offensive = rebounder.team_id == game_state.attacking_team.team_id
     return rebounder, is_offensive

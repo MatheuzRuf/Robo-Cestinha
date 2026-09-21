@@ -1,5 +1,4 @@
-"""Runtime entity models and state tracking for an active basketball simulation.
-"""
+"""Runtime entity models and state tracking for an active basketball simulation."""
 
 from __future__ import annotations
 
@@ -55,7 +54,7 @@ class LiveTeam:
     abbreviation: str
     players: Dict[str, LivePlayer]
     on_court: List[str]  # 5 player_ids currently on court
-    bench: List[str]     # remaining player_ids
+    bench: List[str]  # remaining player_ids
     score: int = 0
     quarter_fouls: int = 0
 
@@ -68,10 +67,14 @@ class LiveTeam:
         starters = [p.player_id for p in team_players if p.is_starter][:5]
         # Fallback if fewer than 5 flagged starters
         if len(starters) < 5:
-            remaining = [p.player_id for p in team_players if p.player_id not in starters]
+            remaining = [
+                p.player_id for p in team_players if p.player_id not in starters
+            ]
             starters.extend(remaining[: 5 - len(starters)])
 
-        bench = [pid for pid in team.roster if pid not in starters and pid in live_players]
+        bench = [
+            pid for pid in team.roster if pid not in starters and pid in live_players
+        ]
 
         for pid in starters:
             live_players[pid].is_on_court = True
@@ -122,16 +125,26 @@ class GameState:
 
     @property
     def attacking_team(self) -> LiveTeam:
-        return self.home_team if self.possession_team_id == self.home_team.team_id else self.away_team
+        return (
+            self.home_team
+            if self.possession_team_id == self.home_team.team_id
+            else self.away_team
+        )
 
     @property
     def defending_team(self) -> LiveTeam:
-        return self.away_team if self.possession_team_id == self.home_team.team_id else self.home_team
+        return (
+            self.away_team
+            if self.possession_team_id == self.home_team.team_id
+            else self.home_team
+        )
 
     def is_attacking_team_home(self) -> bool:
         return self.possession_team_id == self.home_team.team_id
 
-    def flip_possession(self, new_handler_id: Optional[str] = None, rng: Optional[random.Random] = None) -> None:
+    def flip_possession(
+        self, new_handler_id: Optional[str] = None, rng: Optional[random.Random] = None
+    ) -> None:
         """Flips offense and defense, resetting shot clock and assigning ball handler."""
         prev_attacking = self.possession_team_id
         self.possession_team_id = self.defending_team_id

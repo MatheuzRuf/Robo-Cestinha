@@ -94,8 +94,4 @@ class BracketService:
             match.away_team_id = remaining_team_ids.pop(0)
             match.status = "ready"
 
-        return [
-            match
-            for round_matches in rounds
-            for match in round_matches
-        ]
+        return [match for round_matches in rounds for match in round_matches]
