@@ -1,55 +1,68 @@
-import random
 import uuid
 
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.core.ids import generate_session_hash
-from app.db.models import Session, Team, User
-from app.domain.bracket.service import seed_bracket
+from app.db.models import Session, User
+from app.domain.bracket.service import BracketService
+from app.domain.sessions.repository import SessionRepository
 
 
-async def create_session(db: AsyncSession, owner_name: str, num_teams: int = 8) -> tuple[Session, User]:
-    """Create a new session, owner user, and seeded bracket.
+class SessionService:
+    """Coordinate session creation and its initial bracket."""
 
-    Args:
-        db: Active async database session.
-        owner_name: Display name for the session owner.
-        num_teams: Number of catalog teams to seed into the bracket.
+    def __init__(
+        self,
+        repository: SessionRepository,
+        bracket_service: BracketService,
+    ) -> None:
+        """Initialize the service with its collaborators.
 
-    Returns:
-        The created session and owner user.
+        Args:
+            repository: Repository used to persist sessions and users.
+            bracket_service: Service used to create the initial bracket.
+        """
 
-    Raises:
-        ValueError: If the catalog does not contain enough teams.
-    """
+        self._repository = repository
+        self._bracket_service = bracket_service
 
-    session = Session(id=uuid.uuid4(), hash=generate_session_hash())
-    db.add(session)
-    await db.flush()
+    async def create_session(
+        self,
+        owner_name: str,
+        num_teams: int = 8,
+    ) -> tuple[Session, User]:
+        """Create a session, its owner, and a seeded bracket.
 
-    owner = User(
-        id=uuid.uuid4(),
-        session_id=session.id,
-        join_sequence=1,
-        name=owner_name,
-    )
-    db.add(owner)
-    await db.flush()
+        Args:
+            owner_name: Display name for the session owner.
+            num_teams: Number of catalog teams to seed into the bracket.
 
-    session.owner_id = owner.id
+        Returns:
+            The created session and owner user.
 
-    result = await db.execute(select(Team.id))
-    all_team_ids = [row[0] for row in result.all()]
-    if len(all_team_ids) < num_teams:
-        raise ValueError(
-            f"Not enough teams in catalog ({len(all_team_ids)}) to seed a {num_teams}-team bracket. "
-            f"Run the Spec 03 seed script first."
+        Raises:
+            ValueError: If the catalog does not contain enough teams.
+        """
+
+        session = Session(
+            id=uuid.uuid4(),
+            hash=generate_session_hash(),
+        )
+        await self._repository.add_session(session)
+
+        owner = User(
+            id=uuid.uuid4(),
+            session_id=session.id,
+            join_sequence=1,
+            name=owner_name,
+        )
+        await self._repository.add_user(owner)
+        session.owner_id = owner.id
+
+        await self._bracket_service.seed_bracket_for_session(
+            session_id=session.id,
+            num_teams=num_teams,
         )
 
-    chosen = random.sample(all_team_ids, num_teams)
-    await seed_bracket(db, session.id, chosen)
+        await self._repository.commit()
+        await self._repository.refresh(session)
 
-    await db.commit()
-    await db.refresh(session)
-    return session, owner
+        return session, owner
