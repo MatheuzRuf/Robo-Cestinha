@@ -1,4 +1,4 @@
-.PHONY: bootstrap dev migrate reset-db
+.PHONY: bootstrap dev migrate reset-db format format-check
 
 bootstrap:
 	cd backend && ./scripts/bootstrap.sh
@@ -11,6 +11,12 @@ migrate:
 
 reset-db:
 	cd backend && ./scripts/reset-db.sh
+
+format:
+	uv run --extra dev ruff format backend
+
+format-check:
+	uv run --extra dev ruff format --check backend
 
 stop:
 	cd backend && docker compose down

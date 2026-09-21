@@ -5,6 +5,7 @@ plans/
 __pycache__/
 *.pyc
 .venv/
+.ruff_cache/
 data/raw/
 .ipynb_checkpoints/
 .env

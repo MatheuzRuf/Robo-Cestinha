@@ -26,6 +26,7 @@ CLASSIC_FIVE = {"PG", "SG", "SF", "PF", "C"}
 
 # ── Parsing (stdlib only, no lxml/bs4 dependency) ───────────────────────────
 
+
 class _TableScanner(HTMLParser):
     """Collects the cells of every <tr> in the first <table> of the page."""
 
@@ -122,9 +123,7 @@ def parse_positions(html: str) -> dict[str, dict]:
             player_col = next(
                 i for i, c in enumerate(lowered) if c.startswith("player")
             )
-            pos_col = next(
-                i for i, c in enumerate(lowered) if c in ("pos", "position")
-            )
+            pos_col = next(i for i, c in enumerate(lowered) if c in ("pos", "position"))
             header = row
             break
         except StopIteration:
@@ -152,6 +151,7 @@ def parse_positions(html: str) -> dict[str, dict]:
 
 
 # ── Fetch + cache handling ──────────────────────────────────────────────────
+
 
 def fetch_positions_html() -> Path | None:
     """Return a local copy of the bball-ref page, or None.

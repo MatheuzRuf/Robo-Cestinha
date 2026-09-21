@@ -43,7 +43,9 @@ class ActionLog(BaseModel):
     direction: Optional[str] = None
     duration_s: float = 0.0
     shot_type: Optional[str] = None  # "2pt", "3pt", "ft"
-    result: Optional[str] = None     # "made", "missed", "success", "intercepted", "stripped", "foul", "expired"
+    result: Optional[str] = (
+        None  # "made", "missed", "success", "intercepted", "stripped", "foul", "expired"
+    )
     points: int = 0
 
 

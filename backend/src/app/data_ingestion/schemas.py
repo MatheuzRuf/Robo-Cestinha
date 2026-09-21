@@ -85,25 +85,32 @@ class Player(BaseModel):
     @classmethod
     def _ascii_slug(cls, v: str) -> str:
         if not _SLUG_RE.fullmatch(v):
-            raise ValueError(f"expected an ascii_slug (lowercase, underscore-separated), got {v!r}")
+            raise ValueError(
+                f"expected an ascii_slug (lowercase, underscore-separated), got {v!r}"
+            )
         return v
 
     @field_validator("position")
     @classmethod
     def _known_position(cls, v: str) -> str:
         if v not in VALID_POSITIONS:
-            raise ValueError(f"unrecognized NBA position code {v!r} (expected one of {sorted(VALID_POSITIONS)})")
+            raise ValueError(
+                f"unrecognized NBA position code {v!r} (expected one of {sorted(VALID_POSITIONS)})"
+            )
         return v
 
     @field_validator("position5")
     @classmethod
     def _known_position5(cls, v: str) -> str:
         if v not in VALID_POSITION5:
-            raise ValueError(f"unrecognized classic position {v!r} (expected one of {sorted(VALID_POSITION5)})")
+            raise ValueError(
+                f"unrecognized classic position {v!r} (expected one of {sorted(VALID_POSITION5)})"
+            )
         return v
 
 
 # ── teams.json ───────────────────────────────────────────────────────────
+
 
 class TeamStats(BaseModel):
     model_config = {"extra": "forbid"}
@@ -127,7 +134,9 @@ class Team(BaseModel):
     @classmethod
     def _ascii_slug(cls, v: str) -> str:
         if not _SLUG_RE.fullmatch(v):
-            raise ValueError(f"expected an ascii_slug (lowercase, underscore-separated), got {v!r}")
+            raise ValueError(
+                f"expected an ascii_slug (lowercase, underscore-separated), got {v!r}"
+            )
         return v
 
     @field_validator("abbreviation")
@@ -144,11 +153,14 @@ class Team(BaseModel):
             raise ValueError("roster must not be empty")
         if len(v) != len(set(v)):
             dupes = {pid for pid in v if v.count(pid) > 1}
-            raise ValueError(f"roster contains duplicate player_id entries: {sorted(dupes)}")
+            raise ValueError(
+                f"roster contains duplicate player_id entries: {sorted(dupes)}"
+            )
         return v
 
 
 # ── Validation entry points ──────────────────────────────────────────────
+
 
 def validate_players(players_json: list[dict]) -> list[Player]:
     """Validate every player dict; raise once with *all* failures listed."""
@@ -221,13 +233,17 @@ def validate_referential_integrity(players: list[Player], teams: list[Team]) -> 
 
     for p in players:
         if p.team_id not in team_ids:
-            errors.append(f"player {p.player_id!r} has team_id {p.team_id!r}, which is not in teams.json")
+            errors.append(
+                f"player {p.player_id!r} has team_id {p.team_id!r}, which is not in teams.json"
+            )
 
     for t in teams:
         roster_set = set(t.roster)
         for pid in t.roster:
             if pid not in player_ids:
-                errors.append(f"team {t.team_id!r} roster references unknown player_id {pid!r}")
+                errors.append(
+                    f"team {t.team_id!r} roster references unknown player_id {pid!r}"
+                )
         missing_from_roster = players_by_team.get(t.team_id, set()) - roster_set
         for pid in sorted(missing_from_roster):
             errors.append(

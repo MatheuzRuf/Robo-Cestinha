@@ -37,8 +37,8 @@ DIRECTION_VECTORS: dict[Direction, Tuple[int, int]] = {
 }
 
 
-GRID_WIDTH = 10   # X: 0 .. 9
-GRID_HEIGHT = 5   # Y: 0 .. 4
+GRID_WIDTH = 10  # X: 0 .. 9
+GRID_HEIGHT = 5  # Y: 0 .. 4
 TOTAL_CELLS = 50
 
 # Rims

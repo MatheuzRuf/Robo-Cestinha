@@ -16,7 +16,9 @@ def load_settings() -> Settings:
 
     return Settings(
         database_url=secrets.get("DATABASE_URL"),
-        api_cors_origins=secrets.get("API_CORS_ORIGINS", "http://localhost:5173").split(","),
+        api_cors_origins=secrets.get("API_CORS_ORIGINS", "http://localhost:5173").split(
+            ","
+        ),
     )
 
 

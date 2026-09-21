@@ -24,8 +24,25 @@ from .normalize import (
 )
 
 FLOAT_COLS = [  # pandas should read these as floats, never strings
-    "FGM", "FGA", "FG3M", "FG3A", "FTM", "FTA", "OREB", "DREB", "REB",
-    "AST", "TOV", "STL", "BLK", "PF", "PFD", "PTS", "MIN", "GP", "AGE",
+    "FGM",
+    "FGA",
+    "FG3M",
+    "FG3A",
+    "FTM",
+    "FTA",
+    "OREB",
+    "DREB",
+    "REB",
+    "AST",
+    "TOV",
+    "STL",
+    "BLK",
+    "PF",
+    "PFD",
+    "PTS",
+    "MIN",
+    "GP",
+    "AGE",
 ]
 
 
@@ -37,11 +54,14 @@ def _ensure(df: pd.DataFrame, col: str, default=0.0) -> pd.DataFrame:
 
 def _unique_id(df: pd.DataFrame, col: str, keep: str) -> pd.DataFrame:
     """Dedupe a table on PLAYER_ID, keeping the row with highest `keep` (e.g. MIN)."""
-    out = df.sort_values(keep, ascending=False).drop_duplicates("PLAYER_ID", keep="first")
+    out = df.sort_values(keep, ascending=False).drop_duplicates(
+        "PLAYER_ID", keep="first"
+    )
     return out.reset_index(drop=True)
 
 
 # ── 1. Master player table ──────────────────────────────────────────────────
+
 
 def _build_master(raw: dict) -> pd.DataFrame:
     base = raw["player_stats"]["base"].copy()
@@ -72,8 +92,12 @@ def _build_master(raw: dict) -> pd.DataFrame:
     ids = all_players.rename(columns=id_cols)[list(id_cols.values())]
     ids = ids.drop_duplicates("PLAYER_ID", keep="first")
 
-    pos = rosters.rename(columns={"PLAYER": "ROSTER_NAME", "PLAYER_SLUG": "ROSTER_SLUG"})
-    pos = pos[["PLAYER_ID", "POSITION", "HEIGHT", "ROSTER_SLUG"]].drop_duplicates("PLAYER_ID", keep="first")
+    pos = rosters.rename(
+        columns={"PLAYER": "ROSTER_NAME", "PLAYER_SLUG": "ROSTER_SLUG"}
+    )
+    pos = pos[["PLAYER_ID", "POSITION", "HEIGHT", "ROSTER_SLUG"]].drop_duplicates(
+        "PLAYER_ID", keep="first"
+    )
 
     merged = played.merge(ids, on="PLAYER_ID", how="left")
     merged = merged.merge(pos, on="PLAYER_ID", how="left")
@@ -123,9 +147,7 @@ def _build_master(raw: dict) -> pd.DataFrame:
 
     # Identity fallbacks for players not on a current roster (waived mid-season).
     merged["NAME"] = merged["NAME"].fillna(merged["PLAYER_NAME"])
-    merged["SLUG"] = (
-        merged["SLUG"].fillna(merged["ROSTER_SLUG"]).fillna(merged["NAME"])
-    )
+    merged["SLUG"] = merged["SLUG"].fillna(merged["ROSTER_SLUG"]).fillna(merged["NAME"])
     merged["POSITION"] = merged["POSITION"].fillna("X")
 
     # player_id: ascii slug, guaranteed unique.
@@ -180,9 +202,24 @@ def _team_lookup(raw: dict) -> pd.DataFrame:
     tbase = raw["team_stats"]["base"].copy()
     tadv = raw["team_stats"]["advanced"].copy()
     for df in (tbase, tadv):
-        for col in ["FGM", "FGA", "FG3M", "FG3A", "FTM", "FTA", "TOV", "AST", "GP",
-                    "MIN", "PTS", "PACE", "OFF_RATING", "DEF_RATING", "E_OFF_RATING",
-                    "E_DEF_RATING"]:
+        for col in [
+            "FGM",
+            "FGA",
+            "FG3M",
+            "FG3A",
+            "FTM",
+            "FTA",
+            "TOV",
+            "AST",
+            "GP",
+            "MIN",
+            "PTS",
+            "PACE",
+            "OFF_RATING",
+            "DEF_RATING",
+            "E_OFF_RATING",
+            "E_DEF_RATING",
+        ]:
             df = _ensure(df, col)
             df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
     teams = tbase.copy()
@@ -203,15 +240,24 @@ def _team_lookup(raw: dict) -> pd.DataFrame:
 
 # ── 2. Attribute derivation ─────────────────────────────────────────────────
 
-def _derive_attributes(master: pd.DataFrame, teams: pd.DataFrame, player_totals: pd.DataFrame) -> pd.DataFrame:
+
+def _derive_attributes(
+    master: pd.DataFrame, teams: pd.DataFrame, player_totals: pd.DataFrame
+) -> pd.DataFrame:
     m = master.copy()
     K = config.SHRINKAGE_K
 
     # League context
-    avg2 = safe_div(float((player_totals["FGM"] - player_totals["FG3M"]).sum()),
-                    float((player_totals["FGA"] - player_totals["FG3A"]).sum()))
-    avg3 = safe_div(float(player_totals["FG3M"].sum()), float(player_totals["FG3A"].sum()))
-    avgf = safe_div(float(player_totals["FTM"].sum()), float(player_totals["FTA"].sum()))
+    avg2 = safe_div(
+        float((player_totals["FGM"] - player_totals["FG3M"]).sum()),
+        float((player_totals["FGA"] - player_totals["FG3A"]).sum()),
+    )
+    avg3 = safe_div(
+        float(player_totals["FG3M"].sum()), float(player_totals["FG3A"].sum())
+    )
+    avgf = safe_div(
+        float(player_totals["FTM"].sum()), float(player_totals["FTA"].sum())
+    )
     # Every player is rated against the same league-wide possessions per game
     # (see docs/statistics.md §4), so the defensive rates are comparable
     # across teams and players regardless of team tempo.
@@ -222,7 +268,8 @@ def _derive_attributes(master: pd.DataFrame, teams: pd.DataFrame, player_totals:
     m["team_abv"] = m["TEAM_ID_ROSTER"].str.upper()
     m = m.merge(
         t[["makes_pg"]],
-        on="team_abv", how="left",
+        on="team_abv",
+        how="left",
     )
     m["team_id"] = m["team_id"].fillna(m["team_abv"].str.lower())
     # Players whose stat team isn't in team_stats (rare): use league averages.
@@ -240,8 +287,12 @@ def _derive_attributes(master: pd.DataFrame, teams: pd.DataFrame, player_totals:
     m["two_pt_pct_raw"] = np.where(m["_2pa"] > 0, m["_2pm"] / m["_2pa"], 0.0)
     m["three_pt_pct_raw"] = m["ENDP_FG3_PCT"]
     m["ft_pct_raw"] = m["ENDP_FT_PCT"]
-    m["two_pt_pct"] = np.where(m["_2pa"] > 0, (m["_2pm"] + K * avg2) / (m["_2pa"] + K), avg2)
-    m["three_pt_pct"] = np.where(m["FG3A"] > 0, (m["FG3M"] + K * avg3) / (m["FG3A"] + K), avg3)
+    m["two_pt_pct"] = np.where(
+        m["_2pa"] > 0, (m["_2pm"] + K * avg2) / (m["_2pa"] + K), avg2
+    )
+    m["three_pt_pct"] = np.where(
+        m["FG3A"] > 0, (m["FG3M"] + K * avg3) / (m["FG3A"] + K), avg3
+    )
     m["ft_pct"] = np.where(m["FTA"] > 0, (m["FTM"] + K * avgf) / (m["FTA"] + K), avgf)
 
     # Possession usage
@@ -264,10 +315,14 @@ def _derive_attributes(master: pd.DataFrame, teams: pd.DataFrame, player_totals:
     # so teammate makes = team FGM/GP minus own FGM/GP (no FG3M re-add).
     own_makes_pg = m["FGM"] / m["GP"]
     teammate_makes_pg = (m["makes_pg"] - own_makes_pg).clip(lower=0.5)
-    m["assist_rate"] = (m["AST"] / m["GP"] / teammate_makes_pg).fillna(0.0).clip(0.0, 1.0)
+    m["assist_rate"] = (
+        (m["AST"] / m["GP"] / teammate_makes_pg).fillna(0.0).clip(0.0, 1.0)
+    )
 
     # Stamina: minutes/game + youth → endurance capacity.
-    age_penalty = config.STAMINA_AGE_PENALTY * np.clip((m["AGE"] - config.STAMINA_AGE_KNEE) / 10.0, 0, 2)
+    age_penalty = config.STAMINA_AGE_PENALTY * np.clip(
+        (m["AGE"] - config.STAMINA_AGE_KNEE) / 10.0, 0, 2
+    )
     m["stamina"] = (
         config.STAMINA_BASE
         + config.STAMINA_RANGE * np.clip(m["min_pg"] / config.STAMINA_MIN_PG, 0.0, 1.0)
@@ -280,7 +335,9 @@ def _derive_attributes(master: pd.DataFrame, teams: pd.DataFrame, player_totals:
     clutch_fgp = np.where(m["CL_FGA"] > 0, m["CL_FGM"] / m["CL_FGA"], np.nan)
     clutch_delta = np.where(np.isnan(clutch_fgp), 0.0, clutch_fgp - overall_fgp)
     clutch_weight = np.clip(m["CL_FGA"] / 50.0, 0.0, 1.0)
-    m["clutch_factor"] = np.clip(0.5 + config.CLUTCH_SPREAD * clutch_delta * clutch_weight, 0.0, 1.0)
+    m["clutch_factor"] = np.clip(
+        0.5 + config.CLUTCH_SPREAD * clutch_delta * clutch_weight, 0.0, 1.0
+    )
 
     return m
 
@@ -288,9 +345,18 @@ def _derive_attributes(master: pd.DataFrame, teams: pd.DataFrame, player_totals:
 # ── 3. Outputs ──────────────────────────────────────────────────────────────
 
 ATTRS = [
-    "two_pt_pct", "three_pt_pct", "ft_pct", "turnover_rate", "foul_rate",
-    "rebound_rate", "assist_rate", "steal_rate", "block_rate", "stamina",
-    "clutch_factor", "usage_rate",
+    "two_pt_pct",
+    "three_pt_pct",
+    "ft_pct",
+    "turnover_rate",
+    "foul_rate",
+    "rebound_rate",
+    "assist_rate",
+    "steal_rate",
+    "block_rate",
+    "stamina",
+    "clutch_factor",
+    "usage_rate",
 ]
 
 
@@ -302,9 +368,11 @@ def _build_players_json(m: pd.DataFrame) -> list[dict]:
                 "player_id": row.player_id,
                 "name": str(row.NAME),
                 "team_id": str(row.team_id),
-                "position": str(row.POSITION),       # official NBA (G/F/C + combos)
-                "position5": str(row.position5),     # classic PG/SG/SF/PF/C (bball-ref)
-                "is_starter": bool(row.is_starter),  # more minutes as starter than bench
+                "position": str(row.POSITION),  # official NBA (G/F/C + combos)
+                "position5": str(row.position5),  # classic PG/SG/SF/PF/C (bball-ref)
+                "is_starter": bool(
+                    row.is_starter
+                ),  # more minutes as starter than bench
                 "attributes": {
                     attr: round(float(getattr(row, attr)), 4) for attr in ATTRS
                 },
@@ -325,9 +393,7 @@ def _build_teams_json(m: pd.DataFrame, t: pd.DataFrame) -> list[dict]:
     teams = []
     for _, team in t.sort_values("team_abv").iterrows():
         abv = team["team_abv"].upper()
-        player_ids = sorted(
-            m.loc[m["TEAM_ID_ROSTER"] == abv, "player_id"].tolist()
-        )
+        player_ids = sorted(m.loc[m["TEAM_ID_ROSTER"] == abv, "player_id"].tolist())
         teams.append(
             {
                 "team_id": str(team["team_id"]),
@@ -350,8 +416,12 @@ def _quality_report(m: pd.DataFrame, raw: dict) -> dict:
         "season": config.SEASON,
         "players_with_stats": int(len(m)),
         "teams": int(m["team_id"].nunique()),
-        "position_distribution": {k: int(v) for k, v in m["POSITION"].value_counts().items()},
-        "position5_distribution": {k: int(v) for k, v in m["position5"].value_counts().items()},
+        "position_distribution": {
+            k: int(v) for k, v in m["POSITION"].value_counts().items()
+        },
+        "position5_distribution": {
+            k: int(v) for k, v in m["position5"].value_counts().items()
+        },
         "position5_missing": int((m["position5"] == "X").sum()),
         "starters": int(m["is_starter"].sum()),
         "bench_players": int((~m["is_starter"]).sum()),
@@ -385,9 +455,9 @@ def derive(raw: dict) -> tuple[list[dict], list[dict], dict]:
     config.PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
     player_totals = raw["player_stats"]["base"].copy()
-    player_totals = player_totals[
-        (player_totals["MIN"] > 0)
-    ].copy().reset_index(drop=True)
+    player_totals = (
+        player_totals[(player_totals["MIN"] > 0)].copy().reset_index(drop=True)
+    )
 
     master = _build_master(raw)
     teams = _team_lookup(raw)
@@ -411,18 +481,57 @@ def derive(raw: dict) -> tuple[list[dict], list[dict], dict]:
         json.dump(report, fh, indent=2)
 
     table_cols = [
-        "PLAYER_ID", "player_id", "NAME", "team_id", "POSITION", "position5",
-        "height_in", "is_starter", "ST_MIN", "BE_MIN", "AGE",
-        "GP", "MIN", "FGM", "FGA", "FG3M", "FG3A", "FTM", "FTA",
-        "OREB", "DREB", "REB", "AST", "TOV", "STL", "BLK", "PF", "PTS",
-        "USG_PCT", "OREB_PCT", "ENDP_FG3_PCT", "ENDP_FT_PCT",
-        "own_poss", "min_pg", "def_poss_pg",
-        "two_pt_pct_raw", "three_pt_pct_raw", "ft_pct_raw", *ATTRS,
+        "PLAYER_ID",
+        "player_id",
+        "NAME",
+        "team_id",
+        "POSITION",
+        "position5",
+        "height_in",
+        "is_starter",
+        "ST_MIN",
+        "BE_MIN",
+        "AGE",
+        "GP",
+        "MIN",
+        "FGM",
+        "FGA",
+        "FG3M",
+        "FG3A",
+        "FTM",
+        "FTA",
+        "OREB",
+        "DREB",
+        "REB",
+        "AST",
+        "TOV",
+        "STL",
+        "BLK",
+        "PF",
+        "PTS",
+        "USG_PCT",
+        "OREB_PCT",
+        "ENDP_FG3_PCT",
+        "ENDP_FT_PCT",
+        "own_poss",
+        "min_pg",
+        "def_poss_pg",
+        "two_pt_pct_raw",
+        "three_pt_pct_raw",
+        "ft_pct_raw",
+        *ATTRS,
     ]
-    master[table_cols].to_csv(config.PROCESSED_DIR / "attributes_table.csv", index=False)
+    master[table_cols].to_csv(
+        config.PROCESSED_DIR / "attributes_table.csv", index=False
+    )
 
     print("[derive] wrote:")
-    for name in ("players.json", "teams.json", "data_quality.json", "attributes_table.csv"):
+    for name in (
+        "players.json",
+        "teams.json",
+        "data_quality.json",
+        "attributes_table.csv",
+    ):
         print(f"  {config.PROCESSED_DIR / name}")
     print(f"[derive] players = {len(players_json)}, teams = {len(teams_json)}")
     return players_json, teams_json, report

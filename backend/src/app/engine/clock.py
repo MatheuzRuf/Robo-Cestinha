@@ -15,9 +15,9 @@ from dataclasses import dataclass
 class GameClock:
     quarter: int = 1
     game_clock_remaining: float = 720.0  # seconds left in current period
-    shot_clock_remaining: float = 24.0   # seconds left in current possession
-    quarter_duration_s: float = 720.0    # 12 min
-    ot_duration_s: float = 300.0         # 5 min
+    shot_clock_remaining: float = 24.0  # seconds left in current possession
+    quarter_duration_s: float = 720.0  # 12 min
+    ot_duration_s: float = 300.0  # 5 min
     is_game_over: bool = False
 
     def reset_for_new_possession(self, is_offensive_rebound: bool = False) -> None:
@@ -39,11 +39,15 @@ class GameClock:
             return 0.0, False
 
         # Cannot exceed remaining period time or remaining shot clock
-        actual_elapsed = min(duration_s, self.game_clock_remaining, self.shot_clock_remaining)
+        actual_elapsed = min(
+            duration_s, self.game_clock_remaining, self.shot_clock_remaining
+        )
         self.game_clock_remaining = max(0.0, self.game_clock_remaining - actual_elapsed)
         self.shot_clock_remaining = max(0.0, self.shot_clock_remaining - actual_elapsed)
 
-        shot_clock_violation = (self.shot_clock_remaining <= 0.0 and self.game_clock_remaining > 0.0)
+        shot_clock_violation = (
+            self.shot_clock_remaining <= 0.0 and self.game_clock_remaining > 0.0
+        )
         return actual_elapsed, shot_clock_violation
 
     def is_quarter_ended(self) -> bool:
