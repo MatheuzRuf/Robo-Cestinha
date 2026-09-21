@@ -15,54 +15,84 @@
 
 ---
 
+## Status Overview
+
+**Last updated:** 2026-09-21 — item-level status is marked `[x]` (done) / `[~]` (partial) / `[ ]` (not started) inside each phase below. The fine-grained backlog lives in [`docs/BACKLOG.md`](docs/BACKLOG.md) and the live architecture in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); keep those two in sync when updating this section.
+
+> ⚠️ **Architecture pivot (2026-09-13):** the original plan specified a single-process Streamlit app. The team replaced it with a **React (Vite + TypeScript) frontend**, a **FastAPI backend**, and **PostgreSQL** persistence. Phase names below are kept for continuity — where a phase says "Streamlit", read "React frontend / FastAPI API". Sections 1.1–1.3 already reflect the current architecture.
+
+| Phase | Title | Status | Notes |
+|---|---|---|---|
+| **A** | Data Contracts & Scaffolding | ✅ Done | Pydantic schemas + validators; `backend/` + `frontend/` monorepo |
+| **B** | Data Acquisition & Cleaning | ✅ Done | `data/processed/players.json` (582 players) + `teams.json` (30 teams); see `docs/statistics.md` |
+| **C** | State Machine Engine Core | 🟡 Partial | Possession loop, heuristics, clock, match log run headless (`engine/`); fouls/free-throws, substitutions, timeouts and unit tests pending |
+| **D** | Full Application (React + FastAPI) | 🟡 Partial | Home + Match Broadcast pages exist (mock-powered); Team Locker, Bracket, Tournament, real match endpoints missing |
+| **E** | 2D Court Visualization | 🟡 Partial | Live court/broadcast animation done in React (mock frames); persisted-frames replay pending |
+| **F** | LLM Narration | ⛔ Not started | Commentary column is mock/static text only |
+| **G** | Tournament Bracket | 🟡 Partial | Backend bracket seeding done (linked `Match` rows); UI, simulation advancement, bracket display pending |
+| **H** | Final Polish & Testing | ⛔ Not started | No test suite yet; frontend is mock-backed |
+
+**Legend:** ✅ done · 🟡 in progress / partially done · ⛔ not started.
+
+---
+
 ## 1. Project Overview & Architecture
 
 ### 1.1 What We Are Building
 
-A statistical basketball match simulator that runs **single-elimination tournaments** entirely in-browser via Streamlit. The simulation uses:
+A statistical basketball match simulator that runs **single-elimination multiplayer tournaments**. A React (Vite + TypeScript) frontend talks to a FastAPI backend over REST (commands/queries) and Server-Sent Events (live match frames), and PostgreSQL persists the team/player catalog plus all session & match data (see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)). The simulation uses:
 
 - A **deterministic state machine** to model possession flow (who has the ball, what action is taken, what the outcome is).
 - **Heuristic outcome resolution** — every possession action (shot, pass, dribble, turnover, foul) resolves through probabilities computed from real player attributes and game context. No trained model: the statistics themselves drive the outcomes.
-- An **LLM** (post-game only) to generate dramatic sports narration from structured match logs.
-- A **2D court visualization** showing interpolated player/ball movement, rendered after the simulation completes.
+- An **LLM** to generate dramatic play-by-play commentary from structured match events (live commentary column; post-game recap planned).
+- A **2D court visualization** rendering live player/ball movement from dense frame chunks, with replay from stored frames planned.
 
 ### 1.2 High-Level Data Flow
 
 ```
 NBA APIs / Basketball-Reference
-        │
+        │  (offline, one-off job)
         ▼
-  ┌─────────────┐
-  │ Data Scraper │──────► players.json  (cleaned player profiles)
-  │ & Cleaner    │──────► teams.json    (team rosters & stats)
-  └─────────────┘
-        │
+  ┌───────────────────────────────────┐
+  │ Data Scraper & Cleaner            │──────► players.json / teams.json
+  │ (backend/src/app/data_ingestion)  │        (data/processed/) ──► db seed
+  └───────────────────────────────────┘
+        │  (seeds PostgreSQL catalog)
         ▼
-  ┌──────────────────────────────────┐
-  │        Simulation Runner         │
-  │  State Machine (possession loop) │
-  │  + heuristic outcome resolution  │
-  │      from player attributes      │
-  └──────────────┬───────────────────┘
-                 │
-    ┌────────────┼────────────┐
-    ▼            ▼            ▼
-┌────────┐ ┌──────────┐ ┌──────────┐
-│ Stream-│ │ 2D Court │ │ Match    │
-│ lit UI │ │ Renderer │ │ Log JSON │──► LLM Narration
-└────────┘ └──────────┘ └──────────┘
+  ┌─────────────────────────────────────────────┐
+  │              FastAPI Backend                │
+  │  ┌───────────────────────────────────────┐  │
+  │  │ Simulation Engine (engine/)           │  │
+  │  │  State machine (possession loop)      │  │
+  │  │  + heuristic outcome resolution       │  │
+  │  └───────────────────────────────────────┘  │
+  │  ┌───────────────┐   ┌──────────────────┐  │
+  │  │ Domain Svc:    │   │ PostgreSQL:      │  │
+  │  │ sessions,      │   │ catalog +        │  │
+  │  │ bracket        │   │ session/match    │  │
+  │  └───────────────┘   └──────────────────┘  │
+  └─────────────────┬───────────────────────────┘
+                    │  REST (commands/queries) + SSE (live frames/events)
+                    ▼
+  ┌──────────────────────────────────────────┐
+  │          React Frontend (frontend/)      │
+  │  Home · Match Broadcast: live court,     │
+  │  scoreboard, play-by-play, commentary    │
+  └──────────────────────────────────────────┘
 ```
 
 ### 1.3 Tech Stack
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| UI & Dashboards | Streamlit | Tournament setup, live scoreboard, box scores, settings |
-| 2D Visualization | Streamlit + Matplotlib / Plotly | Simplified court rendering (dot-level animation) |
-| Backend Engine | Python 3.10+ | State machine, possession loop, heuristic outcome resolution, fatigue/foul system |
+| UI & Dashboards | React 19 + Vite + TypeScript + Framer Motion | Home, Team Locker, Bracket, Match Broadcast |
+| 2D Visualization | React + SVG (custom `CourtStage`) | Live/replay court rendering with pass/shot trajectories |
+| Backend API | FastAPI (Python 3.11+) | Sessions, catalog, bracket, match endpoints (REST + SSE) |
+| Backend Engine | Python (`backend/src/app/engine/`) | State machine, possession loop, heuristic outcome resolution, fatigue/foul system |
+| Persistence | PostgreSQL + SQLAlchemy 2 + Alembic | Global catalog + all session/match data (runtime source of truth) |
 | Data Source | `nba_api` Python package, Basketball-Reference (positions + fallback) | Player profiles, team rosters, season stats |
-| LLM Narration | OpenAI API / Groq (Llama 3) | Post-game dramatic narration |
-| Data Exchange | JSON files (players, teams, match logs) | Contract between all components |
+| LLM Narration | OpenAI API / Groq (Llama 3) | Live commentary + post-game recap |
+| Data Exchange | JSON files (players, teams, match logs) + Pydantic schemas | Contract between components; the DB is the runtime contract |
 
 ---
 
@@ -247,27 +277,25 @@ Each phase lists its goal, deliverables, and dependencies (which phases it build
 **Priority:** HIGH — Must be done first, unblocks everything else.
 **Can be parallel with:** Nothing (first phase).
 
-#### A.1 Project Repository Setup
-- Initialize Python project with `pyproject.toml` or `requirements.txt`.
-- Create folder structure:
+#### A.1 Project Repository Setup — ✅ DONE
+- [x] Python project managed with **uv** (`pyproject.toml` + `uv.lock`, Python 3.11+ pinned in `.python-version`).
+- [x] Folder structure (evolved from the original sketch into a backend/frontend monorepo):
   ```
   robo-cestinha/
-  ├── data/              # raw & processed JSON files
-  ├── engine/            # state machine, simulation runner
-  ├── ui/                # Streamlit pages & components
-  ├── narration/         # LLM prompt templates & API calls
-  ├── visualization/     # 2D court renderer
-  ├── tests/             # unit & integration tests
-  └── config/            # YAML/JSON config files
+  ├── backend/src/app/   # FastAPI: api/, domain/ (sessions, bracket), engine/, data_ingestion/, db/ (models + Alembic)
+  ├── frontend/src/      # React: pages/ (Home, MatchBroadcast), components/, hooks/, lib/i18n/, mock/
+  ├── data/              # raw cache (gitignored) + processed JSON (players/teams)
+  ├── docs/              # ARCHITECTURE.md, statistics.md, data_ingestion.md, BACKLOG.md
+  └── .spec/             # product specs & solution design
   ```
-- Set up `.gitignore`, `README.md`, and a shared virtual environment.
+- [x] `.gitignore`, `README.md`, `Makefile` (bootstrap/dev/migrate/reset-db/format), shared venv via `uv sync`.
 
-#### A.2 Formalize JSON Schemas
-- Lock down `players.json`, `teams.json`, `match_log.json` schemas (as described in Section 2.1).
-- Write validators using Pydantic or dataclasses — these become the **single source of truth** for every other module.
-- Commit the schema definitions + validators. This is the contract.
+#### A.2 Formalize JSON Schemas — ✅ DONE
+- [x] Lock down `players.json`, `teams.json`, `match_log.json` schemas (Section 2.1).
+- [x] Validators via Pydantic — single source of truth: `backend/src/app/data_ingestion/schemas.py` (catalog) and `backend/src/app/engine/schemas.py` (match log / box scores).
+- [x] SQLAlchemy models + Alembic migration `0001_initial_tables.py` implement the runtime-side contract.
 
-**Deliverable:** A Python package with schema classes that all other modules import.
+**Deliverable:** ✅ DONE — schema package in `backend/src/app/` imported by engine, data ingestion, and domain services.
 
 ---
 
@@ -277,27 +305,26 @@ Each phase lists its goal, deliverables, and dependencies (which phases it build
 **Depends on:** Phase A (schemas).
 **Can be parallel with:** Phase C (engine core, if engine uses mock data initially).
 
-#### B.1 NBA API Integration
-- **▶ Fully designed & implemented — see [`docs/statistics.md`](docs/statistics.md) and `src/data_ingestion/`.**
-- Use the `nba_api` Python package to pull current season or historical player stats.
-- Extract per-player: FG%, 3P%, FT%, rebounds, assists, turnovers, steals, blocks, usage rate.
-- Extract per-team: pace, offensive rating, defensive rating.
+#### B.1 NBA API Integration — ✅ DONE
+- [x] **Implemented — see [`docs/statistics.md`](docs/statistics.md) and `backend/src/app/data_ingestion/`.**
+- [x] Uses the `nba_api` Python package (stats.nba.com) for the **2025-26 regular season**, cached verbatim under `data/raw/2025_26/`.
+- [x] Extracts per-player: FG%, 3P%, FT%, rebounds, assists, turnovers, steals, blocks, usage rate (+ clutch and OREB%).
+- [x] Extracts per-team: pace, offensive rating, defensive rating.
 
-#### B.2 Basketball-Reference Scraper
-- Pull the classic 5-position taxonomy (PG/SG/SF/PF/C) from Basketball-Reference (the NBA only publishes G/F/C).
-- Use `requests` + stdlib HTML parsing (the site blocks scripts; the page is saved locally once).
-- Match the same attribute fields as the API path wherever the API lacks them.
+#### B.2 Basketball-Reference Scraper — ✅ DONE
+- [x] Classic 5-position taxonomy (PG/SG/SF/PF/C) pulled from a locally-saved Basketball-Reference totals page (`bballref.py`, stdlib HTML parsing).
+- [x] Pipeline refuses to derive output without it (see `docs/statistics.md §7`); matches the positions onto players.
 
-#### B.3 Data Cleaning & Normalization
-- Convert all raw stats into the 0–1 or percentage-based attributes defined in `players.json`.
-- Derive `stamina` (default 0.85, scaled by minutes per game), `clutch_factor` (from clutch-situation stats vs overall), and `turnover_rate`.
-- Output cleaned `players.json` and `teams.json` to `data/processed/`.
+#### B.3 Data Cleaning & Normalization — ✅ DONE
+- [x] Raw stats converted into the 0–1 or percentage-based attributes defined in `players.json` (shrinkage applied to stabilize rates).
+- [x] `stamina` derived from minutes played; `clutch_factor` from clutch-situation splits; turnover/steal/rebound rates from league endpoints.
+- [x] Outputs `data/processed/players.json` (582), `teams.json` (30), `attributes_table.csv`, `data_quality.json`.
 
-#### B.4 Team Builder (UI and Logic)
-- Allow users to select NBA teams or create custom teams with custom player attributes in Streamlit.
-- This is the first Streamlit page built — it doubles as the UI scaffolding.
+#### B.4 Team Builder (UI and Logic) — 🟡 PARTIAL (UI pending)
+- [ ] Allow users to select NBA teams or create custom teams with custom player attributes (the "Team Locker" screen in `.spec/` replaces the old Streamlit idea).
+- [x] UI scaffolding exists: React design system (Button, Card, Modal, Chip, SegmentedControl, …) + Home page, i18n (en-US/pt-BR).
 
-**Deliverable:** `data/processed/players.json` + `data/processed/teams.json` with ≥30 NBA players, and a working Team Selection page in Streamlit.
+**Deliverable:** 🟡 `data/processed/players.json` + `teams.json` **DONE** (582 players / 30 teams, seeded into Postgres via `backend/src/app/db/seed.py`); **Team Locker page not built yet** (BACKLOG `TS-01…TS-03`).
 
 ---
 
@@ -307,68 +334,62 @@ Each phase lists its goal, deliverables, and dependencies (which phases it build
 **Depends on:** Phase A (schemas).
 **Can be parallel with:** Phase B (use mock player data during development).
 
-#### C.1 Possession Loop (Heuristics)
-- Implement the 3-state machine: `POSSESS → TEAMMATE → OPPONENT`.
-- Each state triggers deterministic logic based on player attributes:
-  - **Dribble:** consume N seconds, advance "ball position."
-  - **Pass:** compute success probability from passer `turnover_rate` vs defender `steal_rate`.
-  - **Shoot:** compute outcome from shooter %, defense adjusted.
-  - **Turnover / Rebound:** transition to opponent.
-- Resolve every action with **weighted random choice** based on the player attributes (no model involved).
+#### C.1 Possession Loop (Heuristics) — ✅ DONE
+- [x] State machine implemented in `engine/state_machine.py` + `engine/heuristics.py` (`decide_handler_action`, `resolve_pass_teammate`/`resolve_pass_outcome`, `decide_move_direction`, `resolve_move_outcome`, `resolve_shot`, `resolve_rebound`).
+- [x] Every action resolved via **weighted random choice** from real player attributes (shot %, turnover, steal, rebound, usage, clutch, fatigue) — no model involved.
+- [x] 50-cell court grid, 8-direction movement, 2pt/3pt distance rule in `engine/grid.py`; players start clustered mid-court.
 
-#### C.2 Fatigue & Foul System
-- **Fatigue:** start at `stamina`, decay by 0.01 per possession for on-court players. At thresholds (e.g., 0.4), reduce shooting % and increase turnover rate. Substitutions triggered at fatigue thresholds or time intervals.
-- **Fouls:** each defensive action has a small chance to commit a foul (based on player `foul_rate`). At 5 personal fouls → player fouls out. Team fouls → bonus free throws.
+#### C.2 Fatigue & Foul System — 🟡 PARTIAL
+- [x] **Fatigue:** `current_stamina` decays per second on court (`LivePlayer.record_minutes`); below 0.4 stamina, shooting penalized in `resolve_shot`.
+- [~] **Fouls:** foul events can be drawn on idle moves (weighted by `foul_rate`), tracked per player/quarter — but **free throws, 5-foul fouling-out, and substitutions are not yet implemented**.
 
-#### C.3 Clock & Quarter Management
-- 4 quarters of 12 minutes each (NBA rules, adjustable via config).
-- Shot clock (24s) enforcement.
-- Timeouts (7 per team per game), substitutions, overtime logic.
+#### C.3 Clock & Quarter Management — 🟡 PARTIAL
+- [x] 4 quarters × 12 min, 24 s shot clock (14 s after offensive rebound), 5-min OT period, quarter-end handling (`engine/clock.py` + `match_runner.py`).
+- [ ] Timeouts (7 per team per game) and fatigue-triggered substitutions not implemented.
 
-#### C.4 Match Log Generation
-- Every possession writes an entry to the in-memory `match_log` structure (conforming to Phase A schema).
-- After the game ends, dump to `match_log.json`.
+#### C.4 Match Log Generation — ✅ DONE
+- [x] Every possession/action writes to the in-memory `MatchLog` (Pydantic `engine/schemas.py`), incl. box scores + key moments; `engine/demo.py` runs a full headless match.
+- [ ] Not yet persisted per match in the DB, and not yet emitted as `MatchEvent` / `MatchFrameChunk` for SSE streaming (only designed in `.spec/solution-design.md`).
 
-#### C.5 Unit Tests
-- Test the state machine with extreme attribute values (e.g., 100% shooter should never miss).
-- Test fatigue decay, foul accumulation, quarter transitions.
+#### C.5 Unit Tests — ⛔ NOT STARTED
+- [ ] No test suite yet (`backend/tests/` absent; `pytest`/`pytest-asyncio` are dev extras but unused). Needed: extreme attributes (100% shooter never misses), fatigue decay, foul accumulation, quarter transitions.
 
-**Deliverable:** A headless Python module that takes two team IDs and produces a complete `match_log.json` using heuristic-based simulation.
+**Deliverable:** 🟡 Headless engine **exists** (takes two `LiveTeam`s → full `MatchLog`). Wiring engine output into a Match service/API + live streaming events is the main remaining engine work (BACKLOG `SE-*`, `LB-02/03`).
 
 ---
 
-### Phase D: Streamlit UI — Full Application
+### Phase D: Full Application — React Frontend + FastAPI (supersedes the original Streamlit phase)
 
 **Priority:** MEDIUM.
 **Depends on:** Phase A (schemas), Phase B (team data), Phase C (engine for full integration).
 **Can be parallel with:** Phases C (scaffolding and mock-based pages), E, F, G.
+**Note (2026-09-13):** the Streamlit app was replaced by a **React + Vite frontend** and a **FastAPI backend** — see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). The page table below maps to the current codebase.
 
-#### D.1 Page Structure (Streamlit Multi-Page)
+#### D.1 Page Structure (React Routes)
 
-| Page | Route | Purpose | Depends On |
-|---|---|---|---|
-| Home | `/` | User registration (name), tutorial, settings (sound toggle, theme) | Nothing |
-| Team Setup | `/setup` | Select teams, customize rosters, edit player attributes | Phase B |
-| Bracket Editor | `/bracket` | Interactive single-elimination bracket builder | Phase A schemas |
-| Simulation Runner | `/simulate` | Start simulation, progress bar, live scoreboard | Phase C |
-| Match Result | `/match/<id>` | Box score, quarter-by-quarter breakdown, 2D playback | Phase C + Phase E |
-| Tournament | `/tournament` | Full bracket view with results, advance winners | Phase C |
+| Page | Route | Status | Purpose | Depends On |
+|---|---|---|---|---|
+| Home | `/` | ✅ done (mock) | Display name (localStorage), join UI, recent sessions | Nothing |
+| Team Locker (was "Team Setup") | `/setup` | ⛔ not started | Browse catalog, claim a team, view roster/stats | Phase B + API |
+| Bracket Editor | `/bracket` | ⛔ not started | Interactive single-elimination bracket builder | Phase A + G |
+| Simulation Runner | `/simulate` | ⛔ not started | Start simulation, progress, live scoreboard via SSE | Phase C |
+| Match Broadcast (was "Match Result") | `/match-demo` (demo) · `/match/<id>` (real) | 🟡 page built, **mock data** | Box score, play-by-play, 2D playback | Phase C + E |
+| Tournament | `/tournament` | ⛔ not started | Full bracket view with results, advance winners | Phase C + G |
 
-#### D.2 Session State Management
-- Use `st.session_state` to persist: selected teams, tournament bracket, current match log, user preferences.
-- Avoid global variables; keep state clean and serializable.
+#### D.2 Session & UI State Management
+- [x] Backend: `POST /sessions` creates a Session + owner User + seeds the bracket (BACKLOG `SI-01`).
+- [~] Frontend: display name persisted to localStorage (Home page); session join flow not wired to the real API yet (`SI-02…SI-05`).
+- [ ] Bracket/team/match state in React + serializable API mirror — not started.
 
-#### D.3 Simulation Progress Feedback
-- Since Streamlit is single-threaded and re-renders on each interaction, the simulation **must** run in a background thread or as a pre-computed batch.
-- **Strategy:** User clicks "Simulate Match" → engine runs to completion in < 3 seconds → Streamlit loads the result page with the full `match_log.json`. Use `st.progress()` with a polling mechanism if needed.
-- No real-time streaming during simulation — this is a deliberate tradeoff for simplicity.
+#### D.3 Simulation Progress & Live Updates
+- [x] Backend runs the engine **headless and fast** (full match in a few seconds — `engine/match_runner.py`).
+- [ ] Live delivery via **SSE** (`MatchEvent` + `MatchFrameChunk`) designed in `.spec/solution-design.md` but **not implemented** — no `/matches` endpoints yet (BACKLOG `LB-02/03`).
 
 #### D.4 Box Score & Stats Display
-- Read `match_log.json` box score section.
-- Render styled tables with `st.dataframe` or `st.table`.
-- Highlight top performers, show shooting charts, play-by-play timeline.
+- [x] `MatchLog` produces full box scores (`engine/schemas.py` → `TeamBoxScore`/`PlayerBoxScore`).
+- [ ] No box-score/stats view yet — broadcast components render from `mockMatchData.ts`.
 
-**Deliverable:** A fully navigable Streamlit app with all 6 pages working end-to-end.
+**Deliverable:** 🟡 Navigable app: **Home + Match Broadcast (demo/mock) working**; Team Locker, Bracket, Tournament, and real API-backed match pages still to build (BACKLOG `TS-*`, `TB-*`, `MR-*`).
 
 ---
 
@@ -378,24 +399,18 @@ Each phase lists its goal, deliverables, and dependencies (which phases it build
 **Depends on:** Phase C (final `match_log.json` structure).
 **Can be parallel with:** Phases D, F, G.
 
-#### E.1 Court Rendering
-- Use `matplotlib` to draw a simplified half-court or full-court diagram.
-- Court lines: 3-point arc, key, baseline, sideline.
-- Players rendered as labeled dots with team colors.
+#### E.1 Court Rendering — ✅ DONE (React/SVG)
+- [x] SVG court (94×50 ft; config in `frontend/src/config/court.ts`), players as labeled dots with team colors, ball with offset physics (`CourtStage/`).
 
-#### E.2 Key Moment Playback
-- From `match_log.json`, extract "key moments" (field goals, turnovers, steals).
-- For each key moment, show 2–3 frames:
-  - Frame 1: ball handler position (interpolated from possession clock).
-  - Frame 2: pass trajectory (line from passer to receiver).
-  - Frame 3: shot arc (from shooter to rim) and outcome (made = green, miss = red).
-- Display as a slideshow or auto-advancing animation using `st.empty()` + `time.sleep()`.
+#### E.2 Live Playback & Key Moments — 🟡 PARTIAL
+- [x] Frame-queue player with speed control (1×/1.5×/2×) and pause (`hooks/useGameFrames.ts`), Framer Motion animations, pass/release trajectory lines — currently driven by the **mock engine** (`frontend/src/mock/mockEngine.ts`).
+- [ ] Key-moment slideshow (2–3 frame steps per key moment from `match_log.json`) not implemented.
 
-#### E.3 Integration into Match Result Page
-- Embed the court visualization in the Match Result page below the box score.
-- Let users scrub through key moments.
+#### E.3 Integration into Match Broadcast Page — 🟡 PARTIAL
+- [x] Court embedded in the broadcast page with a Timeline Scrubber (`TimelineScrubber.tsx`).
+- [ ] Replay page from stored `MatchFrameChunk`s (BACKLOG `MR-01`/`MR-02`) not built.
 
-**Deliverable:** Animated 2D court view embedded in Streamlit showing key match moments.
+**Deliverable:** 🟡 Animated live court works end-to-end on mock data; real-frames playback requires the engine streaming layer + persistence.
 
 ---
 
@@ -405,35 +420,29 @@ Each phase lists its goal, deliverables, and dependencies (which phases it build
 **Depends on:** Phase C (final `match_log.json` structure).
 **Can be parallel with:** Phases D, E, G.
 
-#### F.1 Prompt Engineering
-- Design a system prompt for the LLM:
+#### F.1 Prompt Engineering — ⛔ NOT STARTED
+- [ ] Design a system prompt for the LLM:
   ```
   You are a dramatic basketball play-by-play announcer. Given a JSON match log,
   produce an exciting 3-paragraph game recap covering: opening highlights, key
   turning points, and closing moments. Use Brazilian Portuguese (or English),
   energetic tone, and reference player names and stats from the log.
   ```
-- Experiment with different prompt variants for tone, length, and language.
+- [ ] Experiment with different prompt variants for tone, length, and language.
 
-#### F.2 Log-to-Prompt Compiler
-- Extract from `match_log.json`:
-  - Final score.
-  - Top 3 performers (PTS, REB, AST).
-  - Key moments (lead changes, clutch shots, big runs).
-  - Quarter-by-quarter score progression.
-- Format as a compact text blob appended to the system prompt.
+#### F.2 Log/Event-to-Prompt Compiler — ⛔ NOT STARTED
+- [ ] Extract from `match_log.json` / `MatchEvent`s: final score, top 3 performers (PTS/REB/AST), key moments, quarter-by-quarter progression.
+- [ ] Format as a compact text blob appended to the system prompt.
 
-#### F.3 LLM API Integration
-- Support at least one provider: OpenAI (GPT-4o-mini for cost) or Groq (Llama 3, free tier).
-- Add a configurable API key in `config/settings.yaml`.
-- Call the API **after** the simulation completes; run in a background thread.
-- Show a spinner ("Generating narration…") on the result page. Display narration text when ready.
+#### F.3 LLM API Integration — ⛔ NOT STARTED
+- [ ] Provider support: OpenAI (GPT-4o-mini for cost) or Groq (Llama 3, free tier); configurable API key.
+- [ ] Plan evolved: commentary feeds on **live `MatchEvent` groups** via a Commentary Generator (BACKLOG `LB-04`), plus a post-game recap — run in a background task so the UI never blocks.
 
-#### F.4 Fallback & Error Handling
-- If the API call fails (timeout, rate limit, no key), show a static template-based recap instead (no narration, just stats).
-- Never block the result page from loading because the LLM is slow.
+#### F.4 Fallback & Error Handling — ⛔ NOT STARTED
+- [ ] Static template-based recap when the API fails (timeout, rate limit, no key).
+- [ ] Never block the page from loading because the LLM is slow.
 
-**Deliverable:** Dynamic, LLM-generated game recap displayed on the Match Result page.
+**Deliverable:** ⛔ Not started — `CommentaryColumn.tsx` renders mock/static text. Blocked on the engine streaming layer (LB-02/03) and the prompt/API pipeline.
 
 ---
 
@@ -443,10 +452,11 @@ Each phase lists its goal, deliverables, and dependencies (which phases it build
 **Depends on:** Phase A (schemas), Phase C (engine for match simulation).
 **Can be parallel with:** Phases D, E, F.
 
-#### G.1 Bracket Data Structure
-- Support 4, 8, or 16-team single-elimination brackets.
-- Represent as a binary tree with byes for non-power-of-2 sizes.
-- JSON schema for bracket state:
+#### G.1 Bracket Data Structure — ✅ DONE (backend)
+- [x] 4/8/16-team single-elimination brackets (2ⁿ sizes) as **linked `Match` rows** (`next_match_id` + `next_match_slot`) — `backend/src/app/domain/bracket/`.
+- [x] `BracketService.seed_bracket_for_session` seeds any catalog team count (round 1 "ready", later rounds "locked").
+- [ ] Byes for non-power-of-2 sizes not supported (out of current scope).
+- [x] JSON schema for bracket state (still the UI contract):
   ```jsonc
   {
     "rounds": [
@@ -460,20 +470,17 @@ Each phase lists its goal, deliverables, and dependencies (which phases it build
   }
   ```
 
-#### G.2 Bracket Editor UI
-- Drag-and-drop or dropdown-based team assignment to bracket slots.
-- Streamlit doesn't support true drag-and-drop natively; use selectboxes arranged in a visual bracket layout.
+#### G.2 Bracket Editor UI — ⛔ NOT STARTED
+- [ ] Dropdown/selectbox-based team assignment to bracket slots (no drag-and-drop; selectboxes in a visual bracket layout).
 
-#### G.3 Tournament Simulation
-- "Simulate All" button: iterates through all round-1 matches, determines winners, populates round-2 slots, and repeats until champion.
-- Progress bar across all matches.
-- Each match result is individually viewable.
+#### G.3 Tournament Simulation — 🟡 PARTIAL (backend seeding only)
+- [x] Round structure and advancement links created server-side at session creation (`POST /sessions`).
+- [ ] "Simulate All": running `MatchRunner` per match, persisting results, advancing winners — **not wired**; needs the Match API/engine service (BACKLOG `LB-02`, `TB-*`).
 
-#### G.4 Bracket Display
-- Visual bracket tree using styled HTML/CSS inside `st.markdown()` or a Plotly Sankey-like diagram.
-- Winners advance visually. Champion highlighted.
+#### G.4 Bracket Display — ⛔ NOT STARTED
+- [ ] Visual bracket tree with winner advancement + champion highlight.
 
-**Deliverable:** Full tournament mode: build bracket → simulate all → view champion.
+**Deliverable:** 🟡 Backend seeding done; build-bracket UI, tournament simulation, and bracket display pending.
 
 ---
 
@@ -483,26 +490,24 @@ Each phase lists its goal, deliverables, and dependencies (which phases it build
 **Depends on:** Everything above.
 **Can be parallel with:** Nothing (final phase).
 
-#### H.1 End-to-End Integration Testing
-- Full flow: User opens app → picks teams → builds bracket → simulates → views box score + 2D playback + narration.
-- Test with different team counts, custom players, edge cases (all players foul out, overtime, blowout).
+#### H.1 End-to-End Integration Testing — ⛔ NOT STARTED
+- [ ] Full flow: open app → pick teams → build bracket → simulate → view broadcast/replay + narration.
+- [ ] Edge cases: all players foul out, overtime, blowouts, custom players.
 
-#### H.2 Performance Profiling
-- Ensure match simulation completes in < 3 seconds for a full game.
-- Ensure LLM narration does not block UI rendering.
-- Memory usage check for large brackets (16 teams × 15 matches = 15 simulated games).
+#### H.2 Performance Profiling — 🟡 PARTIAL
+- [x] Headless match sim completes in a few seconds (`engine/match_runner.py`) — tune during H.
+- [ ] LLM/SSE must never block the UI; memory checks for 16-team brackets (15 matches) not measured.
 
-#### H.3 UI/UX Polish
-- Consistent styling (custom Streamlit theme via `.streamlit/config.toml`).
-- Error messages for missing data, API failures.
-- Loading spinners, progress bars, empty states.
+#### H.3 UI/UX Polish — 🟡 PARTIAL
+- [x] Design system with shared tokens/components (`frontend/src/styles/tokens.css`, per-component `.module.css`) — replaces the old Streamlit theme idea.
+- [ ] Error/empty states and loading spinners for real API calls (mock data never hits the network).
 
-#### H.4 Documentation
-- `README.md` with setup instructions, architecture diagram, how to run.
-- Docstrings on key engine functions.
-- Demo video or screenshots for the presentation.
+#### H.4 Documentation — ✅ DONE (mostly)
+- [x] `README.md` (uv setup + data ingestion), `docs/ARCHITECTURE.md`, `docs/statistics.md`, `docs/data_ingestion.md`, `docs/BACKLOG.md`, `backend/openapi.yaml`.
+- [x] Docstrings on key engine/services functions (ruff-formatted).
+- [ ] End-to-end "how to run the app" (backend + frontend dev flows) and demo screenshots/video pending.
 
-**Deliverable:** Production-ready, documented, tested application.
+**Deliverable:** ⛔ Not production-ready yet — backend services lack tests, the frontend is mock-backed, and the API surface is incomplete.
 
 ---
 
@@ -519,7 +524,7 @@ Phase A: Contracts & Scaffolding
    ┌─────────┼─────────┬───────────┐
    ▼         ▼         ▼           ▼
 Phase D:  Phase E:   Phase F:    Phase G:
- Streamlit  2D Court   LLM          Tournament
+ React      2D Court   LLM          Tournament
  UI         Renderer   Narration
    └─────────┴─────────┴───────────┘
              │
@@ -549,10 +554,10 @@ Phase D:  Phase E:   Phase F:    Phase G:
 |---|---|---|---|
 | `nba_api` package is deprecated or rate-limited | HIGH — No real player data | Medium | Basketball-Reference as fallback (Phase B.2). Cache all API responses locally. |
 | Heuristic outcomes drift from realistic NBA distributions | MEDIUM — Sims feel off | Medium | Calibrate the attribute→probability curves against real league averages during Phase H; every formula is isolated in data ingestion and the engine, so tuning is cheap. |
-| Streamlit re-renders break long-running simulation | HIGH — App freezes | Medium | **Simulation runs to completion before UI renders results.** No real-time streaming. Use `@st.cache_data` for static assets. |
+| Long-running simulation blocks the live UI | HIGH — App freezes | Medium | Engine runs headless and fast (<3 s/match); live streams arrive via **SSE** (`MatchEvent`/`MatchFrameChunk`) so the React UI never blocks. Replays read stored chunks. |
 | LLM API is slow or unavailable | LOW — Narration is non-critical | Medium | Implement static template fallback (Phase F.4). Narration is a "nice to have," not core. |
 | Team member availability gaps | MEDIUM — Work blocked | Medium | Phases are designed with clear interfaces. One person's module can progress using mock data that conforms to the schema contract from Phase A. |
-| Scope creep (too many features) | HIGH — Won't finish on time | Medium | The plan is split into MUST (A–C, D basic), SHOULD (D full, G), and NICE (E, F). If time is tight, drop E and F first. |
+| Scope creep (too many features) | HIGH — Won't finish on time | Medium | The plan is split into MUST (A–C, D basic), SHOULD (D full, G), and NICE (F). If time is tight, drop LLM narration (F) first — its UI slot should render a static fallback. |
 
 ---
 
