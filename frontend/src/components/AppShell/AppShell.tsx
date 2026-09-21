@@ -10,7 +10,7 @@ interface AppShellProps {
   children: ReactNode;
 }
 
-export function AppShell({ activeNavItem, onlineCount, sessionCode, tickerText, children }: AppShellProps) {
+export function AppShell({ activeNavItem, onlineCount, sessionCode, children }: AppShellProps) {
   const { t } = useTranslation();
   return (
     <div className={styles.shell} data-active-nav-item={activeNavItem}>
@@ -32,12 +32,6 @@ export function AppShell({ activeNavItem, onlineCount, sessionCode, tickerText, 
             </span>
           ) : null}
           {sessionCode ? <span className={styles.pill}>{t('shell.session_code', { code: sessionCode })}</span> : null}
-          <button className={styles.iconButton} type="button" aria-label={t('common.sound')}>
-            🔊
-          </button>
-          <button className={styles.iconButton} type="button" aria-label={t('common.profile')}>
-            ☺
-          </button>
         </div>
       </header>
       {children}
