@@ -1,0 +1,1166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Robô Cestinha — Full-Repo Walkthrough · MC 857</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>" />
+<link rel="stylesheet" href="vendor/reveal/dist/reset.css" />
+<link rel="stylesheet" href="vendor/reveal/dist/reveal-6.css" />
+<link rel="stylesheet" href="vendor/reveal/dist/theme/black.css" />
+<link rel="stylesheet" href="vendor/reveal/dist/plugin/highlight/monokai.css" />
+<link rel="stylesheet" href="theme.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="bt">ROBÔ CESTINHA</span>
+    <span class="bs">FULL-REPO WALKTHROUGH · MC 857 · 2026</span>
+  </div>
+  <nav class="controls">
+    <button id="btn-notes" class="pill hide-mobile" data-on="false" type="button">NOTES (N)</button>
+    <button id="btn-timer" class="pill" data-on="false" type="button">TIMER (T)</button>
+  </nav>
+</header>
+
+<footer class="bottombar">
+  <span class="part-label" id="partLabel">PART I · GENERAL OVERVIEW</span>
+  <span class="status">
+    <span class="timer" id="timerChip" hidden></span>
+    <span class="counter" id="counter">01 / 25</span>
+  </span>
+</footer>
+<div class="hint">← → navigate · O overview · F fullscreen · N notes · T timer · Esc close</div>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ══════════════════════════════════════════════════════════
+     S1 · TITLE
+     ══════════════════════════════════════════════════════════ -->
+<section id="s1" data-part="I" data-budget="0:30" class="slide-hero">
+  <div class="kicker">MC 857 · Course Project · Team Robô Cestinha · 2026</div>
+  <h2 class="mega">Robô <span class="hl">Cestinha</span></h2>
+  <p class="hero-sub">From real NBA data to a live broadcast — a statistical basketball tournament simulator where every possession resolves heuristically from real player attributes, rendered live on a 2D court.</p>
+  <div class="chips" style="justify-content:center">
+    <span class="chip">React 19 + Vite</span>
+    <span class="chip">FastAPI + SQLAlchemy</span>
+    <span class="chip">PostgreSQL 16</span>
+    <span class="chip hot">≈ 20 min</span>
+  </div>
+  <aside class="notes">
+Good morning — we're Team Robô Cestinha, and this is the whole repository, end to end. In 20 minutes we'll go front to back: the general shape of the product, the React frontend, the FastAPI backend (which includes the data-processing pipeline that feeds everything), and final considerations. Two things to keep in your head the whole time: every number you'll see comes from real NBA statistics, and there is exactly one contract between the data and the simulation.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S2 · AGENDA
+     ══════════════════════════════════════════════════════════ -->
+<section id="s2" data-part="I" data-budget="0:30">
+  <div class="kicker">The plan · 0:30</div>
+  <h2>Agenda — <span class="hl">four acts + backup</span></h2>
+  <div class="flow">
+    <div class="fnode"><b><span class="part-I">I · General overview</span> — 4 min</b> <span class="meta">the product, the system map, the stack, the contract philosophy</span></div>
+    <div class="fnode"><b><span class="part-II">II · Frontend: overview &amp; details</span> — 6 min</b> <span class="meta">pages · design system · the broadcast · the court · frame flow · i18n</span></div>
+    <div class="fnode"><b><span class="part-III">III · Backend: overview &amp; details</span> — 6.5 min</b> <span class="meta">layers · engine · <b>data processing (ingestion + math + gate)</b> · persistence &amp; API · ops</span></div>
+    <div class="fnode"><b><span class="part-IV">IV · Final considerations</span> — 3 min</b> <span class="meta">status · decisions &amp; risks · how to run it · closing</span></div>
+    <div class="fnode pass"><b>Backup slides</b> — Q&amp;A <span class="meta">possession math · shrinkage · gate output · contract in code</span></div>
+  </div>
+  <div class="callout center" style="margin-top:10px"><b>TOTAL ≈ 20:00</b> · a timer chip with each slide's budget is in the bottom bar</div>
+  <aside class="notes">
+Tour map: first the big picture — what the product is and the four blocks behind it. Then frontend: what the user sees — two pages, the design system, and the animated broadcast. Then the backend, including the data pipeline that sits inside it: how NBA data becomes simulator attributes, with a contract gate at the exit. We close with where the project stands and the decisions we're defending. Backup slides live after the divider for Q&amp;A.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S3 · PRODUCT IN ONE PICTURE
+     ══════════════════════════════════════════════════════════ -->
+<section id="s3" data-part="I" data-budget="0:45">
+  <div class="kicker">Part I · The product · 0:45</div>
+  <h2>One picture, <span class="hl">end to end</span></h2>
+  <div class="chain">
+    <div class="node">NBA APIs<small>stats.nba.com</small></div>
+    <span class="arr">+</span>
+    <div class="node">Basketball-Reference<small>positions</small></div>
+    <span class="arr">→</span>
+    <div class="node hot">Data Ingestion<small>offline pipeline</small></div>
+    <span class="arr">→</span>
+    <div class="node"><span class="mono">players.json</span><small>582 · 12 attrs</small></div>
+    <span class="arr">→</span>
+    <div class="node hot">Simulation Engine<small>possession state machine</small></div>
+    <span class="arr">→</span>
+    <div class="node">MatchLog<small>possessions · box score</small></div>
+    <span class="arr">→</span>
+    <div class="node hot">Live Broadcast<small>2D court · scoreboard</small></div>
+  </div>
+  <div class="grid-2" style="margin-top:16px">
+    <div class="card">
+      <div class="card-head"><span class="tag in">THE PITCH</span></div>
+      <p>A statistical simulator for single-elimination NBA-style tournaments: deterministic possession flow, <b>heuristic outcome resolution</b> — probabilities come straight from real player stats, no trained model.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag out">THREE FACTS</span></div>
+      <ul class="tight">
+        <li>Simulation is <b>headless in the backend</b> — one demo runs a full game in ~4 min</li>
+        <li>Broadcast UI is <b>mock-powered today</b> — live SSE is the next hop</li>
+        <li>Everything downstream reads <b>one contract</b> (2 files, 0–1 values)</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+The whole product is a chain: real statistics in, dramatic broadcast out. Data ingestion turns two external sources into two JSON files. The engine is a possession-level state machine whose probabilities come from those files — no ML. The output is a MatchLog that the broadcast renders. Keep this chain in mind — everything on the frontend and backend is a link in it.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S4 · SYSTEM MAP
+     ══════════════════════════════════════════════════════════ -->
+<section id="s4" data-part="I" data-budget="0:50">
+  <div class="kicker">Part I · System map · 0:50</div>
+  <h2>Four blocks, <span class="hl">one-way rules</span></h2>
+  <div class="grid-2n">
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag in">FRONTEND · React 19</span><span class="dim xs">renders, never rules</span></div>
+        <p class="xs">Services → Components → Pages. Thin pages compose shared UI; services talk to API + localStorage. REST for commands/queries, <b>SSE for live frames</b>.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag out">BACKEND · FastAPI</span><span class="dim xs">owns every rule</span></div>
+        <p class="xs">Engine → Domain services → API — strictly one-way (<span class="mono">api → domain → db</span>). The engine is a headless dependency of Match services; it knows nothing about HTTP or users.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag warn">PERSISTENCY · PostgreSQL 16</span></div>
+        <p class="xs">Catalog (teams / players with a <span class="mono">JSON</span> attributes blob) + sessions, brackets, matches, events.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag ok">EXTERNAL DATA · one-off pipeline</span></div>
+        <p class="xs">Offline fetch + derive → catalog files → <b>seeds the DB</b>. Not part of live request traffic.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag in">DATA MODEL — 6 TABLES</span></div>      <pre class="sm"><code data-trim data-noescape class="language-nohighlight">Team  · Player ( attributes: JSON )
+Session · User ( per-session join # )
+Match — next_match_id self-links the bracket tree
+MatchEvent / MatchFrameChunk — sparse vs dense</code></pre>
+      <div class="callout">Match events &amp; frames are <b>deliberately separate</b>: different access patterns, different schemas.</div>
+    </div>
+  </div>
+  <aside class="notes">
+The architecture doc splits the world into four blocks. Frontend renders; backend owns all rules; PostgreSQL persists; and the data pipeline is a one-off offline job that prepares the catalog. Two design rules matter: dependencies point one way in the backend — api to domain to db, with the engine as an isolated dependency — and on the wire, REST handles commands and queries while SSE carries live match frames. The schema shows the philosophy: a JSON attributes column means the file schema and the database agree without migrations.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S5 · STACK & REPO LAYOUT
+     ══════════════════════════════════════════════════════════ -->
+<section id="s5" data-part="I" data-budget="0:45">
+  <div class="kicker">Part I · The stack · 0:45</div>
+  <h2>Stack &amp; <span class="hl">repo layout</span></h2>
+  <div class="grid-2">
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag in">FRONTEND</span></div>
+        <div class="chips" style="gap:6px">
+          <span class="chip">React 19</span><span class="chip">Vite 8</span><span class="chip">TypeScript 6</span>
+          <span class="chip">Framer Motion</span><span class="chip">CSS Modules</span><span class="chip">oxlint / prettier</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag out">BACKEND</span></div>
+        <div class="chips" style="gap:6px">
+          <span class="chip">FastAPI</span><span class="chip">SQLAlchemy 2 async</span><span class="chip">Alembic</span>
+          <span class="chip">Pydantic v2</span><span class="chip">uv · Python 3.14</span><span class="chip">nba-api · pandas</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag warn">INFRA &amp; TOOLING</span></div>
+        <p class="xs">PostgreSQL 16 via Docker · ruff format · Makefile targets · <span class="mono">uv.lock</span> / <span class="mono">package-lock.json</span> committed · secrets only via <span class="mono">core/secrets.py</span></p>
+      </div>
+    </div>
+    <div class="card" style="padding:10px 0 10px 0">
+      <div class="card-head" style="padding:0 16px"><span class="tag in">REPO TREE (condensed)</span></div>
+      <pre><code data-trim data-noescape class="language-nohighlight">backend/src/app/
+ ├ api/       routers + factories + schemas
+ ├ core/      config · secrets · ids
+ ├ db/        models · session · seed
+ ├ domain/    services + repositories
+ ├ engine/    state machine · heuristics
+ └ data_ingestion/  fetch · derive · gate
+frontend/src/
+ ├ pages/  Home · MatchBroadcast
+ ├ components/  shared UI (10)
+ ├ hooks/  useGameFrames
+ ├ mock/   mockEngine · mockMatchData
+ ├ config/ court.ts · teams.ts
+ ├ types/  game.ts · lib/i18n · styles
+data/         raw/2025_26 · processed/
+docs + .spec + plan.md + Makefile</code></pre>
+    </div>
+  </div>
+  <aside class="notes">
+The repo is a monorepo: backend, frontend, data, docs. Python is managed by uv with 3.14 pinned; the frontend is React 19 on Vite 8. Note the deliberate separations — the engine module imports the data-ingestion schemas, domain services never touch the engine, and all secrets read through one place. The data folder has two halves: raw, which is gitignored, and processed, which is committed — that's the pipeline contract.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S6 · CONTRACT-FIRST
+     ══════════════════════════════════════════════════════════ -->
+<section id="s6" data-part="I" data-budget="0:50">
+  <div class="kicker">Part I · The core idea · 0:50</div>
+  <h2>Contract-first — <span class="hl">one contract, all consumers</span></h2>
+  <div class="grid-2n">
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag in">CATALOG CONTRACT</span><code class="xs mono">data_ingestion/schemas.py</code></div>
+        <p class="xs">Pydantic models for <span class="mono">players.json / teams.json</span>: <span class="mono">Player, PlayerAttributes, Team</span>. Imported by the engine, the DB seed, and the demo — nobody reads the files ad hoc.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag out">MATCH CONTRACT</span><code class="xs mono">engine/schemas.py</code></div>
+        <p class="xs"><span class="mono">MatchLog → QuarterLog → PossessionLog → ActionLog</span>, plus box scores and key moments — the only way the engine reports a match.</p>
+      </div>
+      <div class="callout"><b>Why 0–1:</b> an attribute is a probability. 0.58 two-pt → the engine rolls a random number against 0.58.</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag ok">SAME CLASSES, EVERYWHERE</span></div>
+      <pre class="sm"><code data-trim data-noescape class="language-python"># engine/entities.py — the engine literally
+# imports the ingestion schemas
+from app.data_ingestion.schemas import (
+    Player, PlayerAttributes, Team,
+)
+
+# db/seed.py — attributes copy straight in
+player = Player(
+    id=uuid.uuid4(),
+    team_id=db_id,
+    name=entry["name"],
+    attributes=entry["attributes"],  # JSON column
+)</code></pre>
+      <div class="callout">The DB stores attributes as a <b>JSON column</b> — file schema and database agree without a hard migration.</div>
+    </div>
+  </div>
+  <aside class="notes">
+If you take one idea from this talk, take this: the contract. At the catalog level, the Pydantic schemas in data_ingestion define the two JSON files, and every consumer — engine, seed, demo — imports those same classes. At the match level, engine/schemas.py defines the MatchLog shape. The 0-to-1 normalization isn't cosmetic: an attribute is literally the probability the engine rolls against. And because the player attributes live in a JSON column, the file schema and the database stay in sync without migrations.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S7 · FRONTEND OVERVIEW
+     ══════════════════════════════════════════════════════════ -->
+<section id="s7" data-part="II" data-budget="0:45">
+  <div class="kicker">Part II · Frontend overview · 0:45</div>
+  <h2>Frontend — <span class="hl">two pages, one experience</span></h2>
+  <div class="grid-2n">
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag in">/ — HOME</span></div>
+        <ul class="tight">
+          <li>Host / join session cards (paste invite code)</li>
+          <li>Display-name modal → saved in <b>localStorage</b></li>
+          <li>Recent sessions persisted per device</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag out">/match-demo — MATCH BROADCAST</span></div>
+        <ul class="tight">
+          <li>Live 2D court animation + scoreboard</li>
+          <li>Play-by-play strip, commentary feed, timeline scrubber</li>
+          <li>Speed 1× / 1.5× / 2×, pause/resume</li>
+        </ul>
+      </div>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag warn">MOCK-POWERED TODAY</span></div>
+        <p class="xs">Both pages render fully with <span class="mono">src/mock/mockEngine.ts</span> + <span class="mono">mockMatchData.ts</span> — no API calls yet. REST + SSE wiring is backlog <span class="mono">SI-02…05</span>.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag in">ROUTING</span></div>
+        <pre class="xs"><code data-trim data-noescape class="language-tsx">// App.tsx — no router library yet
+const page = window.location.pathname;
+return page === '/match-demo'
+  ? <MatchBroadcast />
+  : <Home />;</code></pre>
+        <p class="xs">AppShell wraps every page: top nav + online/session pills.</p>
+      </div>
+      <div class="callout"><b>Rule:</b> pages are thin; shared components never fetch data; every user-facing string lives in <span class="mono">en-US.ts</span> + <span class="mono">pt-BR.ts</span>.</div>
+    </div>
+  </div>
+  <aside class="notes">
+The frontend today is two pages under one shell. Home handles the session lifecycle — host or join, a display name kept per device, recent sessions. The Match Broadcast is the theater: animated court, scoreboard with game and shot clocks, play-by-play, commentary, and a scrubber with speed controls. Important honesty note: both pages run on mock data today — the API wiring is planned. Routing is a pathname check in App.tsx; AppShell provides the chrome.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S8 · DESIGN SYSTEM
+     ══════════════════════════════════════════════════════════ -->
+<section id="s8" data-part="II" data-budget="0:50">
+  <div class="kicker">Part II · Design details · 0:50</div>
+  <h2>The design system — <span class="hl">cream &amp; orange on dark wood</span></h2>
+  <div class="grid-2">
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag in">COLOR TOKENS · tokens.css</span></div>
+        <div class="chips" style="gap:6px">
+          <span class="chip" style="background:#14100d">bg #14100d</span>
+          <span class="chip" style="background:#1f1913">surface #1f1913</span>
+          <span class="chip" style="background:#2a221a">raised #2a221a</span>
+          <span class="chip" style="background:#3a2f24">border #3a2f24</span>
+          <span class="chip hot">primary #e2661a</span>
+          <span class="chip" style="color:#f0e6d2;background:#2a221a">text #f0e6d2</span>
+          <span class="chip" style="background:#7a1f22">live #c1272d</span>
+          <span class="chip" style="background:#8a6700;color:#14100d">warn #f2b705</span>
+          <span class="chip" style="background:#24563a">ok #4c9a6a</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag warn">COURT PALETTE</span></div>
+        <p class="xs">wood <span class="mono">#713713</span> · court lines <span class="mono">#f7ead8</span> · hoop <span class="mono">#ff8c00</span> — matches the SVG court in <span class="mono">CourtStage/Court</span>.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag out">SHAPES &amp; TYPE</span></div>
+        <p class="xs">Cards <span class="mono">radius 12</span> · pills <span class="mono">999px</span> · eyebrows uppercase + 0.08em spacing · scores in <b>mono, orange, 4rem</b> · play-call strips with a 3px orange left border.</p>
+      </div>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag in">10 SHARED COMPONENTS</span></div>
+        <p class="xs">Button (primary / secondary / outline) · Card · Chip · Modal · SegmentedControl · TextInput · StatusBadge (live / complete / paused / info) · CheckboxRow · LogPanel · AppShell.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag ok">CONVENTIONS · AGENTS.md</span></div>
+        <ul class="tight">
+          <li>CSS Modules, colors only via <span class="mono">var(--…)</span> tokens</li>
+          <li>Shared components are <b>dumb</b> — no data fetching</li>
+          <li>Feature-based folders; private → shared on second use</li>
+          <li>i18n keys added to <b>both</b> locales, always</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+The visual identity is a warm "cream and orange on dark wood" — the tokens file defines every color, spacing and radius you saw in the demo. Cards are 12-pixel radius, pills are fully rounded, eyebrows are uppercase and letterspaced, and scores are huge orange mono numbers — a scoreboard language. Ten shared components cover the UI; the rules in AGENTS.md keep them dumb: no fetching inside shared components, tokens only, dual-locale i18n.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S9 · BROADCAST ANATOMY
+     ══════════════════════════════════════════════════════════ -->
+<section id="s9" data-part="II" data-budget="0:55">
+  <div class="kicker">Part II · Broadcast anatomy · 0:55</div>
+  <h2>Match Broadcast — <span class="hl">the pieces on screen</span></h2>
+  <div class="grid-3">
+    <div class="card" style="grid-column:span 2">
+      <div class="card-head"><span class="tag in">WIREFRAME → COMPONENTS</span></div>
+      <pre class="xs"><code data-trim data-noescape class="language-tsx">MatchBroadcast/
+├ BroadcastHeader      teams · seed · latency pill
+├ Scoreboard           4rem mono scores · quarter · clocks
+├ PlayCallStrip        mono uppercase play description
+└ CourtStage           the SVG court (next slide)
+    ├ Court · Player (motion) · Ball (trajectory)
+├ PlayByPlayColumn     actions feed
+├ CommentaryColumn     narration feed (mock text today)
+├ TimelineScrubber     round-trip timeline, session markers
+└ MomentumShiftEngine  consoles momentum swings</code></pre>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag out">SCOREBOARD DETAILS</span></div>
+        <ul class="tight">
+          <li>Team cards: name, stat row, <b>mono orange 4rem</b> score</li>
+          <li>Quarter + game clock (mono) · shot clock in warning yellow</li>
+          <li>Play-call strip: left 3px orange border</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag warn">STATUS</span></div>
+        <p class="xs">Scoreboard + play-by-play + commentary append <b>mock entries on an interval</b>; momentum is derived from recent scoring runs.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+Structurally, the page is eight components. The header names the matchup; the scoreboard is the identity piece — huge orange mono digits, game and shot clocks, quarter label; the play-call strip announces the action in broadcast uppercase. The court sits center stage and the two side columns stream play-by-play and commentary. The scrubber handles timeline navigation and a momentum component tracks runs. Everything on the page, right now, is fed by mock data — the real MatchLog will drive the same components.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S10 · COURT IN CODE
+     ══════════════════════════════════════════════════════════ -->
+<section id="s10" data-part="II" data-budget="0:55">
+  <div class="kicker">Part II · The court · 0:55</div>
+  <h2>The court in code — <span class="hl">real NBA dimensions, SVG</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><span class="tag in">DIMENSIONS · config/court.ts</span></div>
+      <pre class="xs"><code data-trim data-noescape class="language-ts">export const COURT_WIDTH_FT = 94;
+export const COURT_HEIGHT_FT = 50;
+export const SCALE = 10;      // 1 ft = 10 SVG units
+export const KEY_WIDTH_FT = 16;
+export const KEY_LENGTH_FT = 19;
+export const FREE_THROW_RADIUS_FT = 6;
+export const THREE_POINT_RADIUS_FT = 23.75;
+export const HOOP_DISTANCE_FROM_BASELINE_FT = 5.25;
+
+export function gameToSvg(x: number, y: number) {
+  return { cx: x * SCALE, cy: y * SCALE };
+}</code></pre>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag out">RENDER · Court.tsx</span></div>
+        <ul class="tight">
+          <li>Wood fill <span class="mono">#713713</span>, cream boundary &amp; lines — same palette as the app</li>
+          <li>Hoop in <span class="mono">#ff8c00</span>, backboards in cream</li>
+          <li>One foot = ten SVG units → everything is <b>proportionally real</b></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag warn">ANIMATION · framer-motion</span></div>
+        <ul class="tight">
+          <li><span class="mono">&lt;motion.circle&gt;</span> players: jersey number, team color</li>
+          <li><span class="mono">&lt;motion.path&gt;</span> ball: pass / shot <b>trajectory</b> between frames</li>
+          <li>Positions tween over the 800 ms frame transition</li>
+        </ul>
+      </div>
+      <div class="callout">The <b>same rendering path</b> is planned for live SSE frames and stored replay (shared frame-source interface, backlog MR-02).</div>
+    </div>
+  </div>
+  <aside class="notes">
+The court is drawn from real NBA measurements: 94 by 50 feet, a 23.75-foot three-point line, the key and free-throw circle — scaled at ten SVG units per foot. The Court component paints the wood and cream lines with the app's court palette; players are motion circles with jersey numbers; the ball animates along pass and shot trajectories. Because frames are just positions, the same components will later render live SSE frames and stored replay without changes.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S11 · FRAME DATA FLOW
+     ══════════════════════════════════════════════════════════ -->
+<section id="s11" data-part="II" data-budget="0:55">
+  <div class="kicker">Part II · Data flow · 0:55</div>
+  <h2>Frames: <span class="hl">mock engine → queue → screen</span></h2>
+  <div class="grid-2n">
+    <div class="stack-gap">
+      <div class="flow">
+        <div class="fnode prep"><b>startMockEngine</b> <span class="meta">src/mock/mockEngine.ts · a Frame every 800 ms</span></div>
+        <div class="down">▼</div>
+        <div class="fnode"><b>useGameFrames</b> <span class="meta">buffer (max 5) → play one at a time · 800 ms transitions · 1×/1.5×/2× · pause</span></div>
+        <div class="down">▼</div>
+        <div class="fnode live"><b>the broadcast</b> <span class="meta">CourtStage · Scoreboard · PlayByPlay · Commentary — same components for live + replay</span></div>
+      </div>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag in">THE FRAME · types/game.ts</span></div>
+        <pre class="xs"><code data-trim data-noescape class="language-ts">interface Frame {
+  players: PlayerState[];   // x, y in feet
+  ball: BallState;
+  trajectory?: BallTrajectory; // pass | shot
+}</code></pre>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag warn">MOCK SIM</span></div>
+        <ul class="tight xs">
+          <li>10 players random-walk the court · 35% pass chance per tick</li>
+          <li>Real engine will stream <span class="mono">MatchEvent / MatchFrameChunk</span> over SSE — the same Frame contract</li>
+        </ul>
+      </div>
+      <div class="callout"><b>Designed for replacement:</b> live data slots into the same frame interface.</div>
+    </div>
+  </div>
+  <aside class="notes">
+The broadcast is a frame pipeline. A mock engine emits a Frame every 800 milliseconds — players with positions in feet, ball position, and optional pass or shot trajectories. The useGameFrames hook buffers up to five frames and plays them one at a time with framer-motion transitions, at 1x, 1.5x or 2x speed, pausable. The Frame type is deliberately the contract — when the real engine streams frames over SSE, only the producer changes.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S12 · HOME + I18N
+     ══════════════════════════════════════════════════════════ -->
+<section id="s12" data-part="II" data-budget="0:40">
+  <div class="kicker">Part II · Home &amp; i18n · 0:40</div>
+  <h2>Home page &amp; <span class="hl">the i18n layer</span></h2>
+  <div class="grid-2">
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag in">HOME · Home.tsx</span></div>
+        <ul class="tight">
+          <li>Hero with product pitch (<span class="mono">home.hero.title / subtitle</span>)</li>
+          <li><b>Host</b> card · <b>Join</b> card with code input</li>
+          <li>Display-name modal → <span class="mono">localStorage</span></li>
+          <li>Recent sessions list — device-local, never sent to the API</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag ok">CONVENTIONS</span></div>
+        <ul class="tight">
+          <li>Pages never fetch or hold rules; services do</li>
+          <li>Every string is a <span class="mono">t('path.to.key')</span> call</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag out">I18N · lib/i18n · en-US + pt-BR</span></div>
+      <pre class="sm"><code data-trim data-noescape class="language-tsx">const t = useI18n();           // context provider
+t('home.host.title');          // dot-path lookup
+// detectLocale(): localStorage → navigator.language
+// every key must exist in BOTH locale files
+export const i18n = {
+  'home.host.description':
+    ['pt-BR']: 'Inicie uma nova sessão…',
+    ['en-US']: 'Start a new session…',
+}</code></pre>
+      <div class="callout">PT-first product — the UI ships in <b>português</b> by default with English fallback.</div>
+    </div>
+  </div>
+  <aside class="notes">
+Home is the session entry point, and it also demonstrates two conventions. Device-only state — display name, recent sessions — lives in localStorage and never hits the API; that separation is part of the architecture. And every user-facing string goes through a tiny custom i18n provider with dot-path keys: both en-US and pt-BR files must stay in sync, with Portuguese first. When the backend grows join and claim-team endpoints, the service layer is where they'll plug in.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S13 · BACKEND OVERVIEW
+     ══════════════════════════════════════════════════════════ -->
+<section id="s13" data-part="III" data-budget="0:45">
+  <div class="kicker">Part III · Backend overview · 0:45</div>
+  <h2>Backend — <span class="hl">layers that don't look back</span></h2>
+  <div class="grid-2n">
+    <div class="stack-gap">
+      <div class="flow">
+        <div class="fnode live"><b>API · api/</b> <span class="meta">FastAPI · thin: parse → delegate · factories per request</span></div>
+        <div class="down">▼</div>
+        <div class="fnode"><b>Domain · domain/</b> <span class="meta">sessions service + repository · bracket service (seeds N-team bracket as linked Match rows)</span></div>
+        <div class="down">▼</div>
+        <div class="fnode"><b>DB · db/</b> <span class="meta">SQLAlchemy 2 async · Alembic migrations · seed script</span></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag warn">ONE-WAY RULE</span></div>
+        <p class="xs">api → domain → db. <b>core/</b> (config + secrets) reachable from every layer. The <b>engine</b> is a standalone dependency of Match services — no HTTP, no sessions.</p>
+      </div>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag in">THE API TODAY</span></div>
+        <pre class="term"><code data-trim data-noescape class="language-nohighlight"><span class="ps1">$</span> curl localhost:8000/health
+{"status": "ok"}
+
+<span class="ps1">$</span> curl -X POST localhost:8000/sessions \
+    -d '{"owner_name": "Luigi"}'
+→ Session + owner User + 8-team bracket
+  (Match rows, later rounds locked)</code></pre>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag out">TODAY vs PLAN</span></div>
+        <ul class="tight">
+          <li><b>Live:</b> health, sessions, bracket seeding</li>
+          <li><b>Next:</b> join/claim teams, team catalog reads, match endpoints, SSE broadcast, replay</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+The backend is a strict layering stack: the API parses requests and delegates to request-scoped services; domain services hold the rules — today sessions and bracket seeding; the DB layer is async SQLAlchemy with Alembic. core is the only place allowed to read environment. The engine sits beside all of this, headless, imported only by match services. Live today: health and session creation, which seeds an 8-team single-elimination bracket with linked Match rows — later rounds start locked.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S14 · ENGINE ENTITIES
+     ══════════════════════════════════════════════════════════ -->
+<section id="s14" data-part="III" data-budget="0:45">
+  <div class="kicker">Part III · Engine: entities · 0:45</div>
+  <h2>Live entities — <span class="hl">catalog in, athletes out</span></h2>
+  <div class="grid-2n">
+    <div class="card">
+      <div class="card-head"><span class="tag in">LivePlayer · entities.py</span></div>
+      <pre class="xs"><code data-trim data-noescape class="language-python">@dataclass
+class LivePlayer:
+    player_id: str
+    name: str
+    team_id: str
+    position5: str        # classic position
+    is_starter: bool
+    attributes: PlayerAttributes  # the contract!
+    current_stamina: float
+    fouls: int
+    box_score: PlayerBoxScore
+
+    @classmethod
+    def from_player(cls, p: Player) -> LivePlayer:
+        ...  # attributes straight from the file
+
+    def record_minutes(self, duration_s: float):
+        # fatigue: −0.0005/s on court, floor 0.20
+        self.current_stamina = max(
+            0.20, self.current_stamina - 0.0005 * duration_s)</code></pre>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag out">LiveTeam</span></div>
+        <pre class="xs"><code data-trim data-noescape class="language-python">LiveTeam.from_team_and_players(
+    team, players)
+# → picks the 5 starters via is_starter
+# → bench from team.roster minus starters
+
+def select_ball_handler(self, rng):
+    # ball handler weighted by usage_rate
+    weights = [max(0.01, p.attributes.usage_rate)
+               for p in self.active]</code></pre>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag warn">GameState</span></div>
+        <ul class="tight">
+          <li>home/away LiveTeams + GameClock</li>
+          <li>possession / defending team, active handler</li>
+          <li><span class="mono">last_passer_id</span> — assists credited</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+The engine turns catalog data into live athletes. LivePlayer.from_player copies the 12 attributes straight from the JSON contract, plus classic position and starter flag. LiveTeam picks the five starters and the bench from the roster, and selects the ball handler by usage rate — so high-usage stars naturally touch the ball more. LivePlayer carries a box score and a stamina figure that decays while on court, floored at twenty percent so exhausted players still function.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S15 · STATE MACHINE + HEURISTICS
+     ══════════════════════════════════════════════════════════ -->
+<section id="s15" data-part="III" data-budget="0:55">
+  <div class="kicker">Part III · Engine: heuristics · 0:55</div>
+  <h2>Possession state machine — <span class="hl">probabilities, not rules</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><span class="tag in">DECIDE: PASS · MOVE · SHOOT</span></div>
+      <pre class="xs"><code data-trim data-noescape class="language-python">if shot_clock <= 2.0:    return "SHOOT"
+if shot_clock <= 7.0:    # urgency ramp
+    p_shoot = 0.35 + 0.55 * (7 - shot_clock) / 7
+else:
+    p_shoot = 0.22
+p_pass = (1 - p_shoot) * 0.52
+p_move = (1 - p_shoot) * 0.48</code></pre>
+      <p class="xs">Movement biases toward the opponent rim — the clock decides.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag out">RESOLVE SHOT · heuristics.py</span></div>
+      <pre class="xs"><code data-trim data-noescape class="language-python">base = three_pt_pct if is_three else two_pt_pct
+if stamina < 0.40:            # fatigue
+    base -= (0.40 - stamina) * 0.25
+if quarter >= 4 and |diff| <= 5: # clutch
+    base += (clutch_factor - 0.5) * 0.12
+is_made = rng.random() < clamp(base, 0.10, 0.95)</code></pre>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag warn">EVERY EXIT, DATA-DRIVEN</span></div>
+      <ul class="tight">
+        <li><b>Pass turnover:</b> <span class="mono">clamp(turnover×0.7 + avg_steal×1.5, .04, .35)</span></li>
+        <li><b>Strip:</b> <span class="mono">clamp(turnover×0.5 + avg_steal, .03, .25)</span></li>
+        <li><b>Rebounds:</b> all 10 players by <span class="mono">rebound_rate</span> — defense ≈ 75% norm</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag in">THE LOOP</span></div>
+      <pre class="xs"><code data-trim data-noescape class="language-python">while outcome == "continue":
+    action = decide_handler_action(...)
+    resolved = resolve(action)  # pass/move/shot
+    clock.tick(action.duration_s)
+# ends on basket · turnover · violation
+# seeded rng → reproducible matches</code></pre>
+    </div>
+  </div>
+  <aside class="notes">
+The heart of the engine is a small state machine that loops a possession until a basket, turnover, or violation. Every decision is a weighted roll built from the player's real attributes: as the shot clock dies the shoot probability ramps; a shot's make probability is literally the player's two or three point percentage from the data, adjusted for fatigue below 40% stamina and boosted by clutch factor in tight late quarters. Passes and dribbles carry their own turnover risk from turnover and steal rates. The random generator is seeded, so any match can be replayed deterministically.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S16 · CLOCK + RUNNER + DEMO
+     ══════════════════════════════════════════════════════════ -->
+<section id="s16" data-part="III" data-budget="0:45">
+  <div class="kicker">Part III · Engine: clock &amp; runner · 0:45</div>
+  <h2>The game clock &amp; <span class="hl">running a full match</span></h2>
+  <div class="grid-2n">
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag in">GameClock · clock.py</span></div>
+        <pre class="xs"><code data-trim data-noescape class="language-python">## NBA timing
+# 4 × 12 min quarters · 5 min OT if tied
+# 24 s shot clock · 14 s after offensive board
+
+def tick(self, duration_s):
+    elapsed = min(duration_s,
+                  self.game_clock_remaining,
+                  self.shot_clock_remaining)
+    # clamp at period/shot-clock end
+    return elapsed, is_shot_clock_violation</code></pre>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag out">MatchRunner · match_runner.py</span></div>
+        <p class="xs">Loop 4 quarters → <span class="mono">resolve_possession()</span> until buzzer → collect <span class="mono">QuarterLog</span>s → return <b>MatchLog</b> with winner, final score, quarters. Fatigue ticks per possession.</p>
+      </div>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag warn">THE DEMO · engine/demo.py</span></div>
+        <pre class="term"><code data-trim data-noescape class="language-nohighlight"><span class="ps1">$</span> uv run python -m app.engine.demo
+<span class="cm"># loads players/teams through the SAME
+# validate_processed_output() the CLI uses</span>
+<span class="ok-line">Match Result: lal 112 - 104 bos</span>
+Total possessions: 212
+<span class="cm"># full game, headless, ≈ 4 min runtime</span></code></pre>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag in">OUTPUT CONTRACT</span></div>
+        <p class="xs"><span class="mono">MatchLog → QuarterLog → PossessionLog → ActionLog</span> · <span class="mono">PlayerBoxScore</span> (pts, reb, ast, stl, blk, tov, fga/fgm… seconds played) — the future feed for the broadcast + LLM.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+The clock implements real NBA timing — twelve-minute quarters, five-minute overtimes, a 24-second shot clock that resets to 14 after an offensive rebound, and every tick clamps at the quarter or shot clock so violations are caught. The runner simulates four quarters of possessions and returns a full MatchLog. The demo — LAL versus BOS — loads the catalog through the same validation gate the pipeline uses, then plays a full game headless in about four minutes and prints the result: 112 to 104. That MatchLog is the contract the broadcast and the future LLM narration will consume.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S17 · DATA PROCESSING: TWO STAGES
+     ══════════════════════════════════════════════════════════ -->
+<section id="s17" data-part="III" data-budget="0:40">
+  <div class="kicker">Part III · Data processing: stages · 0:40</div>
+  <h2>The data pipeline — <span class="hl">fetch once, derive forever</span></h2>
+  <div class="stage flow">
+    <div class="fnode prep"><b>STAGE 1 · FETCH <span class="dim">(network, once)</span></b> <span class="meta">≈39 throttled stats.nba.com calls + 30 rosters → each response saved verbatim to data/raw/2025_26 (gitignored) · Basketball-Reference positions HTML saved once by hand (Cloudflare) → stdlib-only parser → cached JSON</span></div>
+    <div class="down">▼</div>
+    <div class="fnode"><b>STAGE 2 · DERIVE <span class="dim">(offline, pure pandas)</span></b> <span class="meta">master table (totals + identity + roster pos + classic pos + starter/bench + clutch + advanced) → 12 attributes → validate_processed_output() gate → data/processed (committed)</span></div>
+    <div class="down">▼</div>
+    <div class="fnode pass"><b>OUTPUTS</b> <span class="meta">players.json (582) · teams.json (30) · attributes_table.csv · data_quality.json</span></div>
+  </div>
+  <div class="chips" style="margin-top:10px;justify-content:center">
+    <span class="chip mono">python -m app.data_ingestion</span>
+    <span class="chip mono">--no-fetch</span>
+    <span class="chip mono">--refresh</span>
+    <span class="chip soft">derive offline · force re-fetch</span>
+  </div>
+  <div class="callout center" style="margin-top:10px">The network is a <b>one-time cost per season</b> — re-derives are free and reproducible.</div>
+  <aside class="notes">
+Now the data-processing stage inside the backend. Everything is deliberately split into two stages. Stage one touches the network: about thirty-nine polite calls to the NBA stats API, each saved verbatim to the raw folder — no processing ever. Basketball-Reference's classic positions need a one-time manual save because of Cloudflare. Stage two is pure offline pandas: it builds a master table, computes the twelve attributes, validates them against the schemas, and only then writes the final files. Because raw data is cached, re-running costs nothing; --no-fetch forces an offline run and fails fast if something's missing.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S18 · DATA PROCESSING: THE MATH
+     ══════════════════════════════════════════════════════════ -->
+<section id="s18" data-part="III" data-budget="0:50">
+  <div class="kicker">Part III · Data processing: the math · 0:50</div>
+  <h2>Numbers → attributes — <span class="hl">12 values, all 0–1</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><span class="tag in">SHOOTING (shrunk)</span></div>
+      <pre class="xs"><code data-trim data-noescape class="language-nohighlight">two_pt_pct = (2PM + 10·0.550) ÷ (2PA + 10)
+three_pt_pct = league FG3_PCT, shrunk (0.360)
+ft_pct = league FT_PCT, shrunk (0.783)</code></pre>
+      <p class="xs">10 pseudo-attempts toward the league mean — a 1-for-1 player is ≈ league average, never 1.0.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag out">POSSESSION &amp; DEFENSE</span></div>
+      <pre class="xs"><code data-trim data-noescape class="language-nohighlight">usage_rate   = league USG_PCT (as-is)
+turnover_rate= TOV ÷ used possessions
+possessions  = FGA + 0.44·FTA + TOV   # ≈113.2/gm
+defended     = team poss × min(min/48, 1)
+foul/steal/block = per defended possession</code></pre>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag warn">PLAYMAKING &amp; BOARD</span></div>
+      <pre class="xs"><code data-trim data-noescape class="language-nohighlight">rebound_rate = league OREB_PCT (as-is)
+assist_rate  = AST ÷ teammate-made baskets</code></pre>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag ok">EFFORT &amp; INTANGIBLES</span></div>
+      <pre class="xs"><code data-trim data-noescape class="language-nohighlight">stamina = minutes/game model − 0.5%/yr
+          for age &gt; 34     # config-tunable
+clutch  = clutch FG% (last 5 min, close)
+          vs season FG%   # boost, not raw stat</code></pre>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:10px"><b>Shrinkage, worked:</b> 6-for-6 (small sample) → <span class="mono">(6 + 10·0.550) ÷ 16 = 0.72</span>, not 1.00 · a 600-attempt star keeps ≈ his real number.</div>
+  <aside class="notes">
+Quick tour of the formulas behind the twelve attributes — full detail lives in docs/statistics.md. Shooting percentages are shrunk with ten pseudo-attempts toward league averages, so small samples can't produce extremes. Usage and offensive-rebound rates reuse the league's own published columns. Defensive stats are computed per defended possession — a player's share of team possessions estimated from his minutes — so bench players don't inherit stats for defense they weren't on the floor for. Stamina is a minutes model with an age penalty; clutch measures how shooting changes in the last five minutes of close games. Consistent output: everything lands between zero and one.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S19 · DATA PROCESSING: GATE + QUALITY
+     ══════════════════════════════════════════════════════════ -->
+<section id="s19" data-part="III" data-budget="0:40">
+  <div class="kicker">Part III · Data processing: the gate · 0:40</div>
+  <h2>The contract gate — <span class="hl">fail loud, write nothing</span></h2>
+  <div class="grid-2n">
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag in">validate_processed_output()</span><span class="dim xs">runs BEFORE any file is written</span></div>
+        <ul class="tight">
+          <li>Attribute values within [0, 1]</li>
+          <li>Unique player ids · every roster id resolves</li>
+          <li>582 roster entries ⇄ 30 teams agree both ways</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag warn">TWO POLICIES = INTEGRITY BY CONSTRUCTION</span></div>
+        <ul class="tight">
+          <li>Zero-minute players excluded (−5 roster spots)</li>
+          <li>Team = the club the player <b>played for</b> (57 waived players stay put)</li>
+        </ul>
+      </div>
+      <div class="callout"><b>Same schemas power the engine's demo</b> — one gate protects every consumer at once.</div>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag live">FAILING LOUDLY</span></div>
+        <pre class="term"><code data-trim data-noescape class="language-nohighlight"><span class="err-line">players.json: player 'x' two_pt_pct=1.42
+  out of range [0,1]</span>
+<span class="err-line">players.json: duplicate id 'y'</span>
+<span class="err-line">[error] derive output failed schema
+  validation, nothing was written</span>
+<span class="cm">exit code 1 · last-known-good untouched</span></code></pre>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag ok">data_quality.json</span></div>
+        <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat"><b>582</b><span>players</span></div>
+          <div class="stat"><b>216</b><span>starters</span></div>
+          <div class="stat"><b>366</b><span>bench</span></div>
+        </div>
+        <p class="xs">+ small-sample flags · attribute min/mean/max — a machine-readable sanity report.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+The last step of the pipeline is the gate — the contract being enforced. Before anything is written, the full output is validated against the Pydantic schemas: ranges in bounds, no duplicate ids, every roster entry resolving. On failure the CLI lists every problem and exits with code one — nothing is written, so the last-known-good files stay untouched. Two policy decisions make referential integrity pass by construction: zero-minute players are excluded, and each player is assigned to the club he actually played for, so all 582 roster entries and 30 teams agree. Sidecar output is a machine-readable quality report with counts and distribution sanity checks.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S20 · PERSISTENCE & API
+     ══════════════════════════════════════════════════════════ -->
+<section id="s20" data-part="III" data-budget="0:50">
+  <div class="kicker">Part III · Persistence &amp; API · 0:50</div>
+  <h2>Catalog → Postgres → <span class="hl">sessions &amp; brackets</span></h2>
+  <div class="grid-2n">
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag in">SEED · db/seed.py</span></div>
+        <pre class="term"><code data-trim data-noescape class="language-nohighlight"><span class="ps1">$</span> cd backend && uv run python -m app.db.seed
+<span class="cm"># reads data/processed → PostgreSQL
+# skips if catalog already seeded
+# make reset-db wipes the volume to re-seed</span></code></pre>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag out">MATCH = BRACKET TREE</span></div>
+        <pre class="xs"><code data-trim data-noescape class="language-nohighlight">Match:
+  round · slot_in_round
+  home/away_team_id (nullable)
+  next_match_id → self     # tree!
+  status: locked | ready | live | finished</code></pre>
+        <p class="xs">The full bracket is just this table's rows linked together.</p>
+      </div>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag warn">EVENTS — DESIGNED, READY TO WIRE</span></div>
+        <pre class="xs"><code data-trim data-noescape class="language-nohighlight">MatchEvent:      match_id · sequence · game_clock
+                 type (shot_made, foul, …) · payload
+MatchFrameChunk: match_id · chunk_index · frames</code></pre>
+        <p class="xs">Sparse semantic events vs dense position batches — <b>separate schemas on purpose</b> (different access patterns).</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag in">SESSION FLOW</span></div>
+        <ol class="steps">
+          <li><b>POST /sessions</b> → Session + owner User</li>
+          <li>Bracket service seeds an <b>8-team</b> single-elimination tree</li>
+          <li>Later rounds start <span class="mono">locked</span>; winners advance</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+The seed script reads the same processed files into Postgres: teams first, then players with their attributes as JSON. The bracket is elegant — a single Match table whose rows link to each other through next_match_id, so the whole single-elimination tree is just rows; later rounds start locked. The two broadcast tables are already designed: sparse semantic MatchEvents for the play log and commentary, and dense MatchFrameChunks for the court animation — deliberately separate because they're accessed differently. Creating a session today returns a session, an owner, and an eight-team bracket ready to be claimed.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S21 · OPS & CONVENTIONS
+     ══════════════════════════════════════════════════════════ -->
+<section id="s21" data-part="III" data-budget="0:40">
+  <div class="kicker">Part III · Ops · 0:40</div>
+  <h2>Running &amp; <span class="hl">keeping it honest</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><span class="tag in">MAKEFILE</span></div>
+      <pre class="term"><code data-trim data-noescape class="language-nohighlight"><span class="ps1">$</span> make bootstrap   # .env + uv sync + PG + migrate
+<span class="ps1">$</span> make dev         # PG up + migrate + uvicorn :8000
+<span class="ps1">$</span> make migrate     # alembic upgrade head
+<span class="ps1">$</span> make reset-db    # wipe volume + recreate
+<span class="ps1">$</span> make format      # ruff format backend</code></pre>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag out">DISCIPLINES</span></div>
+        <ul class="tight">
+          <li>Secrets only via <span class="mono">core/secrets.py</span> — CORS origins, DATABASE_URL</li>
+          <li>Python pinned 3.14 via uv · lockfiles committed</li>
+          <li>ruff (format/lint) · oxlint + prettier (frontend)</li>
+          <li>AGENTS.md per half: layering + conventions enforced in review</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag warn">GAPS WE KNOW ABOUT</span></div>
+        <ul class="tight">
+          <li>No test suite yet (backlog QO-01)</li>
+          <li>Engine: fouls/free-throws, subs, timeouts pending</li>
+          <li>Frontend not wired to the API (SI-02…05)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+Operationally everything hangs off the Makefile and uv: bootstrap, dev, migrate, reset-db. A few disciplines keep the monorepo honest — env reads go through one module, Python and Node versions are pinned with committed lockfiles, formatting is enforced per half. And we keep an explicit list of what we know is missing: tests, engine fouls and substitutions, and the frontend-to-API wiring. The status slide next makes it concrete.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S22 · STATUS MAP
+     ══════════════════════════════════════════════════════════ -->
+<section id="s22" data-part="IV" data-budget="0:50">
+  <div class="kicker">Part IV · Where things stand · 0:50</div>
+  <h2>Status — <span class="hl">done, partial, not started</span></h2>
+  <div class="grid-2n">
+    <div class="card">
+      <div class="card-head"><span class="tag in">PHASES A–H</span></div>
+      <table>
+        <tr><th></th><th>Phase</th><th>Status</th></tr>
+        <tr><td><span class="status-dot done"></span></td><td>A · Contracts &amp; scaffolding</td><td>done</td></tr>
+        <tr><td><span class="status-dot done"></span></td><td>B · Data acquisition &amp; cleaning</td><td>done — 582 / 30</td></tr>
+        <tr><td><span class="status-dot part"></span></td><td>C · Engine state machine</td><td>partial — fouls, subs, tests</td></tr>
+        <tr><td><span class="status-dot part"></span></td><td>D · Full app (React + FastAPI)</td><td>partial — mock pages; real endpoints</td></tr>
+        <tr><td><span class="status-dot part"></span></td><td>E · 2D court visualization</td><td>partial — animation done; replay</td></tr>
+        <tr><td><span class="status-dot todo"></span></td><td>F · LLM narration</td><td>not started</td></tr>
+        <tr><td><span class="status-dot part"></span></td><td>G · Tournament bracket</td><td>partial — seeded; UI pending</td></tr>
+        <tr><td><span class="status-dot todo"></span></td><td>H · Testing &amp; polish</td><td>not started</td></tr>
+      </table>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag out">BIGGEST LEVERAGE NEXT</span></div>
+        <ol class="steps">
+          <li><b>Engine completeness</b> — fouls, subs, timeouts, calibration (SE-03…11)</li>
+          <li><b>Match Coordinator + SSE</b> — real frames to the broadcast (LB-02/03)</li>
+          <li><b>Team Locker &amp; bracket UI</b> — catalog API + claim flow (TS, TB)</li>
+        </ol>
+      </div>
+      <div class="callout">The <b>contract layer is done</b> — engine, seed, demo, gate all speak the same schemas. The remaining work is <b>breadth</b>, not plumbing.</div>
+    </div>
+  </div>
+  <aside class="notes">
+Where do we stand? The foundations and the data are done — contracts, scaffolding, and the full pipeline through validation. The engine's possession loop runs headless but is missing fouls, free throws, substitutions, and timeouts. The frontend has both pages, mock-driven. The court animation works; replay doesn't yet. LLM narration and the test suite are untouched; bracket seeding is done and its UI isn't. The optimistic way to read this: the plumbing that everything shares — the contract, the gate, the frame types — is built. The remaining work is breadth on top of a stable spine.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S23 · DECISIONS & RISKS
+     ══════════════════════════════════════════════════════════ -->
+<section id="s23" data-part="IV" data-budget="0:45">
+  <div class="kicker">Part IV · Decisions &amp; risks · 0:45</div>
+  <h2>Decisions we defend &amp; <span class="hl">risks we track</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><span class="tag ok">WE DEFEND</span></div>
+      <ul class="tight">
+        <li><b>0–1 attributes = probabilities</b> — one mapping, zero conversion bugs</li>
+        <li><b>Shared schemas, not duplicated DTOs</b> — engine imports ingestion schemas</li>
+        <li><b>Two-stage pipeline + verbatim cache</b> — one network cost, reproducible re-derives</li>
+        <li><b>Gate before write</b> — a broken pipeline beats a silently broken dataset</li>
+        <li><b>Heuristics over ML</b> — statistics drive outcomes; explainable by construction</li>
+        <li><b>JSON attributes column</b> — schema evolution without migrations</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag live">RISKS WE TRACK</span></div>
+      <ul class="tight">
+        <li><b>Realism / calibration</b> — do sims look statistically plausible? (SE-11)</li>
+        <li><b>Mock → live swap</b> — the frame pipeline must survive SSE replacing the mock</li>
+        <li><b>Engine scope</b> — fouls &amp; free throws change the pace of the loop</li>
+        <li><b>No tests yet</b> — the gate protects data, not services</li>
+        <li><b>LLM dependency</b> — commentary quality gates Phase F</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout center" style="margin-top:10px">Trade-off we accepted: <b>mock-first frontend</b> buys a demo-able broadcast while the engine matures — the contract keeps the swap cheap.</div>
+  <aside class="notes">
+A quick section on judgment calls. We defend the one-to-one probability contract, shared schemas everywhere, the two-stage pipeline with a verbatim cache, validating before writing, and heuristics instead of ML — every roll in the engine is explainable by the stat behind it. The risks we track: calibration and realism, the mock-to-live swap staying clean, engine scope like fouls changing pace, no tests, and LLM dependence. The trade-off we accepted is mock-first on the frontend — you can demo a broadcast today, and the contract is why swapping in a real engine later is cheap rather than a rewrite.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S24 · HOW TO RUN IT
+     ══════════════════════════════════════════════════════════ -->
+<section id="s24" data-part="IV" data-budget="0:40">
+  <div class="kicker">Part IV · Live demo path · 0:40</div>
+  <h2>Run it — <span class="hl">three terminals</span></h2>
+  <div class="grid-2n">
+    <div class="card">
+      <div class="card-head"><span class="tag in">BACKEND + DATA</span></div>
+      <pre class="term"><code data-trim data-noescape class="language-nohighlight"><span class="ps1">$</span> make bootstrap        <span class="cm"># once</span>
+<span class="ps1">$</span> make dev              <span class="cm"># API on :8000</span>
+<span class="ps1">$</span> uv run python -m app.db.seed
+<span class="cm"># --- data processing, replayable ---</span>
+<span class="ps1">$</span> uv run python -m app.data_ingestion --no-fetch
+<span class="ps1">$</span> uv run python -m app.engine.demo
+<span class="cm"># LAL × BOS · ~4 min sim · prints score</span></code></pre>
+    </div>
+    <div class="stack-gap">
+      <div class="card">
+        <div class="card-head"><span class="tag out">FRONTEND</span></div>
+        <pre class="term"><code data-trim data-noescape class="language-nohighlight"><span class="ps1">$</span> cd frontend && npm install
+<span class="ps1">$</span> npm run dev    <span class="cm"># :5173</span>
+<span class="cm"># → / (Home) · /match-demo (Broadcast)</span></code></pre>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="tag warn">READ FURTHER</span></div>
+        <ul class="tight">
+          <li><span class="mono">docs/statistics.md</span> — every formula, worked examples</li>
+          <li><span class="mono">docs/data_ingestion.md</span> — every failure mode</li>
+          <li><span class="mono">docs/ARCHITECTURE.md · docs/BACKLOG.md · plan.md</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+To run this live: backend with make bootstrap and dev, then seed the catalog once; re-derive the processing output anytime with --no-fetch; and run the LAL-BOS demo to watch a complete headless game. Frontend is npm install and npm run dev, serving Home and the Broadcast. Everything is documented in the docs folder — statistics.md has the math, data_ingestion.md has the failure modes, and plan.md has the item-level status.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     S25 · CLOSING
+     ══════════════════════════════════════════════════════════ -->
+<section id="s25" data-part="IV" data-budget="0:45" class="slide-hero">
+  <div class="kicker">Part IV · Closing · 0:45</div>
+  <h2 class="mega" style="font-size:46px">Clean data in → <span class="hl">simulations that behave like basketball</span></h2>
+  <p class="hero-sub">One-time fetching · offline derivation · real statistics · a contract gate at the exit · a broadcast waiting for the live feed.</p>
+  <div class="grid-3" style="margin-top:8px">
+    <div class="card"><div class="card-head"><span class="tag in">DATA</span></div><p class="xs">582 players · 30 teams · 12 attributes · 0–1 · gate-protected</p></div>
+    <div class="card"><div class="card-head"><span class="tag out">ENGINE</span></div><p class="xs">Possession state machine · seeded &amp; reproducible · same schemas everywhere</p></div>
+    <div class="card"><div class="card-head"><span class="tag ok">BROADCAST</span></div><p class="xs">Real-dimension court · frame pipeline · designed for SSE + replay</p></div>
+  </div>
+  <div class="callout center" style="margin-top:12px"><b>QUESTIONS WELCOME</b> · backup slides follow for the deep dives</div>
+  <aside class="notes">
+To close: the chain works because each end respects the same contract. Ingestion fetches politely once, derives offline, and validates before writing. The engine turns those validated 0-to-1 attributes into seeded, reproducible basketball. And the broadcast — court, scoreboard, play-by-play — is built on a frame contract that will happily carry live SSE and replay. Clean data in means simulations that behave like actual basketball — and that's what makes everything downstream work. Questions welcome; the four backup slides go deeper on the math and the contract.
+  </aside>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     APPENDIX
+     ══════════════════════════════════════════════════════════ -->
+<section id="a1" data-part="A">
+  <div class="kicker">Backup · Possession math</div>
+  <h2>A.1 — <span class="hl">possession math, concretely</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><span class="tag in">PER TEAM</span></div>
+      <pre class="sm"><code data-trim data-noescape class="language-nohighlight">possessions/game = Σ(FGA + 0.44·FTA + TOV) ÷ games
+                  # 0.44 = NBA free-throw constant
+                  # 2025-26 league: ≈ 113.2/game</code></pre>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag out">PER PLAYER (defense)</span></div>
+      <pre class="sm"><code data-trim data-noescape class="language-nohighlight">defended_possessions =
+    team_possessions × min(minutes ÷ 48, 1)
+
+# bench steal rates aren't inflated by
+# defense they weren't on the floor for</code></pre>
+    </div>
+  </div>
+  <aside class="notes">
+Backup: possession math. Team possessions per game are the classic estimator — sum of field goal, free throw (weighted 0.44) and turnover events, divided by games — about 113 per team per game in 2025-26. Defensive attributes divide by the player's defended possessions: his minutes share of team possessions, capped at full game. A bench player's steal rate never includes possessions he wasn't on court for.
+  </aside>
+</section>
+
+<section id="a2" data-part="A">
+  <div class="kicker">Backup · Shrinkage</div>
+  <h2>A.2 — <span class="hl">shrinkage, worked</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><span class="tag in">THE RULE</span></div>
+      <pre class="sm"><code data-trim data-noescape class="language-nohighlight">SHRINKAGE_K = 10   # config.py, tunable
+
+value = (made + 10·league_rate) ÷ (attempted + 10)</code></pre>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag out">WORKED · league 2pt ≈ 0.550</span></div>
+      <pre class="sm"><code data-trim data-noescape class="language-nohighlight">6-for-6   → (6 + 10·0.550) ÷ 16 = 0.72
+             # not 1.00 — small sample
+600 att @ 58% → ≈ 0.579
+             # volume keeps the real number</code></pre>
+    </div>
+  </div>
+  <aside class="notes">
+Backup: shrinkage. Every shooting rate gets ten pseudo-attempts from the league mean, tunable in config.py. A player who went six-for-six sits at 0.72 instead of a mythical 1.00; a star with six hundred attempts keeps almost exactly his real rate. Same logic applies to three-pointers and free throws with their own league averages.
+  </aside>
+</section>
+
+<section id="a3" data-part="A">
+  <div class="kicker">Backup · The gate</div>
+  <h2>A.3 — <span class="hl">the gate, failing loudly</span></h2>
+  <div class="card">
+    <div class="card-head"><span class="tag live">CLI OUTPUT · every failing record listed</span></div>
+    <pre class="term"><code data-trim data-noescape class="language-nohighlight"><span class="err-line">players.json: player 'x' two_pt_pct=1.42 out of range [0,1]</span>
+<span class="err-line">players.json: duplicate id 'y'</span>
+<span class="err-line">teams.json: roster entry 'z' has no matching player</span>
+<span class="err-line">[error] derive output failed schema validation, nothing was written</span>
+exit code 1         # last-known-good files untouched</code></pre>
+  </div>
+  <p class="sm dim">No partial writes — you fix the source or the formula and re-run.</p>
+  <aside class="notes">
+Backup: the gate's error output. Everything fails together — out-of-range values, duplicates, dangling roster links — then exits 1 before any write. You fix the source or the formula and rerun; the last-known-good files were never touched.
+  </aside>
+</section>
+
+<section id="a4" data-part="A">
+  <div class="kicker">Backup · Contract in code</div>
+  <h2>A.4 — <span class="hl">the contract, in code</span></h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><span class="tag in">ENGINE SIDE</span></div>
+      <pre class="xs"><code data-trim data-noescape class="language-python"># engine/entities.py
+from app.data_ingestion.schemas import (
+    Player, PlayerAttributes, Team)
+
+# engine and ingestion output literally
+# share the same classes</code></pre>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag out">DB SIDE</span></div>
+      <pre class="xs"><code data-trim data-noescape class="language-python"># db/models/player.py
+attributes: Mapped[dict] = mapped_column(JSON)
+
+# db/seed.py copies the blob straight in
+entry["attributes"]  # → JSON column
+# file schema and database agree — no migration</code></pre>
+    </div>
+  </div>
+  <aside class="notes">
+Backup: the contract in code. engine/entities.py imports the ingestion schemas directly — the same classes that validate the files are the classes the simulation runs on. On the database side, Player.attributes is a JSON column and the seed copies each player's attributes blob straight in. The file schema, the runtime classes, and the database all agree by construction.
+  </aside>
+</section>
+
+</div>
+</div>
+
+<!-- notes drawer -->
+<aside id="notesDrawer" class="notes-drawer" aria-label="Speaker notes">
+  <div class="drawer-head">
+    <span class="tag in">SPEAKER NOTES</span>
+    <button id="btn-notes-close" type="button" aria-label="Close notes">✕</button>
+  </div>
+  <div class="notes-body" id="notesBody"></div>
+  <div class="drawer-foot"><span id="notesSlideLabel">SLIDE 01</span><span id="notesWords"></span></div>
+</aside>
+
+<script src="vendor/reveal/dist/reveal.js"></script>
+<script src="vendor/reveal/dist/plugin/notes.js"></script>
+<script src="vendor/reveal/dist/plugin/highlight.js"></script>
+<script src="vendor/reveal/dist/plugin/zoom.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
