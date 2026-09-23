@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Alimentando o Simulador — Ingestão de Dados · Robô Cestinha</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="court-bg" aria-hidden="true">
+  <svg viewBox="0 0 320 420" xmlns="http://www.w3.org/2000/svg">
+    <rect x="14" y="14" width="292" height="392" rx="6" class="cb-boundary" />
+    <line x1="160" y1="14" x2="160" y2="406" class="cb-line" />
+    <circle cx="160" cy="210" r="42" class="cb-line" />
+    <circle cx="160" cy="210" r="8" class="cb-line" />
+    <rect x="118" y="14" width="84" height="150" class="cb-key" />
+    <circle cx="160" cy="118" r="34" class="cb-line" />
+    <circle cx="160" cy="118" r="4" class="cb-line" />
+    <path d="M160 14 A 150 90 0 0 1 310 14" class="cb-line" />
+    <path d="M160 14 A 150 90 0 0 0 10 14" class="cb-line" />
+  </svg>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brandTitle">ROBÔ&nbsp;CESTINHA</span>
+    <span class="brandSubtitle">INGESTÃO DE DADOS · MC 857 · 2026</span>
+  </div>
+  <nav class="controls" aria-label="Controles da apresentação">
+    <button id="btn-overview" type="button" class="pill" title="Mapa dos slides (G)">MAPA</button>
+    <button id="btn-notes" type="button" class="pill" aria-pressed="false" title="Notas do apresentador (N)">NOTAS</button>
+    <button id="btn-timer" type="button" class="pill" aria-pressed="false" title="Cronômetro (T)">TEMPO</button>
+    <button id="btn-full" type="button" class="pill" title="Tela cheia (F)">TELA CHEIA</button>
+  </nav>
+</header>
+
+<div class="ticker" aria-hidden="true">
+  <div class="tickerTrack">
+    <span>582 jogadores</span><i>·</i><span>30 times</span><i>·</i><span>12 atributos por jogador</span><i>·</i><span>escala 0–1</span><i>·</i><span>39 chamadas à API</span><i>·</i><span>intervalo de 0,7 s</span><i>·</i><span>4 tentativas · espera exponencial</span><i>·</i><span>validação antes da escrita</span><i>·</i><b class="tick-marker">◆</b>
+    <span>582 jogadores</span><i>·</i><span>30 times</span><i>·</i><span>12 atributos por jogador</span><i>·</i><span>escala 0–1</span><i>·</i><span>39 chamadas à API</span><i>·</i><span>intervalo de 0,7 s</span><i>·</i><span>4 tentativas · espera exponencial</span><i>·</i><span>validação antes da escrita</span><i>·</i><b class="tick-marker">◆</b>
+    <span>582 jogadores</span><i>·</i><span>30 times</span><i>·</i><span>12 atributos por jogador</span><i>·</i><span>escala 0–1</span><i>·</i><span>39 chamadas à API</span><i>·</i><span>intervalo de 0,7 s</span><i>·</i><span>4 tentativas · espera exponencial</span><i>·</i><span>validação antes da escrita</span><i>·</i><b class="tick-marker">◆</b>
+    <span>582 jogadores</span><i>·</i><span>30 times</span><i>·</i><span>12 atributos por jogador</span><i>·</i><span>escala 0–1</span><i>·</i><span>39 chamadas à API</span><i>·</i><span>intervalo de 0,7 s</span><i>·</i><span>4 tentativas · espera exponencial</span><i>·</i><span>validação antes da escrita</span><i>·</i><b class="tick-marker">◆</b>
+  </div>
+</div>
+
+<main class="viewport" id="viewport" tabindex="-1" aria-label="Apresentação">
+  <div class="track" id="track">
+
+    <!-- ============ SLIDE 1 · TITLE ============ -->
+    <section class="slide" id="s-title" data-title="Abertura" data-kicker="INÍCIO" data-budget="0:30" data-group="core">
+      <div class="slide-inner center">
+        <div class="kicker">Equipe Robô Cestinha&nbsp;·&nbsp;MC&nbsp;857&nbsp;·&nbsp;Projeto de curso&nbsp;·&nbsp;2026</div>
+        <h1 class="mega">Alimentando o Simulador<br /><span>Como ingerimos dados reais da NBA</span></h1>
+        <p class="lede">Como transformamos estatísticas de jogadores da NBA em dados limpos e validados para o simulador.</p>
+        <div class="logo-strip" role="img" aria-label="stats.nba.com alimenta a ingestão de dados, que produz players.json para o engine">
+          <span class="chip mono">stats.nba.com</span><b class="arrow">→</b>
+          <span class="chip">ingestão de dados</span><b class="arrow">→</b>
+          <span class="chip mono">players.json</span><b class="arrow">→</b>
+          <span class="chip">engine</span>
+        </div>
+        <div class="meta-row">
+          <code class="path">repo: backend/src/app/data_ingestion/</code>
+          <span class="dim">· apresentação ≈ 5:00 · 9 slides + apoio</span>
+        </div>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          Bom dia. Somos a equipe Robô Cestinha e vamos apresentar a ingestão de dados: como o simulador recebe estatísticas reais de jogadores da NBA.
+          O engine usa heurísticas: atributos dos jogadores influenciam arremessos, passes e perdas de bola. Por isso, a qualidade dos dados de entrada importa. Vamos mostrar como coletamos, derivamos e validamos esses dados.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ============ SLIDE 2 · FOUNDATION ============ -->
+    <section class="slide" id="s-why" data-title="Por que a ingestão é fundamental" data-kicker="VISÃO GERAL" data-budget="0:40" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">Visão geral · 0:40</div>
+        <h2 class="title">Por que a ingestão é <span>uma etapa fundamental</span></h2>
+
+        <div class="chain" role="img" aria-label="APIs da NBA e Basketball-Reference alimentam a ingestão, que produz players.json e teams.json">
+          <div class="chain-node"><span class="chain-orb">APIs da NBA</span><span class="chain-sub">stats.nba.com</span></div>
+          <b class="arrow">＋</b>
+          <div class="chain-node"><span class="chain-orb">Basketball-Reference</span><span class="chain-sub">posições tradicionais</span></div>
+          <b class="arrow">→</b>
+          <div class="chain-node hl"><span class="chain-orb">Ingestão de dados</span><span class="chain-sub">limpar · validar · proteger</span></div>
+          <b class="arrow">→</b>
+          <div class="chain-node"><span class="chain-orb mono">players.json · teams.json</span><span class="chain-sub">atributos na escala 0–1</span></div>
+          <b class="arrow">→</b>
+          <div class="chain-node"><span class="chain-orb">Engine de simulação</span><span class="chain-sub">probabilístico</span></div>
+          <b class="arrow">→</b>
+          <div class="chain-node"><span class="chain-orb">Transmissão</span><span class="chain-sub">quadra · placar</span></div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><b>582</b><span>jogadores · temporada regular 2025–26</span></div>
+          <div class="stat"><b>30</b><span>times</span></div>
+          <div class="stat"><b>12</b><span>atributos por jogador</span></div>
+          <div class="stat"><b>0–1</b><span>normalizados para o engine</span></div>
+        </div>
+
+        <div class="card warn-list">
+          <div class="warn-head"><span class="tag warn">DADOS BRUTOS TÊM INCONSISTÊNCIAS</span><span class="dim">por que esta etapa existe</span></div>
+          <ul>
+            <li>As fontes <b>divergem sobre elencos</b> e vínculos com os times</li>
+            <li><b>Valores ausentes</b> e <b>amostras pequenas</b> afetam percentuais</li>
+            <li>A NBA não publica <b>posições tradicionais</b> — apenas G / F / C</li>
+            <li>Há <b>mais de uma definição de elenco</b> durante a temporada</li>
+          </ul>
+        </div>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          Em linhas gerais, a ingestão é uma das etapas do projeto. Coletamos estatísticas na API oficial da NBA e posições no Basketball-Reference, e derivamos arquivos JSON para o catálogo.
+          O conjunto de dados processado contém 582 jogadores de 30 times, com 12 atributos usados pelo simulador, como aproveitamento de arremesso, turnovers, roubos, fôlego e desempenho em momentos decisivos.
+          Os dados brutos têm inconsistências: as fontes divergem sobre elencos, a NBA não publica as cinco posições tradicionais e amostras pequenas produzem percentuais instáveis. A pipeline explicita políticas para resolver esses casos.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ============ SLIDE 3 · CONTRACT FILES ============ -->
+    <section class="slide" id="s-files" data-title="Arquivos produzidos pela pipeline" data-kicker="SAÍDAS" data-budget="0:35" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">Saídas · 0:35</div>
+        <h2 class="title">Os arquivos de contrato <span>produzidos pela pipeline</span></h2>
+
+        <div class="files-grid">
+          <div class="card file-card">
+            <div class="file-head"><code class="mono file-name">players.json</code><span class="chip-tiny">582 registros</span></div>
+            <pre class="tree mono"><span class="tk">└─ jogador</span>
+   ├─ <span class="tk">nome · time · posições</span>
+   ├─ <span class="tk">is_starter</span>
+   └─ <span class="tk">attributes</span> <span class="cm">(12 · 0–1)</span>
+       ├─ <span class="tk">arremessos</span>       two_pt_pct · three_pt_pct · ft_pct
+       ├─ <span class="tk">controle e defesa</span> turnover_rate · steal_rate · block_rate · foul_rate
+       ├─ <span class="tk">rebote e criação</span> rebound_rate · assist_rate
+       └─ <span class="tk">esforço e perfil</span> stamina · clutch_factor · usage_rate</pre>
+            <div class="playcall"><b>Escala 0–1</b> · alguns atributos são usados diretamente em sorteios probabilísticos</div>
+          </div>
+
+          <div class="side-col">
+            <div class="card file-card slim">
+              <div class="file-head"><code class="mono file-name">teams.json</code><span class="chip-tiny">30 times</span></div>
+              <p class="dim">elenco&nbsp;· ritmo&nbsp;· ratings ofensivo e defensivo</p>
+            </div>
+            <div class="card file-card slim">
+              <div class="file-head"><span class="mono file-name dim-soft">saídas auxiliares</span></div>
+              <p class="dim"><code class="mono">attributes_table.csv</code> — tabela de dados brutos e derivados <span class="tag muted-tag">análise</span></p>
+              <p class="dim"><code class="mono">data_quality.json</code> — relatório de consistência <span class="tag muted-tag">cobertura · alertas</span></p>
+            </div>
+            <div class="quote-banner">
+              <p>“Estes arquivos não são só saídas —<br />eles <b>definem</b> o contrato.”</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          As principais saídas são players.json e teams.json. Muitos atributos estão na escala de zero a um e alguns são usados como probabilidades pelo engine; outros são taxas ou indicadores que participam de heurísticas.
+          Os atributos cobrem arremesso, controle de bola, defesa, rebote, criação, fôlego e desempenho em momentos decisivos. Também geramos uma tabela auxiliar com valores brutos e derivados e um relatório legível por máquina. Esses arquivos formam um contrato de dados para seus consumidores.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ============ SLIDE 4 · CONTRACT & CONSUMERS ============ -->
+    <section class="slide" id="s-contract" data-title="Contrato de dados e consumidores" data-kicker="CONTRATO" data-budget="0:45" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">Contratos de dados · 0:45</div>
+        <h2 class="title">Contratos de dados e <span>seus consumidores atuais e planejados</span></h2>
+
+        <div class="contracts">
+          <div class="card contract in">
+            <span class="tag in">CONTRATO DO CATÁLOGO</span>
+            <code class="mono">data_ingestion/schemas.py</code>
+            <p class="dim">players.json / teams.json — schemas compartilhados para ler e validar o catálogo</p>
+          </div>
+          <div class="card contract out">
+            <span class="tag out">CONTRATO DO ENGINE</span>
+            <code class="mono">engine/schemas.py · MatchLog</code>
+            <p class="dim">posses · ações · placar · momentos-chave — estrutura do resultado em memória</p>
+          </div>
+        </div>
+
+        <div class="consumers">
+          <div class="card consumer">
+            <div class="consumer-head"><span class="tag in">CATÁLOGO</span><span class="dim">players.json · teams.json</span></div>
+            <div class="catalog-flow">
+              <div class="fnode"><b>Arquivos processados</b><span class="mono">players.json · teams.json</span></div>
+              <div class="branch-stem">↓ dois consumidores independentes</div>
+              <div class="branch-pair">
+                <div class="fnode"><b>Engine demo</b><span>LivePlayer / LiveTeam</span><i>lê diretamente os arquivos</i></div>
+                <div class="fnode"><b>Seed do banco</b><span>→ PostgreSQL</span><i>atributos em coluna JSON</i></div>
+              </div>
+              <div class="fnode planned-node"><b>API do catálogo</b><span>→ futura interface de times</span><i class="planned">PLANEJADO · ainda não conectada</i></div>
+            </div>
+          </div>
+          <div class="card consumer">
+            <div class="consumer-head"><span class="tag out">PARTIDA</span><span class="dim">MatchLog em memória</span></div>
+            <div class="catalog-flow">
+              <div class="branch-pair">
+                <div class="fnode"><b>Runner do engine</b><span>MatchLog em memória</span><i>execução independente</i></div>
+                <div class="fnode"><b>Transmissão frontend</b><span>quadra e placar com mocks</span><i>sem conexão com o runner</i></div>
+              </div>
+              <div class="fnode planned-node"><b>Integração futura</b><span>coordenador → persistência → SSE / replay</span><i class="planned">PLANEJADO</i></div>
+              <div class="fnode planned-node"><b>Narração por LLM</b><span>momentos-chave → comentários</span><i class="planned">PLANEJADO</i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          Há dois contratos principais. Os schemas Pydantic da ingestão definem o formato de players.json e teams.json; o engine os reutiliza para construir suas entidades. O schema do engine define MatchLog, com períodos, posses, ações e momentos-chave.
+          O seed carrega os mesmos arquivos no PostgreSQL, com atributos armazenados em JSON. Porém, uma API para consultar o catálogo ainda não está implementada. Do lado da partida, o log do engine é produzido em memória; a interface atual usa mocks, e SSE, persistência e replay são trabalho futuro.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ============ SLIDE 5 · PIPELINE TWO STAGES ============ -->
+    <section class="slide" id="s-pipeline" data-title="Pipeline em duas etapas" data-kicker="ARQUITETURA" data-budget="0:40" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">Duas etapas · 0:40</div>
+        <h2 class="title">A pipeline em <span>duas etapas</span></h2>
+
+        <div class="pipeline">
+          <div class="stage">
+            <div class="stage-head"><span class="stage-num">1</span><b>Etapa 1 · coleta</b><span class="dim">acessa a rede</span></div>
+            <div class="stage-rows">
+              <div class="flow-row"><span class="fnode src mono">stats.nba.com</span><span class="edge">— intervalo · novas tentativas →</span><span class="fnode dst mono">data/raw/2025_26/</span><span class="edge-sub">CSVs sem transformação</span></div>
+              <div class="flow-row"><span class="fnode src mono">Basketball-Reference</span><span class="edge">— salvamento manual →</span><span class="fnode dst mono">HTML do site</span><span class="edge-sub">página protegida</span></div>
+            </div>
+          </div>
+
+          <div class="pipe-arrow"><b class="arrow">▼</b><span class="dim edge-label">a partir daqui, offline</span></div>
+
+          <div class="stage">
+            <div class="stage-head"><span class="stage-num">2</span><b>Etapa 2 · derivação</b><span class="dim">offline · pandas</span></div>
+            <div class="stage-rows inline-flow">
+              <span class="fnode mono">tabela mestra</span><b class="arrow">→</b>
+              <span class="fnode mono">atributos</span><b class="arrow">→</b>
+              <span class="fnode gate mono">validação dos schemas</span><b class="arrow">→</b>
+              <span class="fnode mono">data/processed</span>
+            </div>
+          </div>
+
+          <div class="pipe-arrow"><b class="arrow">▼</b><span class="dim edge-label">somente após a validação</span></div>
+
+          <div class="outputs">
+            <span class="chip mono">players.json</span>
+            <span class="chip mono">teams.json</span>
+            <span class="chip mono dim-soft">attributes_table.csv</span>
+            <span class="chip mono dim-soft">data_quality.json</span>
+          </div>
+        </div>
+
+        <div class="cli">
+          <code class="mono">python -m app.data_ingestion</code>
+          <code class="mono dim-soft">--no-fetch</code>
+          <code class="mono dim-soft">--refresh</code>
+          <span class="dim">· derivar offline · forçar nova coleta</span>
+        </div>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          A pipeline se divide em duas etapas. A coleta acessa a API de estatísticas da NBA, respeita intervalos entre requisições e salva as respostas brutas localmente. A derivação é offline: combina as fontes, calcula atributos, valida os schemas e só então escreve os arquivos finais.
+          Como os dados brutos ficam em cache, é possível derivar novamente sem acessar a rede. A opção --no-fetch exige que o cache esteja disponível; --refresh força uma nova coleta. Isso facilita reprocessar os mesmos dados e investigar mudanças nas fórmulas.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ============ SLIDE 6 · STAGE 1 POLITE FETCHING ============ -->
+    <section class="slide" id="s-stage1" data-title="Etapa 1 — coleta responsável" data-kicker="ETAPA 1 · COLETA" data-budget="0:40" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">Etapa 1 · coleta responsável · 0:40</div>
+        <h2 class="title">Etapa&nbsp;1 — <span>coleta responsável</span></h2>
+
+        <div class="two-col">
+          <div class="card discipline">
+            <div class="file-head"><span class="tag in">CONTROLE DE REQUISIÇÕES</span><span class="chip-tiny">39 chamadas</span></div>
+            <ul class="check">
+              <li><b>39 requisições</b> — jogadores, elencos, estatísticas por atleta, situações decisivas e totais por time</li>
+              <li><b>0,7 s</b> entre chamadas <span class="cm">intervalo mínimo</span></li>
+              <li>Até <b>4 tentativas</b>, espera exponencial e timeout de <b>30 s</b></li>
+              <li><b>Cache CSV bruto</b> — respostas são salvas sem transformação</li>
+            </ul>
+            <div class="playcall"><b>bruto = cache</b> · reprocessar não acessa a rede · <code class="mono">--no-fetch</code> falha se faltar dado</div>
+          </div>
+
+          <div class="card bbref">
+            <div class="file-head"><span class="tag out">CASO ESPECIAL</span><span class="mono brand-tag">Basketball-Reference</span></div>
+            <div class="pos-flow">
+              <span class="chip mono">G / F / C</span>
+              <b class="arrow">→ necessário</b>
+              <span class="chip mono">PG SG SF PF C</span>
+            </div>
+            <ul class="check">
+              <li>A API da NBA publica <b>3 posições</b>; o simulador usa as <b>5 tradicionais</b></li>
+              <li>A página tem proteção <b>Cloudflare</b> e não pode ser coletada pelo script</li>
+              <li><b>Salvar uma vez no navegador</b> → analisar o HTML → guardar em <code class="mono">bballref_positions.json</code></li>
+            </ul>
+            <div class="playcall"><b>etapa manual pontual</b> · depois, a pipeline reutiliza o arquivo salvo</div>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          A primeira etapa faz cerca de 39 chamadas: lista de jogadores, elencos, estatísticas da temporada, recortes de momentos decisivos, minutos como titular ou reserva e totais por equipe. As chamadas são espaçadas, podem ser repetidas com espera exponencial e são salvas sem transformação.
+          As posições tradicionais exigem outra fonte. A API da NBA publica três grupos; o simulador usa cinco posições. Como a página do Basketball-Reference bloqueia a coleta automatizada, ela é salva manualmente uma vez e depois analisada localmente.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ============ SLIDE 7 · STAGE 2 DERIVATION ============ -->
+    <section class="slide" id="s-stage2" data-title="Etapa 2 — números brutos e atributos" data-kicker="ETAPA 2 · DERIVAÇÃO" data-budget="0:50" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">Etapa 2 · derivação · 0:50</div>
+        <h2 class="title">Etapa&nbsp;2 — <span>números brutos → atributos</span></h2>
+
+        <div class="two-col stage2">
+          <div class="card master">
+            <div class="file-head"><span class="tag in">TABELA MESTRA</span><span class="chip-tiny">1 linha por jogador</span></div>
+            <div class="master-rows">
+              <div class="mrow"><span class="mono">totais da temporada</span><i>pontos · rebotes · assistências · minutos …</i></div>
+              <div class="mrow"><span class="mono">identificação</span><i>nome · id · time</i></div>
+              <div class="mrow"><span class="mono">posição no elenco</span><i>elencos dos times</i></div>
+              <div class="mrow"><span class="mono">posição tradicional</span><i>Basketball-Reference</i></div>
+              <div class="mrow"><span class="mono">minutos como titular / reserva</span><i>recorte por jogador</i></div>
+              <div class="mrow"><span class="mono">recortes decisivos</span><i>minutos em jogos equilibrados</i></div>
+              <div class="mrow"><span class="mono">estatísticas avançadas</span><i>USG% · OREB% · PER …</i></div>
+            </div>
+            <div class="playcall"><b>jogadores sem minutos são excluídos</b> — não entram na pipeline</div>
+          </div>
+
+          <div class="card deriv">
+            <div class="file-head"><span class="tag out">SEIS DECISÕES DE DERIVAÇÃO</span></div>
+            <ol class="deriv-list">
+              <li><b>Normalização</b> para <span class="mono">0–1</span> — escala consumida pelas heurísticas do engine</li>
+              <li><b>Shrinkage</b> — <span class="mono">10 tentativas fictícias</span> aproximam pequenas amostras da média da liga<br /><code class="math mono">(acertos + 10 · média) ÷ (tentativas + 10)</code></li>
+              <li><b>Posse</b> — estimativa baseada em <span class="cm">FGA + 0,44·FTA + TOV</span></li>
+              <li><b>Uso e rebote</b> — aproveita colunas <span class="mono">USG% / OREB%</span> da liga</li>
+              <li><b>Fôlego</b> — modelo por minutos e penalidade gradual após 34 anos</li>
+              <li><b>Clutch</b> — diferença de aproveitamento em minutos decisivos</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          A segunda etapa combina uma linha por jogador com totais da temporada, identidade, time, posições, minutos como titular ou reserva e recortes de clutch. Jogadores sem minutos são excluídos.
+          Algumas derivações exigem decisões estatísticas. Percentuais de arremesso são aproximados da média da liga em amostras pequenas. Estatísticas defensivas são divididas por posses defendidas estimadas. Fôlego é um modelo baseado em minutos e idade; clutch compara o aproveitamento em situações decisivas com o aproveitamento da temporada. Essas decisões são documentadas para que possam ser revisadas.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ============ SLIDE 8 · GATE & QUALITY ============ -->
+    <section class="slide" id="s-gate" data-title="Validação do contrato e qualidade" data-kicker="QUALIDADE" data-budget="0:35" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">Validação · 0:35</div>
+        <h2 class="title">Contrato de saída e <span>relatório de qualidade</span></h2>
+
+        <div class="gate-grid">
+          <div class="card terminal">
+            <div class="terminal-head"><span class="tag live">VALIDAÇÃO DO CONTRATO</span><code class="mono">validate_processed_output()</code></div>
+            <pre class="mono term-body">tudo é validado <span class="cm">antes de gravar qualquer arquivo</span>
+  ✗ valor fora da faixa     <span class="cm">ex.: two_pt_pct = 1.42</span>
+  ✗ id duplicado
+  ✗ jogador ausente
+  ✗ vínculo de elenco inválido
+→ lista todos os problemas · código de saída 1
+→ <span class="ok">arquivos válidos anteriores preservados</span></pre>
+            <div class="playcall"><b>é melhor interromper a pipeline do que gravar dados inválidos</b></div>
+          </div>
+
+          <div class="side-col">
+            <div class="card policies">
+              <div class="file-head"><span class="tag warn">DUAS POLÍTICAS</span><span class="dim">integridade referencial</span></div>
+              <p class="dim"><b>−5</b> jogadores sem minutos são excluídos</p>
+              <p class="dim"><b>57</b> dispensados permanecem associados ao time pelo qual jogaram</p>
+            </div>
+            <div class="card report">
+              <div class="file-head"><code class="mono file-name">data_quality.json</code></div>
+              <div class="report-stats">
+                  <div class="rstat"><b>582</b><span>jogadores</span></div>
+                  <div class="rstat"><b>216</b><span>titulares</span></div>
+                  <div class="rstat"><b>366</b><span>reservas</span></div>
+                  <div class="rstat"><b>min / média / máx.</b><span>por atributo</span></div>
+              </div>
+              <p class="dim">+ alertas de amostras pequenas, cobertura e distribuição dos atributos</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          Antes de escrever os arquivos, a saída inteira é validada contra os schemas Pydantic: faixas válidas, ids únicos e referências de elenco resolvidas. Se houver erros, a pipeline os lista e encerra sem substituir os arquivos válidos anteriores.
+          Algumas políticas tornam as verificações explícitas: jogadores sem minutos são excluídos e os vínculos com times seguem o critério documentado para a temporada. O relatório de qualidade resume cobertura, titulares, reservas e distribuições para apoiar a revisão do catálogo.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ============ SLIDE 9 · RUN IT · CLOSE ============ -->
+    <section class="slide" id="s-run" data-title="Execução e próximos passos" data-kicker="ENCERRAMENTO" data-budget="0:20" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">Encerramento · 0:20</div>
+        <h2 class="title">Como executar · <span>e o que vem depois</span></h2>
+
+        <div class="card terminal run-term">
+          <div class="terminal-head"><span class="tag in">TRÊS COMANDOS</span><span class="dim">na raiz do repositório</span></div>
+          <pre class="mono term-body"><span class="cm">$</span> python -m app.data_ingestion            <span class="cm"># coletar + derivar</span>
+<span class="cm">$</span> python -m app.data_ingestion --no-fetch  <span class="cm"># derivar offline a partir do cache</span>
+<span class="cm">$</span> python -m app.data_ingestion --refresh   <span class="cm"># forçar nova coleta</span></pre>
+        </div>
+
+        <div class="catalog-flow closing-flow">
+          <div class="fnode"><b>players.json · teams.json</b><span>saída da pipeline</span></div>
+          <div class="branch-stem">↓ consumidores independentes</div>
+          <div class="branch-pair">
+            <div class="fnode"><b>Seed do banco</b><span>→ PostgreSQL</span></div>
+            <div class="fnode"><b>engine.demo</b><span>lê os arquivos processados</span></div>
+          </div>
+          <div class="fnode planned-node"><b>API do catálogo</b><span>integração futura</span></div>
+        </div>
+
+        <div class="summary playcall big"><b>coleta controlada</b> · <b>derivação offline</b> · <b>estatísticas reais</b> · <b>validação antes da escrita</b></div>
+
+        <div class="links">
+          <code class="mono">docs/statistics.md</code><span class="dim">— fórmulas</span>
+          <code class="mono">docs/data_ingestion.md</code><span class="dim">— fontes e falhas</span>
+          <span class="tag ok-tag">PERGUNTAS</span>
+        </div>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          Na prática, a pipeline oferece comandos para coletar e derivar, derivar offline a partir do cache ou forçar nova coleta. O seed carrega o catálogo no PostgreSQL, enquanto o demo do engine também pode ler os arquivos processados diretamente.
+          Em resumo: coleta controlada, derivação offline e validação antes da escrita. Isso prepara dados para outros módulos, mas não significa que o engine e a transmissão estejam integrados. Consulte a documentação para fórmulas e detalhes da pipeline.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ============ APPENDIX A.1 ============ -->
+    <section class="slide appendix" id="s-a1" data-title="A.1 — Exemplo de estimativa de posses" data-kicker="APOIO · PERGUNTAS" data-budget="" data-group="appendix">
+      <div class="slide-inner">
+        <div class="kicker">Apoio · perguntas</div>
+        <h2 class="title">A.1 — <span>estimativa de posses</span></h2>
+
+        <div class="card math-card">
+          <p class="dim">Estimativa de posses por jogo e por time:</p>
+          <div class="formula mono">Σ ( <span class="hl">FGA</span> + 0,44 · <span class="hl">FTA</span> + <span class="hl">TOV</span> ) ÷ jogos</div>
+          <p class="dim">O fator <b>0,44</b> estima posses associadas a lances livres.</p>
+          <p class="dim">Atributos defensivos usam as posses <b>defendidas</b> pelo jogador:</p>
+          <div class="formula mono">posses do time × min( minutos ÷ 48 , 1 )</div>
+          <p class="dim">Assim, o tempo no banco não infla a taxa defensiva do jogador.</p>
+        </div>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          Slide de apoio — estimativa de posses. Por time, usamos Σ(FGA + 0,44·FTA + TOV) ÷ jogos. A estimativa de posses defendidas por jogador considera sua fração de minutos em quadra. Consulte docs/statistics.md para definições e ressalvas.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ============ APPENDIX A.2 ============ -->
+    <section class="slide appendix" id="s-a2" data-title="A.2 — Exemplo de shrinkage" data-kicker="APOIO · PERGUNTAS" data-budget="" data-group="appendix">
+      <div class="slide-inner">
+        <div class="kicker">Apoio · perguntas</div>
+        <h2 class="title">A.2 — <span>exemplo de shrinkage</span></h2>
+
+        <div class="two-col">
+          <div class="card math-card">
+            <div class="file-head"><span class="tag in">A REGRA</span></div>
+            <div class="formula mono"><span class="hl">SHRINKAGE_K</span> = 10 tentativas fictícias</div>
+            <p class="dim">Cada jogador recebe 10 tentativas fictícias baseadas na média da liga; o parâmetro fica em <code class="mono">config.py</code>.</p>
+          </div>
+          <div class="card math-card">
+            <div class="file-head"><span class="tag out">EXEMPLO</span><span class="dim">média de 2 pts ≈ 0,48</span></div>
+            <div class="case mono">200 tentativas a 58% → ≈ <b>0,58</b> <span class="cm">(amostra grande)</span></div>
+            <div class="case mono">6 tentativas a 100% → <span class="hl">(6 + 10 × 0,48) ÷ 16 ≈ 0,64</span> <span class="cm">(amostra pequena)</span></div>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          Slide de apoio — shrinkage. Com média de dois pontos próxima de 0,48 e parâmetro 10, um jogador com 200 tentativas a 58% mantém valor próximo do observado; seis acertos em seis tentativas são aproximados para 0,64. O parâmetro SHRINKAGE_K fica em config.py.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ============ APPENDIX A.3 ============ -->
+    <section class="slide appendix" id="s-a3" data-title="A.3 — Erros da validação" data-kicker="APOIO · PERGUNTAS" data-budget="" data-group="appendix">
+      <div class="slide-inner">
+        <div class="kicker">Apoio · perguntas</div>
+        <h2 class="title">A.3 — <span>falha explícita na validação</span></h2>
+
+        <div class="card terminal">
+          <div class="terminal-head"><span class="tag live">SAÍDA DO CLI</span><span class="dim">lista os problemas encontrados</span></div>
+          <pre class="mono term-body"><span class="err">players.json: jogador 'x' two_pt_pct=1.42 fora da faixa [0,1]</span>
+<span class="err">players.json: id duplicado 'y'</span>
+<span class="err">teams.json: jogador 'z' não encontrado no catálogo</span>
+<span class="err">[erro] saída inválida; nenhum arquivo foi gravado</span>
+<span class="cm">código de saída 1</span></pre>
+        </div>
+        <p class="dim note-under">Sem escrita parcial: corrija a fonte ou a fórmula e execute novamente.</p>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          Slide de apoio — saída de erro da validação. O CLI lista valores fora da faixa, ids duplicados e referências quebradas; encerra com código 1 e não grava uma saída parcial. Depois de corrigir a fonte ou fórmula, execute novamente.
+        </blockquote>
+      </aside>
+    </section>
+
+    <!-- ============ APPENDIX A.4 ============ -->
+    <section class="slide appendix" id="s-a4" data-title="A.4 — O contrato no código" data-kicker="APOIO · PERGUNTAS" data-budget="" data-group="appendix">
+      <div class="slide-inner">
+        <div class="kicker">Apoio · perguntas</div>
+        <h2 class="title">A.4 — <span>o contrato no código</span></h2>
+
+        <div class="card terminal">
+          <div class="terminal-head"><span class="tag in">engine/entities.py</span><span class="dim">schemas compartilhados</span></div>
+          <pre class="mono term-body"><span class="cm">from</span> app.data_ingestion.schemas <span class="cm">import</span> <span class="hl">Player, PlayerAttributes, Team</span>
+          <span class="cm"># engine e ingestão reutilizam os mesmos schemas</span>
+
+<span class="cm"># no banco:</span>
+Player.attributes  <span class="cm">→  coluna JSON</span>
+seed: copy(<span class="hl">entry["attributes"]</span>)  <span class="cm">→  banco</span>
+<span class="cm"># o seed copia o objeto de atributos</span></pre>
+        </div>
+      </div>
+      <aside class="notes">
+        <blockquote>
+          Slide de apoio — o contrato no código. engine/entities.py importa Player, PlayerAttributes e Team dos schemas da ingestão. O seed copia o objeto attributes para uma coluna JSON do modelo Player. Isso descreve a carga inicial do catálogo; não significa que o engine consulte o banco durante a simulação.
+        </blockquote>
+      </aside>
+    </section>
+
+  </div>
+
+  <button id="prev" class="nav-arrow prev" aria-label="Slide anterior">‹</button>
+  <button id="next" class="nav-arrow next" aria-label="Próximo slide">›</button>
+</main>
+
+<div class="progress"><span id="progressFill"></span></div>
+
+<footer class="bottombar">
+  <div class="dots" id="dots" role="tablist" aria-label="Navegação por slides"></div>
+  <div class="status">
+    <span id="groupLabel" class="group-label dim">APRESENTAÇÃO</span>
+    <span id="counter" class="counter mono">01 / 09</span>
+    <span id="timerChip" class="timer-chip monomono dim" hidden></span>
+  </div>
+</footer>
+
+<!-- Speaker notes drawer -->
+<aside id="notesDrawer" class="notes-drawer" aria-label="Notas do apresentador">
+  <div class="drawer-head">
+    <span class="tag in">NOTAS DO APRESENTADOR</span>
+    <button id="btn-notes-close" type="button" aria-label="Fechar notas">✕</button>
+  </div>
+  <div id="notesBody" class="notes-body"></div>
+</aside>
+
+<!-- Overview grid -->
+<div id="overview" class="overview" hidden>
+  <div class="overview-inner">
+    <div class="overview-head">
+      <span class="kicker">MAPA DOS SLIDES</span>
+      <button id="btn-overview-close" type="button" aria-label="Fechar mapa">✕</button>
+    </div>
+    <div id="overviewGrid" class="overview-grid"></div>
+  </div>
+</div>
+
+<div id="hint" class="hint dim">← → navegar · N notas · T tempo · G mapa · F tela cheia · Esc fechar</div>
+
+<script src="app.js"></script>
+</body>
+</html>

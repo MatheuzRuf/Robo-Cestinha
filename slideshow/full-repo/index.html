@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Robô Cestinha — Arquitetura do Projeto</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" />
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="theme.css" />
+</head>
+<body class="full-repo-deck" data-deck-label="VISÃO GERAL">
+<div class="court-bg" aria-hidden="true">
+  <svg viewBox="0 0 320 420" xmlns="http://www.w3.org/2000/svg">
+    <rect x="14" y="14" width="292" height="392" rx="6" class="cb-boundary" />
+    <line x1="160" y1="14" x2="160" y2="406" class="cb-line" />
+    <circle cx="160" cy="210" r="42" class="cb-line" />
+    <circle cx="160" cy="210" r="8" class="cb-line" />
+    <rect x="118" y="14" width="84" height="150" class="cb-key" />
+    <circle cx="160" cy="118" r="34" class="cb-line" />
+    <circle cx="160" cy="118" r="4" class="cb-line" />
+  </svg>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brandTitle">ROBÔ&nbsp;CESTINHA</span>
+    <span class="brandSubtitle">ARQUITETURA · MC 857 · 2026</span>
+  </div>
+  <nav class="controls" aria-label="Controles da apresentação">
+    <button id="btn-overview" type="button" class="pill" title="Visão geral (G)">MAPA</button>
+    <button id="btn-notes" type="button" class="pill" aria-pressed="false" title="Notas do apresentador (N)">NOTAS</button>
+    <button id="btn-timer" type="button" class="pill" aria-pressed="false" title="Cronômetro (T)">TEMPO</button>
+    <button id="btn-full" type="button" class="pill" title="Tela cheia (F)">TELA CHEIA</button>
+  </nav>
+</header>
+
+<div class="ticker" aria-hidden="true">
+  <div class="tickerTrack">
+    <span>React + TypeScript</span><i>·</i><span>FastAPI + SQLAlchemy</span><i>·</i><span>PostgreSQL</span><i>·</i><span>engine headless</span><i>·</i><span>heurísticas baseadas em atributos</span><i>·</i><span>integração em andamento</span><i>·</i><b class="tick-marker">◆</b>
+    <span>React + TypeScript</span><i>·</i><span>FastAPI + SQLAlchemy</span><i>·</i><span>PostgreSQL</span><i>·</i><span>engine headless</span><i>·</i><span>heurísticas baseadas em atributos</span><i>·</i><span>integração em andamento</span><i>·</i><b class="tick-marker">◆</b>
+    <span>React + TypeScript</span><i>·</i><span>FastAPI + SQLAlchemy</span><i>·</i><span>PostgreSQL</span><i>·</i><span>engine headless</span><i>·</i><span>heurísticas baseadas em atributos</span><i>·</i><span>integração em andamento</span><i>·</i><b class="tick-marker">◆</b>
+    <span>React + TypeScript</span><i>·</i><span>FastAPI + SQLAlchemy</span><i>·</i><span>PostgreSQL</span><i>·</i><span>engine headless</span><i>·</i><span>heurísticas baseadas em atributos</span><i>·</i><span>integração em andamento</span><i>·</i><b class="tick-marker">◆</b>
+  </div>
+</div>
+
+<main class="viewport" id="viewport" tabindex="-1">
+  <div class="track" id="track">
+
+    <section class="slide" id="s-title" data-title="Robô Cestinha" data-kicker="APRESENTAÇÃO" data-budget="0:30" data-group="core" data-deck-label="VISÃO GERAL">
+      <div class="slide-inner center">
+        <div class="kicker">MC 857 · Projeto de curso · Equipe Robô Cestinha · 2026</div>
+        <h1 class="mega">Robô <span>Cestinha</span></h1>
+        <p class="lede">Um simulador de torneios de basquete que transforma estatísticas de jogadores em decisões probabilísticas dentro de uma partida.</p>
+        <div class="logo-strip" role="img" aria-label="Estatísticas, engine de simulação e transmissão visual">
+          <span class="chip">dados de jogadores</span><span class="connector connector--right" aria-hidden="true"></span>
+          <span class="chip">simulação headless</span><span class="connector connector--right" aria-hidden="true"></span>
+          <span class="chip">transmissão visual</span>
+        </div>
+        <div class="meta-row"><code class="path">visão geral · arquitetura · engine</code><span class="dim">· apresentação técnica</span></div>
+      </div>
+      <aside class="notes"><blockquote>Apresentar o Robô Cestinha como um projeto de software e simulação. O foco desta apresentação é como as partes estão organizadas, o que já funciona de forma independente e o que ainda precisa ser integrado. A ingestão de dados é uma dessas partes, não o objetivo inteiro do projeto.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-project" data-title="O que o projeto está construindo" data-kicker="ESCOPO" data-budget="0:45" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">01 · Escopo do projeto</div>
+        <h2 class="title">Uma partida simulada, <span>do dado ao resultado</span></h2>
+        <div class="journey" role="img" aria-label="Catálogo, sessão de torneio, engine de partida, eventos e interface de transmissão">
+          <div class="journey-node"><b>Catálogo</b><span>times e atributos</span></div><span class="connector connector--right" aria-hidden="true"></span>
+          <div class="journey-node"><b>Torneio</b><span>sessões e bracket</span></div><span class="connector connector--right" aria-hidden="true"></span>
+          <div class="journey-node focus"><b>Partida</b><span>posses e heurísticas</span></div><span class="connector connector--right" aria-hidden="true"></span>
+          <div class="journey-node"><b>Transmissão</b><span>quadra e placar</span></div>
+        </div>
+        <div class="two-col">
+          <div class="card"><span class="tag in">IDEIA CENTRAL</span><p>Estatísticas reais parametrizam uma simulação explicável: cada posse combina decisões do engine e sorteios probabilísticos.</p></div>
+          <div class="card"><span class="tag warn">ESTADO ATUAL</span><p>Os módulos principais existem, mas a interface, a API e a simulação ainda não estão conectadas em um fluxo único.</p></div>
+        </div>
+      </div>
+      <aside class="notes"><blockquote>Este percurso representa o produto pretendido, não um fluxo já integrado. O catálogo é produzido pela ingestão e pode alimentar o seed do banco ou o demo independente do engine. O backend de sessões e a interface existem separadamente; a transmissão mostrada hoje usa dados mock.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-status" data-title="Implementado, parcial e planejado" data-kicker="ESTADO DO PROJETO" data-budget="0:50" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">02 · Estado do projeto</div>
+        <h2 class="title">O que existe hoje <span>e o que falta conectar</span></h2>
+        <div class="status-columns">
+          <div class="card status-card done"><span class="tag ok-tag">IMPLEMENTADO</span><ul><li>Pipeline de dados e catálogo processado</li><li>Modelos, migrações e seed do catálogo</li><li>API de health check e criação de sessão</li><li>Engine headless executável em demo</li><li>Interface React e animação com dados mock</li></ul></div>
+          <div class="card status-card partial"><span class="tag warn">PARCIAL / DESCONECTADO</span><ul><li>Serviços de sessão e bracket existem; criação de sessão não chama o bracket</li><li>Engine produz log em memória; API não o executa</li><li>Frontend renderiza transmissão mock; não consome a API</li><li>Heurísticas têm lacunas de regras e validação estatística</li></ul></div>
+          <div class="card status-card planned"><span class="tag out">PLANEJADO</span><ul><li>Integração entre frontend e endpoints reais</li><li>Coordenação, persistência e transmissão de partidas</li><li>Eventos e frames por SSE e replay</li><li>Completar regras, testes e calibração</li></ul></div>
+        </div>
+        <p class="dim status-foot">Convenção dos diagramas: linha contínua = fluxo existente · tracejada = integração planejada.</p>
+      </div>
+      <aside class="notes"><blockquote>É importante separar existência de integração. Há um BracketService que cria partidas, mas o endpoint atual de sessão não o chama. Há um runner de partidas, mas nenhum serviço de API o executa. E há uma tela de transmissão, mas ela recebe frames simulados no frontend. Vamos manter essa distinção nos próximos diagramas.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-system" data-title="Arquitetura geral do sistema" data-kicker="ARQUITETURA" data-budget="1:10" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">03 · Visão geral da arquitetura</div>
+        <h2 class="title">Módulos separados, <span>integrações em etapas</span></h2>
+        <div class="diagram-wrap" role="img" aria-label="Frontend mock isolado, API ligada a serviço, repositório e PostgreSQL, engine headless e ingestão offline">
+<pre class="mermaid">
+flowchart TB
+  FE["Frontend React<br/><small>Home · transmissão · usa mocks hoje</small>"]
+  API["FastAPI<br/><small>health · sessions</small>"]
+  SVC["Services<br/><small>workflows de domínio</small>"]
+  REPO["Repositories<br/><small>persistência</small>"]
+  DB[("PostgreSQL<br/><small>catálogo · sessões</small>")]
+  ENGINE["Engine headless<br/><small>demo independente</small>"]
+  ING["Ingestão offline<br/><small>buscar · derivar · validar</small>"]
+  FILES["players.json · teams.json<br/><small>também usados pelo seed</small>"]
+
+  FE -. API futura .-> API
+  API --> SVC --> REPO --> DB
+  ING --> FILES -. catálogo JSON .-> ENGINE
+
+  classDef frontend stroke:#22d3ee,stroke-width:2px;
+  classDef storage stroke:#4c9a6a,stroke-width:2px;
+  classDef engine stroke:#f2b705,stroke-width:2px;
+  class FE frontend
+  class DB storage
+  class ENGINE engine
+</pre>
+        </div>
+        <div class="diagram-legend"><span><i class="legend-line"></i>implementado</span><span><i class="legend-line dashed"></i>planejado / não conectado</span></div>
+      </div>
+      <aside class="notes"><blockquote>A aplicação tem quatro áreas relevantes: interface, API/domínio, persistência e processamento de dados/engine. O frontend ainda não chega à API. No backend, health check e criação de sessão chegam ao banco através das camadas de domínio e repositório. O engine é uma execução independente e a ingestão é um processo offline. As linhas tracejadas indicam integrações desejadas, não existentes.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-flows" data-title="Fluxos de dados e de simulação" data-kicker="FLUXOS" data-budget="0:55" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">04 · Dois fluxos distintos</div>
+        <h2 class="title">Catálogo offline <span>não é transmissão ao vivo</span></h2>
+        <div class="flow-split">
+          <div class="card flow-panel">
+            <div class="file-head"><span class="tag in">PREPARAÇÃO DO CATÁLOGO</span><span class="dim">offline</span></div>
+            <div class="vertical-flow"><div class="flow-step">Fontes externas</div><span class="connector connector--down" aria-hidden="true"></span><div class="flow-step">Fetch e cache bruto</div><span class="connector connector--down" aria-hidden="true"></span><div class="flow-step">Derivação + validação</div><span class="connector connector--down" aria-hidden="true"></span><div class="flow-step end-step">JSON processado</div></div>
+            <p class="dim">Consumidores atuais: seed do banco e demo independente do engine.</p>
+          </div>
+          <div class="card flow-panel">
+            <div class="file-head"><span class="tag warn">PARTIDA E TRANSMISSÃO</span><span class="dim">a integrar</span></div>
+            <div class="vertical-flow"><div class="flow-step">Sessão / partida</div><span class="connector connector--down connector--planned" aria-hidden="true"></span><div class="flow-step planned-step">Coordenador executa engine</div><span class="connector connector--down connector--planned" aria-hidden="true"></span><div class="flow-step planned-step">Persistência de eventos / frames</div><span class="connector connector--down connector--planned" aria-hidden="true"></span><div class="flow-step planned-step">API entrega atualização à interface</div></div>
+            <p class="dim">Esse fluxo ao vivo ainda não está implementado.</p>
+          </div>
+        </div>
+      </div>
+      <aside class="notes"><blockquote>A ingestão prepara dados por temporada; não é uma tarefa executada a cada partida. O caminho do catálogo está implementado até os arquivos e pode alimentar o banco via seed ou o demo do engine. Já o caminho da partida até a transmissão é uma direção arquitetural: faltam o coordenador, a persistência de saída e a integração em tempo real.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-frontend" data-title="Frontend: composição e páginas" data-kicker="FRONTEND" data-budget="0:55" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">05 · Frontend · composição</div>
+        <h2 class="title">Páginas compõem a interface; <span>componentes apresentam</span></h2>
+        <div class="diagram-wrap" role="img" aria-label="App.tsx escolhe entre Home e MatchBroadcast, que usam componentes compartilhados e de transmissão; a transmissão consome useGameFrames a partir do mockEngine">
+<pre class="mermaid">
+flowchart TB
+  APP["App.tsx<br/><small>seleção por pathname</small>"]
+  HOME["Home<br/><small>entrada de sessão · mock</small>"]
+  BCAST["MatchBroadcast<br/><small>quadra · placar · feeds</small>"]
+  SHARED["Componentes compartilhados<br/><small>Button · Card · Modal · AppShell</small>"]
+  BCOMP["Componentes da transmissão<br/><small>Court · Scoreboard · PlayByPlay</small>"]
+  MOCK["useGameFrames → mockEngine<br/><small>frames locais para animar a quadra</small>"]
+
+  APP --> HOME
+  APP --> BCAST
+  HOME --> SHARED
+  BCAST --> SHARED
+  BCAST --> BCOMP
+  BCOMP --> MOCK
+
+  classDef shared stroke:#22d3ee,stroke-width:2px;
+  classDef mock stroke:#f2b705,stroke-width:2px;
+  class SHARED,BCOMP shared
+  class MOCK mock
+</pre>
+        </div>
+        <div class="callout"><b>Observação:</b> o roteamento atual é uma verificação de caminho, não React Router; componentes da página ainda não buscam dados do backend.</div>
+      </div>
+      <aside class="notes"><blockquote>O frontend separa duas páginas e um conjunto de componentes reaproveitáveis. A Home e a transmissão são páginas distintas; a App escolhe qual renderizar a partir do pathname. Na transmissão, o hook recebe frames do mock engine e atualiza componentes visuais. O desenho mostra a organização atual, não a estrutura futura recomendada em AGENTS.md.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-frontend-flow" data-title="Frontend: dados que chegam à tela" data-kicker="FRONTEND" data-budget="0:50" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">06 · Frontend · fluxo de renderização</div>
+        <h2 class="title">A transmissão existe; <span>a fonte ainda é simulada no cliente</span></h2>
+        <div class="frame-flow" role="img" aria-label="Mock engine envia frames ao hook, que mantém uma fila e atualiza quadra e placar">
+          <div class="frame-source"><span class="tag warn">ATUAL</span><b>mockEngine</b><small>gera frame a cada 800 ms</small></div>
+          <span class="connector connector--right" aria-hidden="true"></span>
+          <div class="frame-source"><b>useGameFrames</b><small>fila limitada · pausa · velocidade</small></div>
+          <span class="connector connector--right" aria-hidden="true"></span>
+          <div class="frame-source display-source"><b>MatchBroadcast</b><small>quadra SVG · placar · play-by-play</small></div>
+        </div>
+        <div class="two-col">
+          <div class="card"><span class="tag in">JÁ IMPLEMENTADO</span><p>Animação dos frames e controles de reprodução usando dados locais do frontend.</p></div>
+          <div class="card planned-card"><span class="tag out">CAMINHO FUTURO</span><p>Substituir a fonte mock por frames/eventos reais, mantendo a interface de renderização sempre que possível.</p></div>
+        </div>
+      </div>
+      <aside class="notes"><blockquote>O frame contém posições de jogadores e bola. O hook mantém uma fila pequena, respeita pausa e velocidade e alimenta a quadra. Essa experiência visual funciona sem o backend. O frame contract é útil para orientar uma futura integração, mas SSE e replay não estão implementados.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-backend" data-title="Backend: camadas e dependências" data-kicker="BACKEND" data-budget="1:05" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">07 · Backend · camadas</div>
+        <h2 class="title">A requisição passa por <span>domínio e persistência</span></h2>
+        <div class="diagram-wrap" role="img" aria-label="FastAPI routers chamam services; services chamam repositories; repositories usam sessão SQLAlchemy para acessar PostgreSQL">
+<pre class="mermaid">
+flowchart TB
+  API["01 · API · FastAPI<br/><small>GET /health · POST /sessions</small>"]
+  SVC["02 · Services de domínio<br/><small>SessionService · BracketService separado</small>"]
+  REPO["03 · Repositories<br/><small>BaseRepository · Session · Bracket</small>"]
+  DB[("04 · SQLAlchemy async → PostgreSQL<br/><small>sessão por requisição · migrações Alembic</small>")]
+
+  API --> SVC --> REPO --> DB
+
+  classDef storage stroke:#4c9a6a,stroke-width:2px;
+  class DB storage
+</pre>
+        </div>
+        <div class="callout"><b>Factory:</b> `ServiceFactory` monta services e repositories com a sessão da requisição. `SessionService` recebe `BracketService`, mas ainda não aciona a criação do bracket.</div>
+      </div>
+      <aside class="notes"><blockquote>O desenho destaca as fronteiras da persistência: routers não fazem consultas SQL; services coordenam regras e workflows; repositories são a única camada do domínio que usa a sessão assíncrona. ServiceFactory é o composition root por requisição. Hoje os endpoints implementados são health e criação de sessão.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-model" data-title="Modelo de domínio e bracket" data-kicker="BACKEND" data-budget="0:55" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">08 · Backend · dados</div>
+        <h2 class="title">Catálogo global; <span>participação vinculada à sessão</span></h2>
+        <div class="diagram-wrap" role="img" aria-label="Team e Player formam o catálogo global; Session agrupa User e Match; Match referencia a próxima Match do bracket">
+<pre class="mermaid">
+erDiagram
+  TEAM ||--o{ PLAYER : "1 ── 0..N"
+  SESSION ||--o{ USER : "1 ── 0..N"
+  SESSION ||--o{ MATCH : "1 ── 0..N"
+  MATCH ||--o| MATCH : "next_match_id"
+  TEAM {
+    string id PK
+    string name
+  }
+  PLAYER {
+    string team_id FK
+    json attributes
+  }
+  SESSION {
+    string hash PK
+    string owner_id
+  }
+  USER {
+    int join_sequence
+    string team_id "opcional"
+  }
+  MATCH {
+    string round
+    string status
+    json score
+  }
+</pre>
+        </div>
+        <div class="callout"><b>Limite atual:</b> MatchEvent e MatchFrameChunk ainda não são tabelas/modelos implementados.</div>
+      </div>
+      <aside class="notes"><blockquote>O catálogo de times e jogadores é global; jogadores apontam para times e guardam atributos em JSON. User e Match pertencem a uma Session. O bracket é representável pela referência de Match para outra Match, mas o fluxo de sessão não cria essas linhas atualmente. Eventos semânticos e lotes de frames ainda são desenho futuro, não parte do modelo implementado.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-patterns" data-title="Padrões e responsabilidades" data-kicker="DECISÕES DE ARQUITETURA" data-budget="0:55" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">09 · Padrões identificáveis no código</div>
+        <h2 class="title">Separar responsabilidades <span>sem inventar abstrações</span></h2>
+        <div class="pattern-map">
+          <div class="pattern-card"><span class="pattern-num">01</span><div><b>Service Layer</b><p>Coordena workflows do domínio.</p><code>SessionService</code></div></div>
+          <div class="pattern-card"><span class="pattern-num">02</span><div><b>Repository</b><p>Isola acesso e persistência.</p><code>SessionRepository</code></div></div>
+          <div class="pattern-card"><span class="pattern-num">03</span><div><b>Factory + DI</b><p>Compõe dependências por requisição.</p><code>ServiceFactory</code></div></div>
+          <div class="pattern-card"><span class="pattern-num">04</span><div><b>State Machine</b><p>Controla transições de uma posse.</p><code>engine/StateMachine</code></div></div>
+          <div class="pattern-card contract-pattern"><span class="pattern-num">05</span><div><b>Schema / contrato</b><p>Valida formato de dados entre módulos.</p><code>Pydantic schemas</code></div></div>
+        </div>
+        <p class="dim pattern-foot">São padrões observáveis na implementação atual; não implicam que toda camada esteja integrada.</p>
+      </div>
+      <aside class="notes"><blockquote>Repository e Service Layer aparecem na fronteira de persistência. A Factory é usada como ponto de composição com injeção de dependências do FastAPI. O engine organiza a posse como máquina de estados. Schemas Pydantic dão formato a dados, mas não são uma camada mágica de integração. Esses nomes descrevem responsabilidades que conseguimos apontar no código.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-engine" data-title="Engine: componentes da simulação" data-kicker="ENGINE" data-budget="0:55" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">10 · Engine · arquitetura interna</div>
+        <h2 class="title">Runner coordena a partida; <span>estado e regras ficam isolados</span></h2>
+        <div class="diagram-wrap" role="img" aria-label="Catálogo e entidades alimentam o MatchRunner, que usa a StateMachine, apoiada por Heuristics, GameClock e Grid">
+<pre class="mermaid">
+flowchart TB
+  CAT["Catálogo processado<br/><small>Player · Team · atributos</small>"]
+  ENT["Entidades em jogo<br/><small>LivePlayer · LiveTeam · GameState</small>"]
+  RUN["MatchRunner<br/><small>períodos · log final</small>"]
+  SM["StateMachine<br/><small>loop de posse</small>"]
+  HEU["Heuristics<br/><small>ação e resultado</small>"]
+  CLK["GameClock<br/><small>relógio e violações</small>"]
+  GRID["Grid<br/><small>posição e zona do arremesso</small>"]
+
+  CAT --> ENT --> RUN --> SM
+  SM --> HEU
+  SM --> CLK
+  SM --> GRID
+
+  classDef focus stroke:#e2661a,stroke-width:2px;
+  class RUN,SM focus
+</pre>
+        </div>
+        <div class="callout"><b>Fronteira:</b> engine não conhece HTTP, usuário ou sessão. Hoje roda pelo demo e retorna MatchLog em memória.</div>
+      </div>
+      <aside class="notes"><blockquote>O catálogo é transformado em entidades específicas da simulação, com estado mutável como fôlego, posição e placar. MatchRunner percorre períodos e pede à máquina de estados que resolva cada posse. A máquina consulta heurísticas e relógio. Esse desenho é independente da API; conectá-lo a uma partida persistida ainda requer um coordenador de domínio.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-state-machine" data-title="Uma posse como máquina de estados" data-kicker="ENGINE" data-budget="1:00" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">11 · Engine · fluxo de uma posse</div>
+        <h2 class="title">A posse continua até <span>um evento terminal</span></h2>
+        <div class="diagram-wrap" role="img" aria-label="Iniciar posse, selecionar portador, decidir passe movimento ou arremesso, resolver, atualizar relógio; continuar, cesta, turnover ou fim de período">
+<pre class="mermaid">
+stateDiagram-v2
+  state "Iniciar posse" as IniciarPosse
+  state "Selecionar portador" as SelecionarPortador
+  state "Decidir ação" as DecidirAcao
+  state "Resolver ação" as ResolverAcao
+  state "Cesta" as Cesta
+  state "Turnover" as Turnover
+  state "Violação" as Violacao
+  state "Fim do período" as FimDoPeriodo
+
+  [*] --> IniciarPosse
+  IniciarPosse --> SelecionarPortador
+  SelecionarPortador --> DecidirAcao
+  DecidirAcao --> ResolverAcao : passe · movimento · arremesso
+  ResolverAcao --> DecidirAcao : passe completo / movimento continua
+  ResolverAcao --> Cesta
+  ResolverAcao --> Turnover
+  ResolverAcao --> Violacao
+  ResolverAcao --> FimDoPeriodo
+  Cesta --> [*]
+  Turnover --> [*]
+  Violacao --> [*]
+  FimDoPeriodo --> [*]
+</pre>
+        </div>
+        <div class="state-foot dim" style="text-align:center; font-family: var(--font-mono); font-size: 0.8rem;">A cada ação: avançar o relógio → registrar ActionLog → testar o estado terminal</div>
+        <div class="callout"><b>Simplificação atual:</b> arremesso errado troca a posse diretamente; a disputa de rebote ainda não entra nesse fluxo.</div>
+      </div>
+      <aside class="notes"><blockquote>A máquina escolhe um portador inicial, sorteia uma ação e a resolve. Passes bem-sucedidos e movimentos que não encerram a posse retornam à decisão; cesta, turnover, violação ou fim do período encerram o loop. O relógio avança pela duração da ação. A implementação é uma primeira aproximação: falta ligar o rebote após arremessos errados e completar o tratamento de faltas.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-heuristics" data-title="Como as heurísticas usam atributos" data-kicker="ENGINE" data-budget="1:05" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">12 · Engine · heurísticas</div>
+        <h2 class="title">Atributos alteram probabilidades; <span>não há modelo treinado</span></h2>
+        <div class="heuristic-flow">
+          <div class="attribute-column"><span class="tag in">ENTRADAS</span><div class="attribute-pill">usage_rate</div><div class="attribute-pill">turnover_rate · steal_rate</div><div class="attribute-pill">two_pt_pct · three_pt_pct</div><div class="attribute-pill">stamina · clutch_factor</div></div>
+          <span class="connector connector--right" aria-hidden="true"></span>
+          <div class="rule-column"><span class="tag warn">REGRAS</span><div class="rule-box"><b>Escolha da ação</b><small>menos tempo no relógio → maior chance de arremesso</small></div><div class="rule-box"><b>Risco de perda</b><small>turnovers do portador + steals da defesa</small></div><div class="rule-box"><b>Resultado do arremesso</b><small>aproveitamento base ajustado por fadiga e clutch</small></div></div>
+          <span class="connector connector--right" aria-hidden="true"></span>
+          <div class="outcome-column"><span class="tag out">SAÍDAS</span><div class="outcome-box">Passe · movimento · arremesso</div><div class="outcome-box">Cesta · erro · turnover</div><div class="outcome-box">Log da posse</div></div>
+        </div>
+        <div class="callout"><b>Reprodutibilidade:</b> a seed do gerador aleatório permite repetir uma simulação com as mesmas entradas.</div>
+      </div>
+      <aside class="notes"><blockquote>As probabilidades são heurísticas explícitas. Com mais tempo no relógio, a chance base de arremesso é menor; no fim do relógio cresce e abaixo de dois segundos o código força arremesso. Perdas combinam turnover do jogador e pressão de steals. Arremessos usam o atributo de aproveitamento e recebem ajustes por fadiga e clutch em situações apertadas. O uso de aleatoriedade com seed permite reproduzir resultados, mas ainda é necessário validar se as distribuições se parecem com basquete real.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-limitations" data-title="Saída e limites atuais do engine" data-kicker="ENGINE" data-budget="0:50" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">13 · Engine · saída e limites</div>
+        <h2 class="title">Há um resultado estruturado; <span>a partida real ainda não é transmitida</span></h2>
+        <div class="two-col">
+          <div class="card log-card"><div class="file-head"><span class="tag in">SAÍDA DO RUNNER</span><code class="mono">MatchLog</code></div><div class="log-tree"><span>MatchLog</span><span>├── QuarterLog</span><span>│   └── PossessionLog</span><span>│       └── ActionLog</span><span>├── placar e resultado</span><span>└── momentos-chave</span></div><p class="dim">Objeto em memória produzido pela simulação headless.</p></div>
+          <div class="card"><span class="tag warn">AINDA NÃO FECHADO</span><ul><li>Rebotes não são resolvidos após erros</li><li>Faltas não resultam em lances livres</li><li>Substituições não estão integradas</li><li>Runner não fecha empates com overtime</li><li>Persistência e transmissão ainda não consomem MatchLog</li></ul></div>
+        </div>
+      </div>
+      <aside class="notes"><blockquote>Os schemas de saída representam a intenção de registrar uma partida em níveis de períodos, posses e ações. O runner já produz um log em memória, mas alguns campos ainda não são preenchidos como um box score completo. O deck precisa evitar sugerir que esses dados já alimentam a tela ou estejam salvos no banco.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-ingestion" data-title="Ingestão: preparar o catálogo" data-kicker="DADOS" data-budget="0:55" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">14 · Ingestão · suporte ao simulador</div>
+        <h2 class="title">Uma etapa de preparação, <span>não o produto inteiro</span></h2>
+        <div class="pipeline compact-pipeline">
+          <div class="stage"><div class="stage-head"><span class="stage-num">1</span><b>Coletar e armazenar bruto</b><span class="dim">com rede</span></div><div class="stage-rows"><div class="flow-row"><span class="fnode src">NBA Stats</span><span class="edge">cache bruto</span><span class="fnode dst mono">data/raw/</span></div><div class="flow-row"><span class="fnode src">Basketball-Reference</span><span class="edge">etapa manual</span><span class="fnode dst mono">posições</span></div></div></div>
+          <div class="pipe-arrow"><span class="connector connector--down" aria-hidden="true"></span><span class="dim edge-label">reprocessamento offline</span></div>
+          <div class="stage"><div class="stage-head"><span class="stage-num">2</span><b>Derivar e validar</b><span class="dim">tabela mestra → atributos → schemas</span></div><div class="outputs"><span class="chip mono">players.json</span><span class="chip mono">teams.json</span><span class="chip mono">quality report</span></div></div>
+        </div>
+        <div class="stats compact-stats"><div class="stat"><b>582</b><span>jogadores no catálogo</span></div><div class="stat"><b>30</b><span>times</span></div><div class="stat"><b>12</b><span>atributos por jogador</span></div><div class="stat"><b>0–1</b><span>escala dos atributos</span></div></div>
+      </div>
+      <aside class="notes"><blockquote>A ingestão busca estatísticas e posições, guarda dados brutos para permitir reprocessamento e deriva atributos offline. A saída validada alimenta o catálogo. Os números são do dataset processado versionado no repositório; não representam atualização ao vivo. Shrinkage e fórmulas completas ficam nas notas ou no apêndice técnico.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-integration" data-title="Da arquitetura atual à integração planejada" data-kicker="INTEGRAÇÃO" data-budget="0:55" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">15 · Integração · estado atual e direção</div>
+        <h2 class="title">A principal lacuna está <span>entre os módulos</span></h2>
+        <div class="diagram-wrap" role="img" aria-label="Hoje: frontend, API e engine rodam isolados. Direção futura: frontend, API, coordenador, engine, eventos e transmissão em cadeia">
+<pre class="mermaid">
+flowchart TB
+  subgraph HOJE["HOJE · execuções independentes"]
+    direction LR
+    FE1["Frontend<br/><small>mockEngine</small>"]
+    API1["API<br/><small>session → repository → DB</small>"]
+    ENG1["Engine<br/><small>demo → MatchLog em memória</small>"]
+  end
+  subgraph FUTURO["DIREÇÃO FUTURA · por etapas"]
+    direction LR
+    FE2["Frontend"] -.-> API2["API / services"] -.-> COORD["coordenador"] -.-> ENG2["engine"] -.-> EV["eventos / frames"] -.-> TX["transmissão"]
+  end
+
+  linkStyle default stroke:#22d3ee,stroke-width:1.5px;
+</pre>
+        </div>
+        <div class="two-col">
+          <div class="card"><span class="tag warn">HOJE</span><p>Sem fluxo frontend → API → engine → transmissão.</p></div>
+          <div class="card"><span class="tag out">DIREÇÃO FUTURA</span><p>Persistência, SSE e replay dependem de fechar esse caminho.</p></div>
+        </div>
+      </div>
+      <aside class="notes"><blockquote>Hoje os três polos podem ser demonstrados separadamente: frontend mock, API de sessão e demo do engine. O próximo desafio de arquitetura é estabelecer a coordenação e os contratos entre eles. Persistir eventos e frames e transmiti-los por SSE é uma direção planejada, não uma capacidade disponível.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-next" data-title="Próximos passos técnicos" data-kicker="DISCUSSÃO" data-budget="0:45" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">16 · Próximos passos</div>
+        <h2 class="title">Completar regras, <span>integrar e validar</span></h2>
+        <div class="roadmap">
+          <div class="road-step"><span class="road-num">01</span><div><b>Validar o engine</b><p>Fechar lacunas de regras e medir resultados contra referências.</p></div></div>
+          <div class="road-step"><span class="road-num">02</span><div><b>Conectar workflows de domínio</b><p>Acionar bracket na sessão e definir o coordenador da partida.</p></div></div>
+          <div class="road-step"><span class="road-num">03</span><div><b>Definir saída persistida</b><p>Separar eventos semânticos, frames e contratos de API.</p></div></div>
+          <div class="road-step"><span class="road-num">04</span><div><b>Ligar a transmissão</b><p>Trocar mocks por dados reais e então avaliar SSE e replay.</p></div></div>
+        </div>
+        <p class="dim">Ordem proposta pela dependência técnica entre as etapas, não promessa de cronograma.</p>
+      </div>
+      <aside class="notes"><blockquote>Os próximos passos seguem as dependências. Primeiro precisamos entender e validar as regras do engine. Depois, conectar os workflows de sessão e partida. Com uma saída definida e persistível, a interface pode receber dados reais; transmissão ao vivo e replay vêm depois dessa integração básica.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-close" data-title="Resumo" data-kicker="ENCERRAMENTO" data-budget="0:30" data-group="core">
+      <div class="slide-inner center">
+        <div class="kicker">Resumo</div>
+        <h2 class="mega">Fundamentos prontos.<br /><span>Falta integrar.</span></h2>
+        <p class="lede">O projeto já tem fundamentos separados para catálogo, engine, backend e interface. O trabalho central agora é validar e conectar esses fundamentos.</p>
+        <div class="logo-strip"><span class="chip">arquitetura em camadas</span><span class="chip">heurísticas explícitas</span><span class="chip">integração em andamento</span></div>
+        <div class="tag ok-tag">PERGUNTAS</div>
+      </div>
+      <aside class="notes"><blockquote>Encerrar retomando a tese: não estamos apresentando apenas uma pipeline nem uma interface; o projeto procura compor dados, simulação e experiência de transmissão. As partes iniciais existem, mas a integração e a validação do engine são os próximos desafios.</blockquote></aside>
+    </section>
+
+    <section class="slide appendix" id="s-a1" data-title="A.1 — Exemplo de ajuste de aproveitamento" data-kicker="APOIO · ENGINE" data-budget="" data-group="appendix">
+      <div class="slide-inner"><div class="kicker">Apoio · heurísticas</div><h2 class="title">A.1 — <span>Como a amostra afeta o aproveitamento</span></h2><div class="two-col"><div class="card math-card"><span class="tag in">SHRINKAGE</span><div class="formula mono">(acertos + k × média da liga) ÷ (tentativas + k)</div><p>Valores com poucas tentativas são aproximados da média da liga; amostras grandes preservam mais o valor observado.</p></div><div class="card math-card"><span class="tag out">EXEMPLO</span><div class="formula mono">6/6 com k=10 e média=0,55 → 0,72</div><p>O jogador não entra no engine como um arremessador perfeito por causa de seis tentativas.</p></div></div></div>
+      <aside class="notes"><blockquote>Slide de apoio. A pipeline aplica uma correção de amostra pequena às taxas de arremesso. Com k igual a dez e média de dois pontos 0,55, seis acertos em seis tentativas resultam em (6 + 10 × 0,55) / 16, ou aproximadamente 0,72. Os detalhes completos estão em docs/statistics.md.</blockquote></aside>
+    </section>
+
+    <section class="slide appendix" id="s-a2" data-title="A.2 — Probabilidades de decisão" data-kicker="APOIO · ENGINE" data-budget="" data-group="appendix">
+      <div class="slide-inner"><div class="kicker">Apoio · máquina de estados</div><h2 class="title">A.2 — <span>O relógio altera a escolha de ação</span></h2><div class="card math-card"><p>Na implementação atual:</p><div class="formula mono">shot clock ≤ 2 s  →  arremesso forçado</div><div class="formula mono">2 s &lt; shot clock ≤ 7 s  →  urgência aumenta</div><div class="formula mono">shot clock &gt; 7 s  →  p(arremesso) base = 0,22</div><p>O restante da probabilidade é dividido entre passe e movimento.</p></div></div>
+      <aside class="notes"><blockquote>Slide de apoio. A função decide_handler_action força o arremesso quando restam dois segundos ou menos. Abaixo de sete segundos, a urgência aumenta linearmente de acordo com a fórmula implementada. Acima de sete segundos a chance base de arremesso é 0,22; o restante é dividido na proporção 52% para passe e 48% para movimento.</blockquote></aside>
+    </section>
+
+    <section class="slide appendix" id="s-a3" data-title="A.3 — Limites das heurísticas atuais" data-kicker="APOIO · ENGINE" data-budget="" data-group="appendix">
+      <div class="slide-inner"><div class="kicker">Apoio · validação</div><h2 class="title">A.3 — <span>Probabilidade não é calibração</span></h2><div class="two-col"><div class="card"><span class="tag in">O QUE O CÓDIGO FAZ</span><ul><li>Usa atributos em sorteios ponderados</li><li>Aplica ajustes explícitos a arremessos</li><li>Permite seed para repetir aleatoriedade</li></ul></div><div class="card"><span class="tag warn">O QUE AINDA PRECISA SER MEDIDO</span><ul><li>Distribuições de placares e posses</li><li>Taxas de arremesso, turnover e rebote</li><li>Variação entre jogadores e equipes</li></ul></div></div></div>
+      <aside class="notes"><blockquote>Uma regra probabilística transparente ainda pode estar mal calibrada. Testes e simulações em lote devem comparar distribuições geradas com referências de basquete antes de interpretar as heurísticas como realistas.</blockquote></aside>
+    </section>
+
+    <section class="slide appendix" id="s-a4" data-title="A.4 — Referências de código e documentação" data-kicker="APOIO · REFERÊNCIAS" data-budget="" data-group="appendix">
+      <div class="slide-inner"><div class="kicker">Apoio · para perguntas</div><h2 class="title">A.4 — <span>Onde consultar os detalhes</span></h2><div class="two-col"><div class="card"><span class="tag in">IMPLEMENTAÇÃO</span><ul class="reference-list"><li><code>backend/src/app/domain/</code> — serviços e repositórios</li><li><code>backend/src/app/engine/</code> — relógio, estado e heurísticas</li><li><code>frontend/src/pages/</code> — páginas React</li><li><code>frontend/src/mock/</code> — dados simulados da interface</li></ul></div><div class="card"><span class="tag out">DOCUMENTAÇÃO</span><ul class="reference-list"><li><code>docs/ARCHITECTURE.md</code> — arquitetura atual e futura</li><li><code>docs/statistics.md</code> — fórmulas do catálogo</li><li><code>docs/data_ingestion.md</code> — pipeline e fontes</li><li><code>docs/BACKLOG.md</code> — áreas de trabalho</li></ul></div></div></div>
+      <aside class="notes"><blockquote>Usar este slide para encaminhar perguntas aos arquivos de implementação. A arquitetura está documentada em inglês; a apresentação está em português. Confirmar o estado do código antes de usar o backlog como fonte de verdade para integrações específicas.</blockquote></aside>
+    </section>
+
+  </div>
+  <button id="prev" class="nav-arrow prev" aria-label="Slide anterior">‹</button>
+  <button id="next" class="nav-arrow next" aria-label="Próximo slide">›</button>
+</main>
+
+<div class="progress"><span id="progressFill"></span></div>
+<footer class="bottombar">
+  <div class="dots" id="dots" role="tablist" aria-label="Navegação por slides"></div>
+  <div class="status"><span id="groupLabel" class="group-label dim">VISÃO GERAL</span><span id="counter" class="counter mono">01 / 18</span><span id="timerChip" class="timer-chip mono dim" hidden></span></div>
+</footer>
+
+<aside id="notesDrawer" class="notes-drawer" aria-label="Notas do apresentador">
+  <div class="drawer-head"><span class="tag in">NOTAS DO APRESENTADOR</span><button id="btn-notes-close" type="button" aria-label="Fechar notas">✕</button></div>
+  <div id="notesBody" class="notes-body"></div>
+</aside>
+
+<div id="overview" class="overview" hidden>
+  <div class="overview-inner"><div class="overview-head"><span class="kicker">MAPA DOS SLIDES</span><button id="btn-overview-close" type="button" aria-label="Fechar mapa">✕</button></div><div id="overviewGrid" class="overview-grid"></div></div>
+</div>
+
+<div id="hint" class="hint dim">← → navegar · N notas · T tempo · G mapa · F tela cheia · Esc fechar</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script src="../app.js"></script>
+</body>
+</html>

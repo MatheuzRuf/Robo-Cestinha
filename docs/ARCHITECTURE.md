@@ -1,173 +1,250 @@
 # Robô Cestinha Architecture
 
-## Purpose
+## Purpose and architecture status
 
-This document describes the target architecture: the main blocks, how they're organized internally, and how they connect.
+This document describes the architecture currently implemented in the
+repository and distinguishes it from planned flows. Solid arrows in the
+diagrams represent existing integrations; dashed arrows represent future
+integrations.
 
-## System Overview
+**Current status:** data ingestion prepares an offline catalog; the database
+stores the catalog and sessions; the API provides a health check and session
+creation; the engine runs an independent headless simulation; and the frontend
+still uses mock data. These parts do not yet form an integrated broadcast flow.
+
+## System overview
 
 ```mermaid
 flowchart LR
-    subgraph Frontend
-        direction TB
-        FE_Services[Services] --> FE_Components[Components] --> FE_Pages[Pages]
-    end
+    Sources[NBA and Basketball-Reference sources]
+    Ingestion[Offline ingestion]
+    Files[(data/processed<br/>players.json · teams.json)]
+    Seed[Catalog seed]
+    DB[(PostgreSQL)]
+    Engine[Headless engine<br/>independent execution]
+    API[FastAPI<br/>/health · POST /sessions]
+    Domain[SessionService]
+    Repo[SessionRepository]
+    FE[React frontend<br/>pages with mock data]
+    Mock[Mock engine and mock data]
+    Bracket[BracketService<br/>implemented, not connected]
+    BracketRepo[BracketRepository]
+    MatchSvc[MatchService and coordinator<br/>planned]
+    Stream[SSE and event persistence<br/>planned]
 
-    subgraph Backend
-        direction TB
-        BE_Engine[Simulation Engine] --> BE_Domain[Domain Services] --> BE_API[FastAPI API]
-    end
+    Sources --> Ingestion --> Files
+    Files --> Seed --> DB
+    Files --> Engine
+    API --> Domain --> Repo --> DB
+    API --> DB
+    Bracket --> BracketRepo --> DB
+    FE --> Mock
 
-    subgraph Persistency
-        DB[(PostgreSQL)]
-    end
-
-    subgraph "External Data"
-        Ingestion[Data Ingestion]
-    end
-
-    FE_Services --> BE_API
-    BE_Domain --> DB
-    Ingestion --> DB
+    FE -. "future integration" .-> API
+    Domain -. "invoke bracket creation" .-> Bracket
+    API -.-> MatchSvc -.-> Engine
+    MatchSvc -.-> Stream -.-> FE
 ```
 
-Four blocks:
-- **Frontend** — a React app; nothing here holds tournament rules, it renders what the backend returns and sends user actions back.
-- **Backend** — a FastAPI app; owns every rule (sessions, brackets, teams, matches) and runs the match simulation.
-- **Persistency** — PostgreSQL; the catalog (teams/players) and all session/match data.
-- **External Data** — an offline, one-off job that prepares the catalog from external sources. Not part of live request traffic.
-
-Frontend ↔ Backend traffic is REST for commands/queries, SSE for live match updates. WebSocket isn't needed unless the product later adds client→server messages during a live match.
+The engine reads processed data in an independent run; it is not invoked by the
+API and does not query PostgreSQL during simulation. Ingestion and the seed
+script are operational tasks outside request traffic.
 
 ## Frontend
 
 ```mermaid
 flowchart TB
-    subgraph Hierarchy["Component Hierarchy"]
-        Shared[Shared Components] --> PageLevel["Page Level Components"]
-        subgraph PageLevel
-            Private[Private Components] --> Pages
-        end
-    end
+    App[App.tsx<br/>selects page by pathname]
+    Home[Home]
+    Broadcast[MatchBroadcast]
+    Shared[Shared components]
+    Hook[useGameFrames]
+    Mock[mockEngine and mockMatchData]
+    Storage[(localStorage<br/>local state)]
+    API[FastAPI<br/>not connected]
 
-    subgraph Services
-        SessionSvc[Session Service]
-        TeamSvc[Team Service]
-        PlayerSvc[Player Service]
-        MatchSvc[Match Service]
-        BracketSvc[Bracket Service]
-    end
-
-    Services --> Hierarchy
-    Services -.-> LocalStorage[(Local Storage)]
-    Services -.-> API[API]
+    App --> Home
+    App --> Broadcast
+    Home --> Shared
+    Broadcast --> Shared
+    Broadcast --> Hook --> Mock
+    Home -.-> Storage
+    Home -. "future integration" .-> API
+    Broadcast -. "future integration" .-> API
 ```
 
-- **Component Hierarchy** — Shared Components are generic, no data-fetching, used by more than one page. Page Level Components are page-private; a Private Component is promoted to Shared once more than one page needs it.
-- **Services** — one per domain concern, mirroring the backend's Domain Services. They're what pages actually call; pages never fetch data or hold rules themselves.
-- Services reach two different things depending on the data: **Local Storage** for device-only state (saved display name, recent sessions — never sent to the backend), and the **API** for everything else (REST + SSE).
+- The frontend uses React, TypeScript, and Vite. `App.tsx` chooses between
+  pages by checking `window.location.pathname`; there is no routing library
+  yet.
+- `Home` and `MatchBroadcast` render the interface, but their operations do not
+  consume the API. The broadcast uses the mock engine and static match data.
+- `useGameFrames` queues locally generated frames to animate the court. It
+  does not consume SSE or replay persisted frames.
+- Shared components handle presentation. The display name and other local data
+  may use `localStorage`; this is not session state synchronized with the
+  backend.
 
-## Backend
+## Backend and persistence
 
 ```mermaid
 flowchart TB
-    subgraph API["FastAPI API"]
-        SessionEP[Session endpoints]
-        MatchEP[Match endpoints]
-        PlayerEP[Player endpoints]
-        BracketEP[Bracket endpoints]
-        TeamEP[Team endpoints]
+    subgraph Request[Per-request composition]
+        Depends[FastAPI Depends]
+        Factory[ServiceFactory]
+        DBSession[AsyncSession]
+        Depends --> Factory
+        Depends --> DBSession
+        Factory --> DBSession
     end
 
-    subgraph Domain["Domain Services"]
-        SessionSvc[Session Services]
-        BracketSvc[Bracket Services]
-        PlayerSvc[Player Services]
-        MatchSvc[Match Services]
+    subgraph HTTP[Implemented FastAPI endpoints]
+        Health[GET /health]
+        CreateSession[POST /sessions]
     end
 
-    Engine[Simulation Engine]
+    Service[SessionService]
+    SessionRepo[SessionRepository]
+    BracketService[BracketService<br/>existing code, not called by session flow]
+    BracketRepo[BracketRepository]
+    Database[(PostgreSQL)]
 
-    API --> Domain
-    MatchSvc --> Engine
+    Factory --> CreateSession
+    CreateSession --> Service --> SessionRepo --> Database
+    Health --> DBSession --> Database
+    Factory -. "also constructs" .-> BracketService --> BracketRepo --> Database
 ```
 
-- **FastAPI API** — one endpoint group per concern. `api/` only parses requests and maps responses; no DB queries or rules live here.
-- **Domain Services** — the actual rules (`domain/`). Team endpoints route to Player Services, which owns both the team catalog and roster reads — there's no separate Team Services module.
-- **Simulation Engine** — possession state machine, clock, scoring. Has no knowledge of sessions, users, or HTTP. It's a dependency Match Services calls into, not the other way around — the other three domain services never touch it.
-- `core/` (config + secrets) sits underneath all of the above, reachable from every layer — not drawn as its own node since every layer depends on it equally.
+- The current endpoints are `GET /health` and `POST /sessions`. The latter
+  creates and persists a session and its owner user.
+- `api/factories.py` is the composition point: `ServiceFactory` creates
+  services and repositories using a request-scoped asynchronous SQLAlchemy
+  session.
+- Services coordinate domain operations; repositories encapsulate queries and
+  persistence. `BaseRepository` centralizes shared session and transaction
+  operations.
+- `BracketService.seed_bracket_for_session()` and its repository are
+  implemented, but `SessionService.create_session()` does not call that
+  method. Therefore, the session-creation endpoint **does not create bracket
+  matches** today. Describe this integration as future work until it is wired
+  into the code.
+- `core/` centralizes configuration and secrets. The intended backend
+  dependency direction is API → domain → repositories → database; the engine
+  and ingestion do not depend on session or HTTP concepts.
 
-## Data Model
+## Implemented data model
 
-**Team** — global catalog, read-only at runtime.
+The current tables are `Team`, `Player`, `Session`, `User`, and `Match`.
 
-| Field | Type | Notes |
-|---|---|---|
-| id | UUID | PK |
-| name | string | |
+```mermaid
+erDiagram
+    TEAM ||--o{ PLAYER : has
+    SESSION ||--o{ USER : contains
+    SESSION ||--o{ MATCH : organizes
+    TEAM o|--o{ USER : claimed_by
+    TEAM o|--o{ MATCH : participates
+    MATCH o|--o{ MATCH : "next match"
 
-**Player** — global catalog, belongs to a Team.
+    TEAM {
+        uuid id PK
+        string name
+    }
+    PLAYER {
+        uuid id PK
+        uuid team_id FK
+        string name
+        json attributes
+    }
+    SESSION {
+        uuid id PK
+        string hash
+        uuid owner_id FK
+    }
+    USER {
+        uuid id PK
+        uuid session_id FK
+        int join_sequence
+        string name
+        uuid team_id FK
+    }
+    MATCH {
+        uuid id PK
+        uuid session_id FK
+        int round
+        int slot_in_round
+        uuid next_match_id FK
+        string status
+    }
+```
 
-| Field | Type | Notes |
-|---|---|---|
-| id | UUID | PK |
-| team_id | UUID | FK → Team.id |
-| name | string | |
-| attributes | JSON | stats blob |
+`Match.next_match_id` references another row in the same table and can
+represent bracket progression. The implementation does not yet have
+`MatchEvent` or `MatchFrameChunk` table models; event persistence, frame
+persistence, and replay remain planned.
 
-**Session** — one tournament instance.
+## Patterns and responsibilities
 
-| Field | Type | Notes |
-|---|---|---|
-| id | UUID | PK |
-| owner_id | UUID | FK → User.id, nullable |
+- **Repository:** `SessionRepository` and `BracketRepository` encapsulate data
+  access and share operations through `BaseRepository`.
+- **Service Layer:** `SessionService` and `BracketService` coordinate domain
+  workflows without directly receiving an `AsyncSession`.
+- **Factory and Dependency Injection:** `ServiceFactory`, constructed by
+  FastAPI per request, composes services and repositories with the database
+  session.
+- **State Machine:** `engine/state_machine.py` coordinates the states and
+  actions of a possession.
+- **Schemas as contracts:** Pydantic models describe processed data and engine
+  results. They do not imply that an API or persistence flow for those results
+  exists today.
 
-**User** — a participant in a session.
+## Simulation engine
 
-| Field | Type | Notes |
-|---|---|---|
-| id | UUID | PK |
-| session_id | UUID | FK → Session.id |
-| join_sequence | integer | display number, per-session |
-| name | string | duplicates allowed |
-| team_id | UUID | FK → Team.id, nullable until claimed |
+```mermaid
+flowchart LR
+    Catalog[(Processed catalog)] --> Entities[LivePlayer · LiveTeam · GameState]
+    Entities --> Runner[MatchRunner]
+    Runner --> Machine[StateMachine]
+    Machine --> Heuristics[Heuristics]
+    Machine --> Clock[GameClock]
+    Heuristics --> Machine
+    Machine --> Logs[In-memory MatchLog]
+```
 
-**Match** — one bracket slot; `next_match_id` self-links the bracket tree.
+The engine is headless and can be run using the demo. It uses catalog
+attributes in probabilistic decisions: usage influences player selection;
+turnover and steal rates influence turnovers; shooting percentages, fatigue,
+and clutch influence shot outcomes. The random generator can be seeded to
+reproduce a run.
 
-| Field | Type | Notes |
-|---|---|---|
-| id | UUID | PK |
-| session_id | UUID | FK → Session.id |
-| round | integer | |
-| slot_in_round | integer | |
-| home_team_id | UUID | FK → Team.id, nullable |
-| away_team_id | UUID | FK → Team.id, nullable |
-| next_match_id | UUID | FK → Match.id (self), nullable |
-| next_match_slot | string | "home" \| "away", nullable |
-| status | string | locked \| ready \| live \| finished |
-| home_score | integer | |
-| away_score | integer | |
-| winner_team_id | UUID | FK → Team.id, nullable |
+The current scope is partial. The runner simulates four regulation periods;
+although the clock understands overtime, tied games are not fully resolved
+with overtime periods. Missed shots switch possession directly: a rebound
+function exists, but the state machine does not call it. Fouls do not proceed
+to free throws, and substitutions are not integrated into the loop. The
+runner's result is an in-memory `MatchLog`, not persisted events or real-time
+frames.
 
-**MatchEvent** — sparse, semantic events; play log and future commentary.
+## Ingestion and catalog
 
-| Field | Type | Notes |
-|---|---|---|
-| id | UUID | PK |
-| match_id | UUID | FK → Match.id |
-| sequence | integer | monotonic per match |
-| game_clock | string | |
-| type | string | shot_made, foul, commentary, etc. |
-| payload | JSON | shape depends on type |
-| created_at | timestamp | |
+```mermaid
+flowchart LR
+    NBA[NBA statistics] --> Fetch[Fetch and raw cache]
+    BBRef[Basketball-Reference positions<br/>manual step] --> Derive
+    Fetch --> Derive[Offline derivation]
+    Derive --> Validate[Contract validation]
+    Validate --> Files[(data/processed)]
+    Files --> Seed[db/seed.py] --> DB[(PostgreSQL)]
+    Files --> Demo[engine.demo]
+```
 
-**MatchFrameChunk** — dense, batched positions; court animation and replay.
+The pipeline separates network fetching from offline derivation, validates the
+results before writing processed files, and produces the catalog consumed by
+the seed script and the engine's independent demo. It does not participate in
+each API request.
 
-| Field | Type | Notes |
-|---|---|---|
-| id | UUID | PK |
-| match_id | UUID | FK → Match.id |
-| chunk_index | integer | ordering within match |
-| frames | JSON | array of player/ball positions |
+## Future direction
 
-`Match.next_match_id` is self-referencing — the full bracket tree is just this table's rows linked together. `MatchEvent` and `MatchFrameChunk` are deliberately separate: different access patterns, shouldn't share a schema.
+The intended flow is to connect the interface to domain endpoints, complete
+the session and bracket workflow, and have a coordinator service run the
+engine. Match integration may persist appropriate data and send updates to the
+interface over SSE. These components and the event/frame tables should not be
+described as implemented until they exist in the code.
