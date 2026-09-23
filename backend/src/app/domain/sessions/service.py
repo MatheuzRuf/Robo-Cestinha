@@ -57,11 +57,6 @@ class SessionService:
         await self._repository.add_user(owner)
         session.owner_id = owner.id
 
-        await self._bracket_service.seed_bracket_for_session(
-            session_id=session.id,
-            num_teams=num_teams,
-        )
-
         await self._repository.commit()
         await self._repository.refresh(session)
 
