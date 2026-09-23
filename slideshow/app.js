@@ -1,6 +1,49 @@
-/* Robô Cestinha · Data Ingestion slideshow — interactivity */
+/* Robô Cestinha · player compartilhado das apresentações */
 (() => {
   'use strict';
+
+  /* ---------- mermaid theme (matches theme.css palette) ---------- */
+  if (window.mermaid) {
+    mermaid.initialize({
+      startOnLoad: true,
+      securityLevel: 'loose',
+      theme: 'base',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      themeVariables: {
+        background: '#14100d',
+        mainBkg: '#2a221a',
+        primaryColor: '#2a221a',
+        primaryTextColor: '#f0e6d2',
+        primaryBorderColor: '#e2661a',
+        secondaryColor: '#1f1913',
+        secondaryBorderColor: '#3a2f24',
+        tertiaryColor: '#1f1913',
+        tertiaryBorderColor: '#3a2f24',
+        lineColor: '#e2661a',
+        textColor: '#f0e6d2',
+        nodeTextColor: '#f0e6d2',
+        edgeLabelBackground: '#14100d',
+        clusterBkg: 'rgba(31,25,19,0.6)',
+        clusterBorder: '#3a2f24',
+        titleColor: '#f0e6d2',
+        fontSize: '20px',
+      },
+      flowchart: { useMaxWidth: false, curve: 'basis', htmlLabels: true, padding: 18, nodeSpacing: 55, rankSpacing: 70 },
+      state: { useMaxWidth: false },
+      er: { useMaxWidth: false, fontSize: 18, entityPadding: 18, minEntityWidth: 150, minEntityHeight: 90 },
+      themeCSS: `
+        .node small, .nodeLabel small { color: #a69a87; }
+        .edgeLabel { color: #a69a87 !important; background-color: #14100d !important; font-size: 15px !important; }
+        .er.relationshipLabel { fill: #a69a87; font-size: 15px; }
+        .er.entityBox { fill: #2a221a; }
+        .er.entityLabel { fill: #f0e6d2; font-size: 16px; }
+        .er.attributeBoxOdd { fill: #1f1913; }
+        .er.attributeBoxEven { fill: #241d16; }
+        text { font-size: 16px; }
+        .nodeLabel, .edgeLabel, .cluster-label { font-size: 16px; }
+      `,
+    });
+  }
 
   const slides = [...document.querySelectorAll('.slide')];
   const track = document.getElementById('track');
@@ -16,9 +59,6 @@
   const prevBtn = document.getElementById('prev');
   const nextBtn = document.getElementById('next');
   const body = document.body;
-
-  const coreCount = slides.filter((s) => s.dataset.group !== 'appendix').length;
-  const hasAppendix = slides.some((s) => s.dataset.group === 'appendix');
 
   const state = {
     i: 0,
@@ -63,6 +103,7 @@
       const d = document.createElement('button');
       d.className = 'dot' + (groupOf(s) === 'appendix' ? ' appendix' : '');
       d.textContent = groupOf(s) === 'appendix' ? `A${groupIndex(s)}` : String(idx + 1);
+      d.dataset.index = String(idx);
       d.title = slideHeader(s);
       d.setAttribute('role', 'tab');
       d.addEventListener('click', () => go(idx));
@@ -77,10 +118,12 @@
 
     // counter per group
     counter.textContent = `${pad(groupIndex(el))} / ${pad(groupCount(el))}`;
-    groupLabel.textContent = groupOf(el) === 'appendix' ? 'BACKUP · Q&A' : 'CORE DECK';
+    groupLabel.textContent = groupOf(el) === 'appendix'
+      ? 'APÊNDICE · PERGUNTAS'
+      : el.dataset.deckLabel || body.dataset.deckLabel || 'APRESENTAÇÃO';
 
     // dots
-    dotsWrap.querySelectorAll('.dot').forEach((d, idx) => d.classList.toggle('active', idx === state.i));
+    dotsWrap.querySelectorAll('button.dot').forEach((d) => d.classList.toggle('active', Number(d.dataset.index) === state.i));
 
     // arrows
     prevBtn.disabled = state.i === 0;
@@ -130,9 +173,9 @@
     meta.className = 'notes-meta';
     const budget = budgetOf(el);
     meta.innerHTML =
-      `<span>SLIDE ${pad(groupIndex(el))}${groupOf(el) === 'appendix' ? ' · backup' : ''}</span>` +
-      (budget ? `<span>BUDGET ${budget}</span>` : `<span>UNTIMED · Q&A</span>`) +
-      `<span>≈ ${Math.round(el.textContent.trim().split(/\s+/).length / 135)} min talk</span>`;
+      `<span>SLIDE ${pad(groupIndex(el))}${groupOf(el) === 'appendix' ? ' · apoio' : ''}</span>` +
+      (budget ? `<span>TEMPO ${budget}</span>` : `<span>SEM TEMPO · PERGUNTAS</span>`) +
+      `<span>≈ ${Math.round(el.textContent.trim().split(/\s+/).length / 135)} min de fala</span>`;
     notesBody.appendChild(meta);
   }
 
@@ -154,7 +197,7 @@
     timerChip.hidden = false;
     const m = Math.floor(state.elapsed / 60);
     const s = state.elapsed % 60;
-    const budgetTxt = budget ? ` · BUDGET ${budget}` : ' · Q&A';
+    const budgetTxt = budget ? ` · META ${budget}` : ' · PERGUNTAS';
     timerChip.textContent = `${pad(m)}:${pad(s)}${budgetTxt}`;
     timerChip.classList.toggle('over', !!budget && state.elapsed > parseBudget(budget));
   }
