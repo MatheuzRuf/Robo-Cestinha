@@ -86,33 +86,46 @@
       <div class="slide-inner">
         <div class="kicker">03 · Visão geral da arquitetura</div>
         <h2 class="title">Visão geral <span>da arquitetura</span></h2>
-        <div class="diagram-wrap" role="img" aria-label="Frontend mock isolado, API ligada a serviço, repositório e PostgreSQL, engine headless e ingestão offline">
+        <div class="diagram-wrap architecture-diagram" role="img" aria-label="O Backend agrupa endpoints, serviços de domínio, repositórios, PostgreSQL e engine de simulação. O Frontend se comunica com os endpoints por REST e SSE. A ingestão offline fica fora do Backend e carrega o catálogo processado no banco.">
 <pre class="mermaid">
 flowchart TB
-  FE["Frontend React<br/><small>Home · transmissão · usa mocks hoje</small>"]
-  API["FastAPI<br/><small>health · sessions</small>"]
-  SVC["Services<br/><small>workflows de domínio</small>"]
-  REPO["Repositories<br/><small>persistência</small>"]
-  DB[("PostgreSQL<br/><small>catálogo · sessões</small>")]
-  ENGINE["Engine headless<br/><small>demo independente</small>"]
-  ING["Ingestão offline<br/><small>buscar · derivar · validar</small>"]
-  FILES["players.json · teams.json<br/><small>também usados pelo seed</small>"]
+  FE["Frontend React"]
 
-  FE -. API futura .-> API
-  API --> SVC --> REPO --> DB
-  ING --> FILES -. catálogo JSON .-> ENGINE
+  subgraph BACKEND["Backend"]
+    direction TB
+    API["Endpoints<br/><small>REST · SSE</small>"]
+    SVC["Serviços de domínio"]
+    REPO["Repositories"]
+    DB[("PostgreSQL<br/><small>persistência de dados</small>")]
+    ENGINE["Engine de Simulação"]
+    API --> SVC
+    SVC --> REPO --> DB
+    SVC <-->|entrada da partida · stream de eventos| ENGINE
+  end
+
+  FE <-->|REST · SSE| API
+
+  subgraph OFFLINE["Preparação do catálogo · offline"]
+    direction LR
+    SOURCES["Fontes externas"]
+    ING["Ingestão"]
+    CATALOG["Catálogo processado · seed"]
+    SOURCES --> ING --> CATALOG
+  end
+  CATALOG --> DB
 
   classDef frontend stroke:#22d3ee,stroke-width:2px;
   classDef storage stroke:#4c9a6a,stroke-width:2px;
   classDef engine stroke:#f2b705,stroke-width:2px;
-  class FE frontend
+  classDef offline stroke:#a78bfa,stroke-width:2px;
+  class FE,API frontend
   class DB storage
   class ENGINE engine
+  class SOURCES,ING,CATALOG offline
 </pre>
         </div>
-        <div class="diagram-legend"><span><i class="legend-line"></i>implementado</span><span><i class="legend-line dashed"></i>planejado / não conectado</span></div>
       </div>
-      <aside class="notes"><blockquote>A aplicação tem quatro áreas relevantes: interface, API/domínio, persistência e processamento de dados/engine. O frontend ainda não chega à API. No backend, health check e criação de sessão chegam ao banco através das camadas de domínio e repositório. O engine é uma execução independente e a ingestão é um processo offline. As linhas tracejadas indicam integrações desejadas, não existentes.</blockquote></aside>
+      <aside class="notes"><blockquote>O desenho resume o sistema por camadas, deixando os detalhes de frontend e backend para os slides específicos. O frontend conversa com os endpoints por REST e recebe a transmissão por SSE. Os serviços de domínio acessam a persistência por repositories e coordenam a engine: enviam os dados da partida e consomem seu stream incremental de eventos. A engine não depende de HTTP nem acessa o banco diretamente. Em paralelo, a ingestão prepara o catálogo offline e o seed o carrega no PostgreSQL; esse fluxo não roda a cada partida.</blockquote></aside>
     </section>
 
     <section class="slide" id="s-flows" data-title="Fluxos de dados e de simulação" data-kicker="FLUXOS" data-budget="0:55" data-group="core">
