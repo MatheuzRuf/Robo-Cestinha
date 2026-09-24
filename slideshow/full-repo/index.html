@@ -67,7 +67,7 @@
     <section class="slide" id="s-project" data-title="O que o projeto está construindo" data-kicker="ESCOPO" data-budget="0:45" data-group="core">
       <div class="slide-inner">
         <div class="kicker">01 · Escopo do projeto</div>
-        <h2 class="title">Uma partida simulada, <span>do dado ao resultado</span></h2>
+        <h2 class="title">Escopo <span>do projeto</span></h2>
         <div class="journey" role="img" aria-label="Catálogo, sessão de torneio, engine de partida, eventos e interface de transmissão">
           <div class="journey-node"><b>Catálogo</b><span>times e atributos</span></div><span class="connector connector--right" aria-hidden="true"></span>
           <div class="journey-node"><b>Torneio</b><span>sessões e bracket</span></div><span class="connector connector--right" aria-hidden="true"></span>
@@ -82,24 +82,10 @@
       <aside class="notes"><blockquote>Este percurso representa o produto pretendido, não um fluxo já integrado. O catálogo é produzido pela ingestão e pode alimentar o seed do banco ou o demo independente do engine. O backend de sessões e a interface existem separadamente; a transmissão mostrada hoje usa dados mock.</blockquote></aside>
     </section>
 
-    <section class="slide" id="s-status" data-title="Implementado, parcial e planejado" data-kicker="ESTADO DO PROJETO" data-budget="0:50" data-group="core">
-      <div class="slide-inner">
-        <div class="kicker">02 · Estado do projeto</div>
-        <h2 class="title">O que existe hoje <span>e o que falta conectar</span></h2>
-        <div class="status-columns">
-          <div class="card status-card done"><span class="tag ok-tag">IMPLEMENTADO</span><ul><li>Pipeline de dados e catálogo processado</li><li>Modelos, migrações e seed do catálogo</li><li>API de health check e criação de sessão</li><li>Engine headless executável em demo</li><li>Interface React e animação com dados mock</li></ul></div>
-          <div class="card status-card partial"><span class="tag warn">PARCIAL / DESCONECTADO</span><ul><li>Serviços de sessão e bracket existem; criação de sessão não chama o bracket</li><li>Engine produz log em memória; API não o executa</li><li>Frontend renderiza transmissão mock; não consome a API</li><li>Heurísticas têm lacunas de regras e validação estatística</li></ul></div>
-          <div class="card status-card planned"><span class="tag out">PLANEJADO</span><ul><li>Integração entre frontend e endpoints reais</li><li>Coordenação, persistência e transmissão de partidas</li><li>Eventos e frames por SSE e replay</li><li>Completar regras, testes e calibração</li></ul></div>
-        </div>
-        <p class="dim status-foot">Convenção dos diagramas: linha contínua = fluxo existente · tracejada = integração planejada.</p>
-      </div>
-      <aside class="notes"><blockquote>É importante separar existência de integração. Há um BracketService que cria partidas, mas o endpoint atual de sessão não o chama. Há um runner de partidas, mas nenhum serviço de API o executa. E há uma tela de transmissão, mas ela recebe frames simulados no frontend. Vamos manter essa distinção nos próximos diagramas.</blockquote></aside>
-    </section>
-
     <section class="slide" id="s-system" data-title="Arquitetura geral do sistema" data-kicker="ARQUITETURA" data-budget="1:10" data-group="core">
       <div class="slide-inner">
         <div class="kicker">03 · Visão geral da arquitetura</div>
-        <h2 class="title">Módulos separados, <span>integrações em etapas</span></h2>
+        <h2 class="title">Visão geral <span>da arquitetura</span></h2>
         <div class="diagram-wrap" role="img" aria-label="Frontend mock isolado, API ligada a serviço, repositório e PostgreSQL, engine headless e ingestão offline">
 <pre class="mermaid">
 flowchart TB
@@ -132,7 +118,7 @@ flowchart TB
     <section class="slide" id="s-flows" data-title="Fluxos de dados e de simulação" data-kicker="FLUXOS" data-budget="0:55" data-group="core">
       <div class="slide-inner">
         <div class="kicker">04 · Dois fluxos distintos</div>
-        <h2 class="title">Catálogo offline <span>não é transmissão ao vivo</span></h2>
+        <h2 class="title">Fluxos <span>de dados e de simulação</span></h2>
         <div class="flow-split">
           <div class="card flow-panel">
             <div class="file-head"><span class="tag in">PREPARAÇÃO DO CATÁLOGO</span><span class="dim">offline</span></div>
@@ -149,10 +135,10 @@ flowchart TB
       <aside class="notes"><blockquote>A ingestão prepara dados por temporada; não é uma tarefa executada a cada partida. O caminho do catálogo está implementado até os arquivos e pode alimentar o banco via seed ou o demo do engine. Já o caminho da partida até a transmissão é uma direção arquitetural: faltam o coordenador, a persistência de saída e a integração em tempo real.</blockquote></aside>
     </section>
 
-    <section class="slide" id="s-frontend" data-title="Frontend: composição e páginas" data-kicker="FRONTEND" data-budget="0:55" data-group="core">
+    <section class="slide" id="s-frontend" data-title="Frontend: páginas e componentes" data-kicker="FRONTEND" data-budget="0:55" data-group="core">
       <div class="slide-inner">
-        <div class="kicker">05 · Frontend · composição</div>
-        <h2 class="title">Páginas compõem a interface; <span>componentes apresentam</span></h2>
+        <div class="kicker">04 · Frontend · composição</div>
+        <h2 class="title">Frontend: <span>páginas e componentes</span></h2>
         <div class="diagram-wrap" role="img" aria-label="App.tsx escolhe entre Home e MatchBroadcast, que usam componentes compartilhados e de transmissão; a transmissão consome useGameFrames a partir do mockEngine">
 <pre class="mermaid">
 flowchart TB
@@ -181,10 +167,10 @@ flowchart TB
       <aside class="notes"><blockquote>O frontend separa duas páginas e um conjunto de componentes reaproveitáveis. A Home e a transmissão são páginas distintas; a App escolhe qual renderizar a partir do pathname. Na transmissão, o hook recebe frames do mock engine e atualiza componentes visuais. O desenho mostra a organização atual, não a estrutura futura recomendada em AGENTS.md.</blockquote></aside>
     </section>
 
-    <section class="slide" id="s-frontend-flow" data-title="Frontend: dados que chegam à tela" data-kicker="FRONTEND" data-budget="0:50" data-group="core">
+    <section class="slide" id="s-frontend-flow" data-title="Frontend: fluxo de dados até a tela" data-kicker="FRONTEND" data-budget="0:50" data-group="core">
       <div class="slide-inner">
-        <div class="kicker">06 · Frontend · fluxo de renderização</div>
-        <h2 class="title">A transmissão existe; <span>a fonte ainda é simulada no cliente</span></h2>
+        <div class="kicker">05 · Frontend · fluxo de renderização</div>
+        <h2 class="title">Frontend: <span>fluxo de dados até a tela</span></h2>
         <div class="frame-flow" role="img" aria-label="Mock engine envia frames ao hook, que mantém uma fila e atualiza quadra e placar">
           <div class="frame-source"><span class="tag warn">ATUAL</span><b>mockEngine</b><small>gera frame a cada 800 ms</small></div>
           <span class="connector connector--right" aria-hidden="true"></span>
@@ -200,10 +186,10 @@ flowchart TB
       <aside class="notes"><blockquote>O frame contém posições de jogadores e bola. O hook mantém uma fila pequena, respeita pausa e velocidade e alimenta a quadra. Essa experiência visual funciona sem o backend. O frame contract é útil para orientar uma futura integração, mas SSE e replay não estão implementados.</blockquote></aside>
     </section>
 
-    <section class="slide" id="s-backend" data-title="Backend: camadas e dependências" data-kicker="BACKEND" data-budget="1:05" data-group="core">
+    <section class="slide" id="s-backend" data-title="Backend: camadas" data-kicker="BACKEND" data-budget="1:05" data-group="core">
       <div class="slide-inner">
-        <div class="kicker">07 · Backend · camadas</div>
-        <h2 class="title">A requisição passa por <span>domínio e persistência</span></h2>
+        <div class="kicker">06 · Backend · camadas</div>
+        <h2 class="title">Backend: <span>camadas</span></h2>
         <div class="diagram-wrap" role="img" aria-label="FastAPI routers chamam services; services chamam repositories; repositories usam sessão SQLAlchemy para acessar PostgreSQL">
 <pre class="mermaid">
 flowchart TB
@@ -223,10 +209,10 @@ flowchart TB
       <aside class="notes"><blockquote>O desenho destaca as fronteiras da persistência: routers não fazem consultas SQL; services coordenam regras e workflows; repositories são a única camada do domínio que usa a sessão assíncrona. ServiceFactory é o composition root por requisição. Hoje os endpoints implementados são health e criação de sessão.</blockquote></aside>
     </section>
 
-    <section class="slide" id="s-model" data-title="Modelo de domínio e bracket" data-kicker="BACKEND" data-budget="0:55" data-group="core">
+    <section class="slide" id="s-model" data-title="Backend: modelo de dados" data-kicker="BACKEND" data-budget="0:55" data-group="core">
       <div class="slide-inner">
-        <div class="kicker">08 · Backend · dados</div>
-        <h2 class="title">Catálogo global; <span>participação vinculada à sessão</span></h2>
+        <div class="kicker">07 · Backend · dados</div>
+        <h2 class="title">Backend: <span>modelo de dados</span></h2>
         <div class="diagram-wrap" role="img" aria-label="Team e Player formam o catálogo global; Session agrupa User e Match; Match referencia a próxima Match do bracket">
 <pre class="mermaid">
 erDiagram
@@ -262,10 +248,10 @@ erDiagram
       <aside class="notes"><blockquote>O catálogo de times e jogadores é global; jogadores apontam para times e guardam atributos em JSON. User e Match pertencem a uma Session. O bracket é representável pela referência de Match para outra Match, mas o fluxo de sessão não cria essas linhas atualmente. Eventos semânticos e lotes de frames ainda são desenho futuro, não parte do modelo implementado.</blockquote></aside>
     </section>
 
-    <section class="slide" id="s-patterns" data-title="Padrões e responsabilidades" data-kicker="DECISÕES DE ARQUITETURA" data-budget="0:55" data-group="core">
+    <section class="slide" id="s-patterns" data-title="Backend: padrões e responsabilidades" data-kicker="BACKEND" data-budget="0:55" data-group="core">
       <div class="slide-inner">
-        <div class="kicker">09 · Padrões identificáveis no código</div>
-        <h2 class="title">Separar responsabilidades <span>sem inventar abstrações</span></h2>
+        <div class="kicker">08 · Backend · padrões identificáveis no código</div>
+        <h2 class="title">Backend: <span>padrões e responsabilidades</span></h2>
         <div class="pattern-map">
           <div class="pattern-card"><span class="pattern-num">01</span><div><b>Service Layer</b><p>Coordena workflows do domínio.</p><code>SessionService</code></div></div>
           <div class="pattern-card"><span class="pattern-num">02</span><div><b>Repository</b><p>Isola acesso e persistência.</p><code>SessionRepository</code></div></div>
@@ -278,10 +264,10 @@ erDiagram
       <aside class="notes"><blockquote>Repository e Service Layer aparecem na fronteira de persistência. A Factory é usada como ponto de composição com injeção de dependências do FastAPI. O engine organiza a posse como máquina de estados. Schemas Pydantic dão formato a dados, mas não são uma camada mágica de integração. Esses nomes descrevem responsabilidades que conseguimos apontar no código.</blockquote></aside>
     </section>
 
-    <section class="slide" id="s-engine" data-title="Engine: componentes da simulação" data-kicker="ENGINE" data-budget="0:55" data-group="core">
+    <section class="slide" id="s-engine" data-title="Engine: componentes" data-kicker="ENGINE" data-budget="0:55" data-group="core">
       <div class="slide-inner">
-        <div class="kicker">10 · Engine · arquitetura interna</div>
-        <h2 class="title">Runner coordena a partida; <span>estado e regras ficam isolados</span></h2>
+        <div class="kicker">09 · Engine · arquitetura interna</div>
+        <h2 class="title">Engine: <span>componentes</span></h2>
         <div class="diagram-wrap" role="img" aria-label="Catálogo e entidades alimentam o MatchRunner, que usa a StateMachine, apoiada por Heuristics, GameClock e Grid">
 <pre class="mermaid">
 flowchart TB
@@ -307,10 +293,10 @@ flowchart TB
       <aside class="notes"><blockquote>O catálogo é transformado em entidades específicas da simulação, com estado mutável como fôlego, posição e placar. MatchRunner percorre períodos e pede à máquina de estados que resolva cada posse. A máquina consulta heurísticas e relógio. Esse desenho é independente da API; conectá-lo a uma partida persistida ainda requer um coordenador de domínio.</blockquote></aside>
     </section>
 
-    <section class="slide" id="s-state-machine" data-title="Uma posse como máquina de estados" data-kicker="ENGINE" data-budget="1:00" data-group="core">
+    <section class="slide" id="s-state-machine" data-title="Engine: máquina de estados da posse" data-kicker="ENGINE" data-budget="1:00" data-group="core">
       <div class="slide-inner">
-        <div class="kicker">11 · Engine · fluxo de uma posse</div>
-        <h2 class="title">A posse continua até <span>um evento terminal</span></h2>
+        <div class="kicker">10 · Engine · fluxo de uma posse</div>
+        <h2 class="title">Engine: <span>máquina de estados da posse</span></h2>
         <div class="diagram-wrap" role="img" aria-label="Iniciar posse, selecionar portador, decidir passe movimento ou arremesso, resolver, atualizar relógio; continuar, cesta, turnover ou fim de período">
 <pre class="mermaid">
 stateDiagram-v2
@@ -344,10 +330,10 @@ stateDiagram-v2
       <aside class="notes"><blockquote>A máquina escolhe um portador inicial, sorteia uma ação e a resolve. Passes bem-sucedidos e movimentos que não encerram a posse retornam à decisão; cesta, turnover, violação ou fim do período encerram o loop. O relógio avança pela duração da ação. A implementação é uma primeira aproximação: falta ligar o rebote após arremessos errados e completar o tratamento de faltas.</blockquote></aside>
     </section>
 
-    <section class="slide" id="s-heuristics" data-title="Como as heurísticas usam atributos" data-kicker="ENGINE" data-budget="1:05" data-group="core">
+    <section class="slide" id="s-heuristics" data-title="Engine: heurísticas" data-kicker="ENGINE" data-budget="1:05" data-group="core">
       <div class="slide-inner">
-        <div class="kicker">12 · Engine · heurísticas</div>
-        <h2 class="title">Atributos alteram probabilidades; <span>não há modelo treinado</span></h2>
+        <div class="kicker">11 · Engine · heurísticas</div>
+        <h2 class="title">Engine: <span>heurísticas</span></h2>
         <div class="heuristic-flow">
           <div class="attribute-column"><span class="tag in">ENTRADAS</span><div class="attribute-pill">usage_rate</div><div class="attribute-pill">turnover_rate · steal_rate</div><div class="attribute-pill">two_pt_pct · three_pt_pct</div><div class="attribute-pill">stamina · clutch_factor</div></div>
           <span class="connector connector--right" aria-hidden="true"></span>
@@ -360,10 +346,10 @@ stateDiagram-v2
       <aside class="notes"><blockquote>As probabilidades são heurísticas explícitas. Com mais tempo no relógio, a chance base de arremesso é menor; no fim do relógio cresce e abaixo de dois segundos o código força arremesso. Perdas combinam turnover do jogador e pressão de steals. Arremessos usam o atributo de aproveitamento e recebem ajustes por fadiga e clutch em situações apertadas. O uso de aleatoriedade com seed permite reproduzir resultados, mas ainda é necessário validar se as distribuições se parecem com basquete real.</blockquote></aside>
     </section>
 
-    <section class="slide" id="s-limitations" data-title="Saída e limites atuais do engine" data-kicker="ENGINE" data-budget="0:50" data-group="core">
+    <section class="slide" id="s-limitations" data-title="Engine: saída e limitações" data-kicker="ENGINE" data-budget="0:50" data-group="core">
       <div class="slide-inner">
-        <div class="kicker">13 · Engine · saída e limites</div>
-        <h2 class="title">Há um resultado estruturado; <span>a partida real ainda não é transmitida</span></h2>
+        <div class="kicker">12 · Engine · saída e limites</div>
+        <h2 class="title">Engine: <span>saída e limitações</span></h2>
         <div class="two-col">
           <div class="card log-card"><div class="file-head"><span class="tag in">SAÍDA DO RUNNER</span><code class="mono">MatchLog</code></div><div class="log-tree"><span>MatchLog</span><span>├── QuarterLog</span><span>│   └── PossessionLog</span><span>│       └── ActionLog</span><span>├── placar e resultado</span><span>└── momentos-chave</span></div><p class="dim">Objeto em memória produzido pela simulação headless.</p></div>
           <div class="card"><span class="tag warn">AINDA NÃO FECHADO</span><ul><li>Rebotes não são resolvidos após erros</li><li>Faltas não resultam em lances livres</li><li>Substituições não estão integradas</li><li>Runner não fecha empates com overtime</li><li>Persistência e transmissão ainda não consomem MatchLog</li></ul></div>
@@ -372,10 +358,10 @@ stateDiagram-v2
       <aside class="notes"><blockquote>Os schemas de saída representam a intenção de registrar uma partida em níveis de períodos, posses e ações. O runner já produz um log em memória, mas alguns campos ainda não são preenchidos como um box score completo. O deck precisa evitar sugerir que esses dados já alimentam a tela ou estejam salvos no banco.</blockquote></aside>
     </section>
 
-    <section class="slide" id="s-ingestion" data-title="Ingestão: preparar o catálogo" data-kicker="DADOS" data-budget="0:55" data-group="core">
+    <section class="slide" id="s-ingestion" data-title="Ingestão de dados" data-kicker="DADOS" data-budget="0:55" data-group="core">
       <div class="slide-inner">
-        <div class="kicker">14 · Ingestão · suporte ao simulador</div>
-        <h2 class="title">Uma etapa de preparação, <span>não o produto inteiro</span></h2>
+        <div class="kicker">13 · Ingestão · suporte ao simulador</div>
+        <h2 class="title">Ingestão <span>de dados</span></h2>
         <div class="pipeline compact-pipeline">
           <div class="stage"><div class="stage-head"><span class="stage-num">1</span><b>Coletar e armazenar bruto</b><span class="dim">com rede</span></div><div class="stage-rows"><div class="flow-row"><span class="fnode src">NBA Stats</span><span class="edge">cache bruto</span><span class="fnode dst mono">data/raw/</span></div><div class="flow-row"><span class="fnode src">Basketball-Reference</span><span class="edge">etapa manual</span><span class="fnode dst mono">posições</span></div></div></div>
           <div class="pipe-arrow"><span class="connector connector--down" aria-hidden="true"></span><span class="dim edge-label">reprocessamento offline</span></div>
@@ -386,10 +372,24 @@ stateDiagram-v2
       <aside class="notes"><blockquote>A ingestão busca estatísticas e posições, guarda dados brutos para permitir reprocessamento e deriva atributos offline. A saída validada alimenta o catálogo. Os números são do dataset processado versionado no repositório; não representam atualização ao vivo. Shrinkage e fórmulas completas ficam nas notas ou no apêndice técnico.</blockquote></aside>
     </section>
 
-    <section class="slide" id="s-integration" data-title="Da arquitetura atual à integração planejada" data-kicker="INTEGRAÇÃO" data-budget="0:55" data-group="core">
+    <section class="slide" id="s-status" data-title="Estado do projeto" data-kicker="ESTADO DO PROJETO" data-budget="0:50" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">14 · Estado do projeto</div>
+        <h2 class="title">Estado <span>do projeto</span></h2>
+        <div class="status-columns">
+          <div class="card status-card done"><span class="tag ok-tag">IMPLEMENTADO</span><ul><li>Pipeline de dados e catálogo processado</li><li>Modelos, migrações e seed do catálogo</li><li>API de health check e criação de sessão</li><li>Engine headless executável em demo</li><li>Interface React e animação com dados mock</li></ul></div>
+          <div class="card status-card partial"><span class="tag warn">PARCIAL / DESCONECTADO</span><ul><li>Serviços de sessão e bracket existem; criação de sessão não chama o bracket</li><li>Engine produz log em memória; API não o executa</li><li>Frontend renderiza transmissão mock; não consome a API</li><li>Heurísticas têm lacunas de regras e validação estatística</li></ul></div>
+          <div class="card status-card planned"><span class="tag out">PLANEJADO</span><ul><li>Integração entre frontend e endpoints reais</li><li>Coordenação, persistência e transmissão de partidas</li><li>Eventos e frames por SSE e replay</li><li>Completar regras, testes e calibração</li></ul></div>
+        </div>
+        <p class="dim status-foot">Convenção dos diagramas: linha contínua = fluxo existente · tracejada = integração planejada.</p>
+      </div>
+      <aside class="notes"><blockquote>É importante separar existência de integração. Há um BracketService que cria partidas, mas o endpoint atual de sessão não o chama. Há um runner de partidas, mas nenhum serviço de API o executa. E há uma tela de transmissão, mas ela recebe frames simulados no frontend. É a mesma distinção usada nos diagramas anteriores.</blockquote></aside>
+    </section>
+
+    <section class="slide" id="s-integration" data-title="Integração entre os módulos" data-kicker="INTEGRAÇÃO" data-budget="0:55" data-group="core">
       <div class="slide-inner">
         <div class="kicker">15 · Integração · estado atual e direção</div>
-        <h2 class="title">A principal lacuna está <span>entre os módulos</span></h2>
+        <h2 class="title">Integração <span>entre os módulos</span></h2>
         <div class="diagram-wrap" role="img" aria-label="Hoje: frontend, API e engine rodam isolados. Direção futura: frontend, API, coordenador, engine, eventos e transmissão em cadeia">
 <pre class="mermaid">
 flowchart TB
@@ -418,7 +418,7 @@ flowchart TB
     <section class="slide" id="s-next" data-title="Próximos passos técnicos" data-kicker="DISCUSSÃO" data-budget="0:45" data-group="core">
       <div class="slide-inner">
         <div class="kicker">16 · Próximos passos</div>
-        <h2 class="title">Completar regras, <span>integrar e validar</span></h2>
+        <h2 class="title">Próximos <span>passos</span></h2>
         <div class="roadmap">
           <div class="road-step"><span class="road-num">01</span><div><b>Validar o engine</b><p>Fechar lacunas de regras e medir resultados contra referências.</p></div></div>
           <div class="road-step"><span class="road-num">02</span><div><b>Conectar workflows de domínio</b><p>Acionar bracket na sessão e definir o coordenador da partida.</p></div></div>
@@ -432,8 +432,8 @@ flowchart TB
 
     <section class="slide" id="s-close" data-title="Resumo" data-kicker="ENCERRAMENTO" data-budget="0:30" data-group="core">
       <div class="slide-inner center">
-        <div class="kicker">Resumo</div>
-        <h2 class="mega">Fundamentos prontos.<br /><span>Falta integrar.</span></h2>
+        <div class="kicker">Encerramento</div>
+        <h2 class="mega"><span>Resumo</span></h2>
         <p class="lede">O projeto já tem fundamentos separados para catálogo, engine, backend e interface. O trabalho central agora é validar e conectar esses fundamentos.</p>
         <div class="logo-strip"><span class="chip">arquitetura em camadas</span><span class="chip">heurísticas explícitas</span><span class="chip">integração em andamento</span></div>
         <div class="tag ok-tag">PERGUNTAS</div>
@@ -452,7 +452,7 @@ flowchart TB
     </section>
 
     <section class="slide appendix" id="s-a3" data-title="A.3 — Limites das heurísticas atuais" data-kicker="APOIO · ENGINE" data-budget="" data-group="appendix">
-      <div class="slide-inner"><div class="kicker">Apoio · validação</div><h2 class="title">A.3 — <span>Probabilidade não é calibração</span></h2><div class="two-col"><div class="card"><span class="tag in">O QUE O CÓDIGO FAZ</span><ul><li>Usa atributos em sorteios ponderados</li><li>Aplica ajustes explícitos a arremessos</li><li>Permite seed para repetir aleatoriedade</li></ul></div><div class="card"><span class="tag warn">O QUE AINDA PRECISA SER MEDIDO</span><ul><li>Distribuições de placares e posses</li><li>Taxas de arremesso, turnover e rebote</li><li>Variação entre jogadores e equipes</li></ul></div></div></div>
+      <div class="slide-inner"><div class="kicker">Apoio · validação</div><h2 class="title">A.3 — <span>Limites das heurísticas</span></h2><div class="two-col"><div class="card"><span class="tag in">O QUE O CÓDIGO FAZ</span><ul><li>Usa atributos em sorteios ponderados</li><li>Aplica ajustes explícitos a arremessos</li><li>Permite seed para repetir aleatoriedade</li></ul></div><div class="card"><span class="tag warn">O QUE AINDA PRECISA SER MEDIDO</span><ul><li>Distribuições de placares e posses</li><li>Taxas de arremesso, turnover e rebote</li><li>Variação entre jogadores e equipes</li></ul></div></div></div>
       <aside class="notes"><blockquote>Uma regra probabilística transparente ainda pode estar mal calibrada. Testes e simulações em lote devem comparar distribuições geradas com referências de basquete antes de interpretar as heurísticas como realistas.</blockquote></aside>
     </section>
 
