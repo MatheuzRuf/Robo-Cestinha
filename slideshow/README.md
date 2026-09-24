@@ -12,7 +12,8 @@ in English.
 
 ## Run
 
-Open either HTML file directly, or serve the repository root:
+The ingestion deck can be opened directly. The architecture deck loads its slides
+from separate files, so serve the repository root:
 
 ```bash
 python3 -m http.server 4173
@@ -21,8 +22,9 @@ python3 -m http.server 4173
 ```
 
 The architecture deck reuses `slideshow/styles.css` and `slideshow/app.js`.
-Its `theme.css` contains only additional diagram layouts. No build step,
-Reveal.js package, or network dependency is required.
+Its `theme.css` contains only additional diagram layouts. `load-slides.js`
+fetches the slide fragments in order before starting the player. There is no
+build step or Reveal.js package; Mermaid diagrams use the existing CDN script.
 
 ## Controls
 
@@ -42,8 +44,12 @@ after a period of inactivity.
 
 ## Editing
 
-- **Slides:** one `<section class="slide">` per slide. Use `data-title`,
-  `data-kicker`, `data-budget`, and `data-group` for navigation and timing.
+- **Ingestion deck slides:** edit the `<section class="slide">` elements in
+  `slideshow/index.html`.
+- **Architecture deck slides:** each slide is a separate file in
+  `slideshow/full-repo/slides/`. `load-slides.js` lists their display order;
+  keep each file as one `<section class="slide">` and preserve its IDs and
+  `data-*` attributes.
 - **Speaker notes:** place `<aside class="notes"><blockquote>…</blockquote></aside>`
   inside the slide. Notes are shown in the presenter drawer, not on the slide.
 - **Shared visual system:** the ingestion deck is the reference. The

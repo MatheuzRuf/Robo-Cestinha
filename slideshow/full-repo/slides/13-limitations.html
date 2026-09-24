@@ -1,0 +1,11 @@
+<section class="slide" id="s-limitations" data-title="Engine: saída e limitações" data-kicker="ENGINE" data-budget="0:50" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">12 · Engine · saída e limites</div>
+        <h2 class="title">Engine: <span>saída e limitações</span></h2>
+        <div class="two-col">
+          <div class="card log-card"><div class="file-head"><span class="tag in">SAÍDA DO RUNNER</span><code class="mono">MatchLog</code></div><div class="log-tree"><span>MatchLog</span><span>├── QuarterLog</span><span>│   └── PossessionLog</span><span>│       └── ActionLog</span><span>├── placar e resultado</span><span>└── momentos-chave</span></div><p class="dim">Objeto em memória produzido pela simulação headless.</p></div>
+          <div class="card"><span class="tag warn">AINDA NÃO FECHADO</span><ul><li>Rebotes não são resolvidos após erros</li><li>Faltas não resultam em lances livres</li><li>Substituições não estão integradas</li><li>Runner não fecha empates com overtime</li><li>Persistência e transmissão ainda não consomem MatchLog</li></ul></div>
+        </div>
+      </div>
+      <aside class="notes"><blockquote>Os schemas de saída representam a intenção de registrar uma partida em níveis de períodos, posses e ações. O runner já produz um log em memória, mas alguns campos ainda não são preenchidos como um box score completo. O deck precisa evitar sugerir que esses dados já alimentam a tela ou estejam salvos no banco.</blockquote></aside>
+    </section>

@@ -1,0 +1,19 @@
+<section class="slide" id="s-flows" data-title="Fluxos de dados e de simulação" data-kicker="FLUXOS" data-budget="0:55" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">04 · Dois fluxos distintos</div>
+        <h2 class="title">Fluxos <span>de dados e de simulação</span></h2>
+        <div class="flow-split">
+          <div class="card flow-panel">
+            <div class="file-head"><span class="tag in">PREPARAÇÃO DO CATÁLOGO</span><span class="dim">offline</span></div>
+            <div class="vertical-flow"><div class="flow-step">Fontes externas</div><span class="connector connector--down" aria-hidden="true"></span><div class="flow-step">Fetch e cache bruto</div><span class="connector connector--down" aria-hidden="true"></span><div class="flow-step">Derivação + validação</div><span class="connector connector--down" aria-hidden="true"></span><div class="flow-step end-step">JSON processado</div></div>
+            <p class="dim">Consumidores atuais: seed do banco e demo independente do engine.</p>
+          </div>
+          <div class="card flow-panel">
+            <div class="file-head"><span class="tag warn">PARTIDA E TRANSMISSÃO</span><span class="dim">a integrar</span></div>
+            <div class="vertical-flow"><div class="flow-step">Sessão / partida</div><span class="connector connector--down connector--planned" aria-hidden="true"></span><div class="flow-step planned-step">Coordenador executa engine</div><span class="connector connector--down connector--planned" aria-hidden="true"></span><div class="flow-step planned-step">Persistência de eventos / frames</div><span class="connector connector--down connector--planned" aria-hidden="true"></span><div class="flow-step planned-step">API entrega atualização à interface</div></div>
+            <p class="dim">Esse fluxo ao vivo ainda não está implementado.</p>
+          </div>
+        </div>
+      </div>
+      <aside class="notes"><blockquote>A ingestão prepara dados por temporada; não é uma tarefa executada a cada partida. O caminho do catálogo está implementado até os arquivos e pode alimentar o banco via seed ou o demo do engine. Já o caminho da partida até a transmissão é uma direção arquitetural: faltam o coordenador, a persistência de saída e a integração em tempo real.</blockquote></aside>
+    </section>

@@ -1,0 +1,15 @@
+<section class="slide" id="s-heuristics" data-title="Engine: heurísticas" data-kicker="ENGINE" data-budget="1:05" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">11 · Engine · heurísticas</div>
+        <h2 class="title">Engine: <span>heurísticas</span></h2>
+        <div class="heuristic-flow">
+          <div class="attribute-column"><span class="tag in">ENTRADAS</span><div class="attribute-pill">usage_rate</div><div class="attribute-pill">turnover_rate · steal_rate</div><div class="attribute-pill">two_pt_pct · three_pt_pct</div><div class="attribute-pill">stamina · clutch_factor</div></div>
+          <span class="connector connector--right" aria-hidden="true"></span>
+          <div class="rule-column"><span class="tag warn">REGRAS</span><div class="rule-box"><b>Escolha da ação</b><small>menos tempo no relógio → maior chance de arremesso</small></div><div class="rule-box"><b>Risco de perda</b><small>turnovers do portador + steals da defesa</small></div><div class="rule-box"><b>Resultado do arremesso</b><small>aproveitamento base ajustado por fadiga e clutch</small></div></div>
+          <span class="connector connector--right" aria-hidden="true"></span>
+          <div class="outcome-column"><span class="tag out">SAÍDAS</span><div class="outcome-box">Passe · movimento · arremesso</div><div class="outcome-box">Cesta · erro · turnover</div><div class="outcome-box">Log da posse</div></div>
+        </div>
+        <div class="callout"><b>Reprodutibilidade:</b> a seed do gerador aleatório permite repetir uma simulação com as mesmas entradas.</div>
+      </div>
+      <aside class="notes"><blockquote>As probabilidades são heurísticas explícitas. Com mais tempo no relógio, a chance base de arremesso é menor; no fim do relógio cresce e abaixo de dois segundos o código força arremesso. Perdas combinam turnover do jogador e pressão de steals. Arremessos usam o atributo de aproveitamento e recebem ajustes por fadiga e clutch em situações apertadas. O uso de aleatoriedade com seed permite reproduzir resultados, mas ainda é necessário validar se as distribuições se parecem com basquete real.</blockquote></aside>
+    </section>

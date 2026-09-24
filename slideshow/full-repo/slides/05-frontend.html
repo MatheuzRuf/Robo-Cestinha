@@ -1,0 +1,31 @@
+<section class="slide" id="s-frontend" data-title="Frontend: páginas e componentes" data-kicker="FRONTEND" data-budget="0:55" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">04 · Frontend · composição</div>
+        <h2 class="title">Frontend: <span>páginas e componentes</span></h2>
+        <div class="diagram-wrap" role="img" aria-label="App.tsx escolhe entre Home e MatchBroadcast, que usam componentes compartilhados e de transmissão; a transmissão consome useGameFrames a partir do mockEngine">
+<pre class="mermaid">
+flowchart TB
+  APP["App.tsx<br/><small>seleção por pathname</small>"]
+  HOME["Home<br/><small>entrada de sessão · mock</small>"]
+  BCAST["MatchBroadcast<br/><small>quadra · placar · feeds</small>"]
+  SHARED["Componentes compartilhados<br/><small>Button · Card · Modal · AppShell</small>"]
+  BCOMP["Componentes da transmissão<br/><small>Court · Scoreboard · PlayByPlay</small>"]
+  MOCK["useGameFrames → mockEngine<br/><small>frames locais para animar a quadra</small>"]
+
+  APP --> HOME
+  APP --> BCAST
+  HOME --> SHARED
+  BCAST --> SHARED
+  BCAST --> BCOMP
+  BCOMP --> MOCK
+
+  classDef shared stroke:#22d3ee,stroke-width:2px;
+  classDef mock stroke:#f2b705,stroke-width:2px;
+  class SHARED,BCOMP shared
+  class MOCK mock
+</pre>
+        </div>
+        <div class="callout"><b>Observação:</b> o roteamento atual é uma verificação de caminho, não React Router; componentes da página ainda não buscam dados do backend.</div>
+      </div>
+      <aside class="notes"><blockquote>O frontend separa duas páginas e um conjunto de componentes reaproveitáveis. A Home e a transmissão são páginas distintas; a App escolhe qual renderizar a partir do pathname. Na transmissão, o hook recebe frames do mock engine e atualiza componentes visuais. O desenho mostra a organização atual, não a estrutura futura recomendada em AGENTS.md.</blockquote></aside>
+    </section>

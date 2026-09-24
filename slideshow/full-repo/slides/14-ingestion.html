@@ -1,0 +1,13 @@
+<section class="slide" id="s-ingestion" data-title="Ingestão de dados" data-kicker="DADOS" data-budget="0:55" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">13 · Ingestão · suporte ao simulador</div>
+        <h2 class="title">Ingestão <span>de dados</span></h2>
+        <div class="pipeline compact-pipeline">
+          <div class="stage"><div class="stage-head"><span class="stage-num">1</span><b>Coletar e armazenar bruto</b><span class="dim">com rede</span></div><div class="stage-rows"><div class="flow-row"><span class="fnode src">NBA Stats</span><span class="edge">cache bruto</span><span class="fnode dst mono">data/raw/</span></div><div class="flow-row"><span class="fnode src">Basketball-Reference</span><span class="edge">etapa manual</span><span class="fnode dst mono">posições</span></div></div></div>
+          <div class="pipe-arrow"><span class="connector connector--down" aria-hidden="true"></span><span class="dim edge-label">reprocessamento offline</span></div>
+          <div class="stage"><div class="stage-head"><span class="stage-num">2</span><b>Derivar e validar</b><span class="dim">tabela mestra → atributos → schemas</span></div><div class="outputs"><span class="chip mono">players.json</span><span class="chip mono">teams.json</span><span class="chip mono">quality report</span></div></div>
+        </div>
+        <div class="stats compact-stats"><div class="stat"><b>582</b><span>jogadores no catálogo</span></div><div class="stat"><b>30</b><span>times</span></div><div class="stat"><b>12</b><span>atributos por jogador</span></div><div class="stat"><b>0–1</b><span>escala dos atributos</span></div></div>
+      </div>
+      <aside class="notes"><blockquote>A ingestão busca estatísticas e posições, guarda dados brutos para permitir reprocessamento e deriva atributos offline. A saída validada alimenta o catálogo. Os números são do dataset processado versionado no repositório; não representam atualização ao vivo. Shrinkage e fórmulas completas ficam nas notas ou no apêndice técnico.</blockquote></aside>
+    </section>

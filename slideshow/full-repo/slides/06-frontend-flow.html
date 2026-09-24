@@ -1,0 +1,18 @@
+<section class="slide" id="s-frontend-flow" data-title="Frontend: fluxo de dados até a tela" data-kicker="FRONTEND" data-budget="0:50" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">05 · Frontend · fluxo de renderização</div>
+        <h2 class="title">Frontend: <span>fluxo de dados até a tela</span></h2>
+        <div class="frame-flow" role="img" aria-label="Mock engine envia frames ao hook, que mantém uma fila e atualiza quadra e placar">
+          <div class="frame-source"><span class="tag warn">ATUAL</span><b>mockEngine</b><small>gera frame a cada 800 ms</small></div>
+          <span class="connector connector--right" aria-hidden="true"></span>
+          <div class="frame-source"><b>useGameFrames</b><small>fila limitada · pausa · velocidade</small></div>
+          <span class="connector connector--right" aria-hidden="true"></span>
+          <div class="frame-source display-source"><b>MatchBroadcast</b><small>quadra SVG · placar · play-by-play</small></div>
+        </div>
+        <div class="two-col">
+          <div class="card"><span class="tag in">JÁ IMPLEMENTADO</span><p>Animação dos frames e controles de reprodução usando dados locais do frontend.</p></div>
+          <div class="card planned-card"><span class="tag out">CAMINHO FUTURO</span><p>Substituir a fonte mock por frames/eventos reais, mantendo a interface de renderização sempre que possível.</p></div>
+        </div>
+      </div>
+      <aside class="notes"><blockquote>O frame contém posições de jogadores e bola. O hook mantém uma fila pequena, respeita pausa e velocidade e alimenta a quadra. Essa experiência visual funciona sem o backend. O frame contract é útil para orientar uma futura integração, mas SSE e replay não estão implementados.</blockquote></aside>
+    </section>

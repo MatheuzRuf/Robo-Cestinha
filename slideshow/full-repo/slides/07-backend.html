@@ -1,0 +1,22 @@
+<section class="slide" id="s-backend" data-title="Backend: camadas" data-kicker="BACKEND" data-budget="1:05" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">06 · Backend · camadas</div>
+        <h2 class="title">Backend: <span>camadas</span></h2>
+        <div class="diagram-wrap" role="img" aria-label="FastAPI routers chamam services; services chamam repositories; repositories usam sessão SQLAlchemy para acessar PostgreSQL">
+<pre class="mermaid">
+flowchart TB
+  API["01 · API · FastAPI<br/><small>GET /health · POST /sessions</small>"]
+  SVC["02 · Services de domínio<br/><small>SessionService · BracketService separado</small>"]
+  REPO["03 · Repositories<br/><small>BaseRepository · Session · Bracket</small>"]
+  DB[("04 · SQLAlchemy async → PostgreSQL<br/><small>sessão por requisição · migrações Alembic</small>")]
+
+  API --> SVC --> REPO --> DB
+
+  classDef storage stroke:#4c9a6a,stroke-width:2px;
+  class DB storage
+</pre>
+        </div>
+        <div class="callout"><b>Factory:</b> `ServiceFactory` monta services e repositories com a sessão da requisição. `SessionService` recebe `BracketService`, mas ainda não aciona a criação do bracket.</div>
+      </div>
+      <aside class="notes"><blockquote>O desenho destaca as fronteiras da persistência: routers não fazem consultas SQL; services coordenam regras e workflows; repositories são a única camada do domínio que usa a sessão assíncrona. ServiceFactory é o composition root por requisição. Hoje os endpoints implementados são health e criação de sessão.</blockquote></aside>
+    </section>

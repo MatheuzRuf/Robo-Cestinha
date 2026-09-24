@@ -1,0 +1,38 @@
+<section class="slide" id="s-model" data-title="Backend: modelo de dados" data-kicker="BACKEND" data-budget="0:55" data-group="core">
+      <div class="slide-inner">
+        <div class="kicker">07 · Backend · dados</div>
+        <h2 class="title">Backend: <span>modelo de dados</span></h2>
+        <div class="diagram-wrap" role="img" aria-label="Team e Player formam o catálogo global; Session agrupa User e Match; Match referencia a próxima Match do bracket">
+<pre class="mermaid">
+erDiagram
+  TEAM ||--o{ PLAYER : "1 ── 0..N"
+  SESSION ||--o{ USER : "1 ── 0..N"
+  SESSION ||--o{ MATCH : "1 ── 0..N"
+  MATCH ||--o| MATCH : "next_match_id"
+  TEAM {
+    string id PK
+    string name
+  }
+  PLAYER {
+    string team_id FK
+    json attributes
+  }
+  SESSION {
+    string hash PK
+    string owner_id
+  }
+  USER {
+    int join_sequence
+    string team_id "opcional"
+  }
+  MATCH {
+    string round
+    string status
+    json score
+  }
+</pre>
+        </div>
+        <div class="callout"><b>Limite atual:</b> MatchEvent e MatchFrameChunk ainda não são tabelas/modelos implementados.</div>
+      </div>
+      <aside class="notes"><blockquote>O catálogo de times e jogadores é global; jogadores apontam para times e guardam atributos em JSON. User e Match pertencem a uma Session. O bracket é representável pela referência de Match para outra Match, mas o fluxo de sessão não cria essas linhas atualmente. Eventos semânticos e lotes de frames ainda são desenho futuro, não parte do modelo implementado.</blockquote></aside>
+    </section>

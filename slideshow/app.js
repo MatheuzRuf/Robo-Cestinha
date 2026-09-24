@@ -5,7 +5,7 @@
   /* ---------- mermaid theme (matches theme.css palette) ---------- */
   if (window.mermaid) {
     mermaid.initialize({
-      startOnLoad: true,
+      startOnLoad: false,
       securityLevel: 'loose',
       theme: 'base',
       fontFamily: 'Inter, system-ui, sans-serif',
@@ -316,4 +316,5 @@
   buildOverview();
   go(start);
   pokeIdle();
+  if (window.mermaid) mermaid.run();
 })();
