@@ -1,0 +1,28 @@
+<section class="slide" id="s-llm-narration" data-title="Narração em lote" data-kicker="INTEGRAÇÃO" data-budget="0:55" data-group="core">
+  <div class="slide-inner">
+    <div class="kicker">17 · Narração · pré-computação</div>
+    <h2 class="title">Narração <span>em lote e cache</span></h2>
+    <div class="diagram-wrap" role="img" aria-label="Eventos alimentam prompt de narração; prompt vai ao LLM em pré-computação; resultado é gravado em cache; NarrationService lê o cache; Timeline API serve a interface.">
+<pre class="mermaid">
+flowchart LR
+  EV["Eventos da partida<br/><small>tipo · time · relógio</small>"]
+  PROMPT["Prompt<br/><small>evento + placar + idioma</small>"]
+  LLM["LLM<br/><small>pré-computação</small>"]
+  CACHE["Cache<br/><small>match:event:locale</small>"]
+  SVC["NarrationService"]
+  API["Timeline API"]
+  UI["MatchBroadcast<br/><small>play-by-play · comentário</small>"]
+
+  EV --> PROMPT --> LLM --> CACHE
+  CACHE --> SVC --> API --> UI
+
+  classDef llm stroke:#e2661a,stroke-width:2px;
+  classDef cache stroke:#4c9a6a,stroke-width:2px;
+  class LLM llm
+  class CACHE cache
+</pre>
+    </div>
+    <div class="callout">A narração é gerada antes do playback; cache por evento e idioma mantém a transmissão determinística.</div>
+  </div>
+  <aside class="notes"><blockquote>A narração é construída em pré-computação. Os eventos da partida alimentam um prompt com contexto de placar e idioma; o LLM gera o texto e o resultado é gravado em cache por partida, evento e idioma. O NarrationService lê esse cache e a timeline serve a narração já resolvida para a interface. Quando não existe narração, um template por tipo cobre o caso. Isso preserva o playback determinístico, sem chamar o LLM em tempo real, e permite manter os dois idiomas com o mesmo pipeline.</blockquote></aside>
+</section>

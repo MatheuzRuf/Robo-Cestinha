@@ -1,0 +1,28 @@
+<section class="slide" id="s-bridge-strategy" data-title="Estratégia de integração" data-kicker="INTEGRAÇÃO" data-budget="0:55" data-group="core">
+  <div class="slide-inner">
+    <div class="kicker">15 · Ponte de integração · estratégia</div>
+    <h2 class="title">Estratégia <span>de integração incremental</span></h2>
+    <div class="diagram-wrap" role="img" aria-label="Flag VITE_USE_API_TIMELINE decide entre API e mockEngine; API falha volta para mock; ambos alimentam useGameFrames; hook alimenta MatchBroadcast.">
+<pre class="mermaid">
+flowchart LR
+  FLAG{"VITE_USE_API_TIMELINE"}
+
+  FLAG -->|"true"| API["GET /matches/:id/timeline"]
+  FLAG -->|"false"| MOCK["mockEngine<br/><small>caminho local</small>"]
+
+  API -->|"200"| HOOK["useGameFrames<br/><small>fila de frames</small>"]
+  API -->|"erro"| MOCK
+
+  MOCK --> HOOK
+  HOOK --> UI["MatchBroadcast<br/><small>quadra · placar · play-by-play</small>"]
+
+  classDef keep stroke:#22d3ee,stroke-width:2px;
+  classDef new stroke:#e2661a,stroke-width:2px;
+  class MOCK,HOOK,UI keep
+  class API new
+</pre>
+    </div>
+    <div class="callout">A flag ativa a rota da API; se ela falhar, o fluxo cai de volta para o mock sem quebrar a transmissão.</div>
+  </div>
+  <aside class="notes"><blockquote>A ponte é incremental. O caminho local continua sendo o padrão, e a rota de timeline só entra quando a flag é ligada. Se a requisição falhar, o hook cai de volta para o mockEngine, então a experiência nunca fica em branco. O contrato de frame é o mesmo em ambos os caminhos, o que permite trocar a fonte sem mexer na renderização. O escopo é deliberado: validar transporte e contrato antes de conectar o engine real via HTTP.</blockquote></aside>
+</section>

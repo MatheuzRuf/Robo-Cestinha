@@ -1,0 +1,31 @@
+<section class="slide" id="s-integration" data-title="Integração entre os módulos" data-kicker="INTEGRAÇÃO" data-budget="0:55" data-group="core">
+  <div class="slide-inner">
+    <div class="kicker">14 · Integração · cadeia de execução</div>
+    <h2 class="title">Integração <span>entre os módulos</span></h2>
+    <div class="diagram-wrap" role="img" aria-label="Frontend troca comandos e stream com a API; API aciona coordenador; coordenador executa engine; engine produz eventos e frames; narração enriquece eventos; API entrega ao frontend.">
+<pre class="mermaid">
+flowchart TB
+  FE["Frontend<br/><small>MatchBroadcast · Bracket</small>"]
+  API["API · services<br/><small>REST · eventos</small>"]
+  COORD["Coordenador de partida"]
+  ENG["Engine<br/><small>MatchRunner · StateMachine</small>"]
+  EV["Eventos e frames"]
+  NAR["Narração"]
+
+  FE <-->|comandos · payload| API
+  API <--> COORD
+  COORD <--> ENG
+  ENG --> EV
+  EV --> NAR
+  NAR --> API
+
+  classDef edge stroke:#22d3ee,stroke-width:2px;
+  classDef engine stroke:#e2661a,stroke-width:2px;
+  class API,COORD edge
+  class ENG engine
+</pre>
+    </div>
+    <div class="callout">O coordenador orquestra a partida, o engine gera eventos e frames, e a API entrega tudo para a interface.</div>
+  </div>
+  <aside class="notes"><blockquote>Esta é a cadeia que o projeto está montando. O frontend envia comandos e recebe o resultado da API; a API aciona um coordenador que executa o engine; o engine produz eventos e frames; a narração enriquece cada evento; e a API devolve tudo ao frontend. A integração avança em etapas, mantendo cada peça demonstrável enquanto a seguinte é construída.</blockquote></aside>
+</section>
