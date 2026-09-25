@@ -26,7 +26,7 @@ flowchart TB
 
   FESVC <-->|REST · SSE| API
 
-  subgraph OFFLINE["Preparação do catálogo · offline"]
+  subgraph OFFLINE["Data Ingestion · offline"]
     direction LR
     SOURCES["Fontes externas"]
     ING["Ingestão"]
