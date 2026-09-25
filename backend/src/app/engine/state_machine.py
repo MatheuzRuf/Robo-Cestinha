@@ -1,4 +1,4 @@
-"""State machine orchestrator for the possession loop."""
+"""Máquina de estados que conduz cada posse de bola."""
 
 from __future__ import annotations
 
@@ -16,22 +16,25 @@ from app.engine.schemas import ActionLog, PossessionLog
 
 
 class StateMachine:
+    """Converte decisões heurísticas em ações e mudanças de estado."""
+
     def __init__(self, rng: random.Random):
+        """Cria a máquina usando o gerador aleatório compartilhado."""
         self.rng = rng
 
     def resolve_possession(self, state: GameState) -> PossessionLog:
-        """Runs the possession loop until a basket, turnover, or violation."""
+        """Executa uma posse até cesta, perda, violação ou fim do quarto."""
         possession_id = state.possession_count
         team = state.possession_team_id
         actions = []
         points = 0
         outcome = "continue"
 
-        # Initialize handler
+        # A posse começa com um condutor; passes podem trocar esse jogador.
         if not state.active_handler_id:
             state.active_handler_id = state.attacking_team.select_ball_handler(self.rng)
 
-        # Loop until possession ends
+        # Ações curtas consomem o relógio até produzirem um resultado final.
         while outcome == "continue":
             handler = state.attacking_team.get_player(state.active_handler_id)
             action_type = decide_handler_action(state, self.rng)
@@ -53,6 +56,7 @@ class StateMachine:
                     state.active_handler_id = receiver.player_id
                     state.last_passer_id = handler.player_id
                 else:
+                    # A interceptação encerra a posse e inverte o ataque.
                     action_log.result = "intercepted"
                     action_log.player = stealer.player_id
                     outcome = "turnover"
@@ -78,7 +82,7 @@ class StateMachine:
                     outcome = "turnover"
                     state.flip_possession(new_handler_id=intercepter.player_id)
                 else:
-                    # Foul or hold
+                    # Falta sofrida e retenção não encerram a posse nesta fase.
                     action_log.result = outcome_type
                     # Simple handling: clock keeps ticking, possession continues
 
@@ -100,10 +104,10 @@ class StateMachine:
                     state.flip_possession(rng=self.rng)
                 else:
                     outcome = "missed"
-                    # Rebound logic would go here, simplified to flip
+                    # O rebote ainda é simplificado: por enquanto a posse troca.
                     state.flip_possession(rng=self.rng)
 
-            # Advance clock
+            # O relógio pode encerrar a posse mesmo depois da ação escolhida.
             elapsed, violation = state.clock.tick(action_log.duration_s)
             action_log.duration_s = elapsed
 

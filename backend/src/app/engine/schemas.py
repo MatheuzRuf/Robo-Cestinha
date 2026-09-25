@@ -1,7 +1,7 @@
-"""Pydantic schemas for the simulation engine and match logs.
+"""Modelos Pydantic usados pela simulação e pelos logs da partida.
 
-Enforces the JSON contract between the simulation engine, the Streamlit UI,
-the 2D court visualization, and the LLM narration module.
+Eles formam o contrato JSON entre o engine, interfaces de visualização e
+módulos que narram ou persistem a partida.
 """
 
 from __future__ import annotations
@@ -11,6 +11,8 @@ from pydantic import BaseModel, Field
 
 
 class PlayerBoxScore(BaseModel):
+    """Estatísticas acumuladas de um jogador durante a partida."""
+
     pts: int = 0
     reb: int = 0
     oreb: int = 0
@@ -30,11 +32,15 @@ class PlayerBoxScore(BaseModel):
 
 
 class TeamBoxScore(BaseModel):
+    """Estatísticas individuais e totais de um time."""
+
     player_stats: Dict[str, PlayerBoxScore] = Field(default_factory=dict)
     totals: PlayerBoxScore = Field(default_factory=PlayerBoxScore)
 
 
 class ActionLog(BaseModel):
+    """Descreve uma ação atômica dentro de uma posse de bola."""
+
     type: str  # "dispute", "move", "pass", "shoot", "rebound", "foul", "turnover", "shot_clock_violation"
     player: Optional[str] = None
     target_player: Optional[str] = None
@@ -50,6 +56,8 @@ class ActionLog(BaseModel):
 
 
 class PossessionLog(BaseModel):
+    """Agrupa as ações, duração e resultado de uma posse."""
+
     possession_id: int
     team: str
     actions: List[ActionLog] = Field(default_factory=list)
@@ -59,6 +67,8 @@ class PossessionLog(BaseModel):
 
 
 class QuarterLog(BaseModel):
+    """Reúne as posses e o placar observado ao fim de um quarto."""
+
     quarter: int
     possessions: List[PossessionLog] = Field(default_factory=list)
     score_home: int = 0
@@ -66,6 +76,8 @@ class QuarterLog(BaseModel):
 
 
 class KeyMoment(BaseModel):
+    """Representa um evento destacado para narração ou replay."""
+
     quarter: int
     time_remaining_s: float
     description: str
@@ -73,11 +85,15 @@ class KeyMoment(BaseModel):
 
 
 class FinalScore(BaseModel):
+    """Placar final separado entre mandante e visitante."""
+
     home: int
     away: int
 
 
 class MatchLog(BaseModel):
+    """Registro completo de uma partida simulada."""
+
     match_id: str
     home_team: str
     away_team: str

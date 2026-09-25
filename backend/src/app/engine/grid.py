@@ -1,4 +1,4 @@
-"""Spatial 50-cell grid system for the basketball court.
+"""Grade espacial de 50 células que representa a quadra.
 
 Discretized 10x5 grid (50 cells total), representing the NBA 94x50 ft court
 at a 2:1 ratio. No out-of-bounds: all positions clamp to [0, 9] x [0, 4].
@@ -13,6 +13,8 @@ from typing import Tuple
 
 
 class Direction(str, Enum):
+    """Direções possíveis para o deslocamento de um jogador na grade."""
+
     N = "N"
     NE = "NE"
     E = "E"
@@ -50,10 +52,13 @@ THREE_POINT_DISTANCE_THRESHOLD = 3.0  # Euclidean distance >= 3.0 cells is a 3-p
 
 @dataclass(frozen=True)
 class CourtPosition:
+    """Posição imutável na quadra, sempre limitada aos seus 50 quadrados."""
+
     x: int
     y: int
 
     def __post_init__(self) -> None:
+        # O clamp evita que movimentos ultrapassem as linhas da quadra.
         clamped_x = max(0, min(GRID_WIDTH - 1, self.x))
         clamped_y = max(0, min(GRID_HEIGHT - 1, self.y))
         if clamped_x != self.x or clamped_y != self.y:
@@ -61,31 +66,34 @@ class CourtPosition:
             object.__setattr__(self, "y", clamped_y)
 
     def move(self, direction: Direction) -> CourtPosition:
+        """Cria a posição vizinha indicada, aplicando o limite da quadra."""
         dx, dy = DIRECTION_VECTORS[direction]
         return CourtPosition(self.x + dx, self.y + dy)
 
     def distance_to(self, other: CourtPosition | Tuple[int, int]) -> float:
+        """Calcula a distância euclidiana até outra posição."""
         ox = other[0] if isinstance(other, tuple) else other.x
         oy = other[1] if isinstance(other, tuple) else other.y
         return math.hypot(self.x - ox, self.y - oy)
 
     def to_tuple(self) -> Tuple[int, int]:
+        """Converte a posição para o formato usado nos logs JSON."""
         return (self.x, self.y)
 
 
 def get_target_rim(attacking_team_is_a: bool) -> Tuple[int, int]:
-    """Team A attacks Rim B (9, 2). Team B attacks Rim A (0, 2)."""
+    """Retorna a cesta que o time atacante deve alcançar."""
     return RIM_B if attacking_team_is_a else RIM_A
 
 
 def is_three_pointer(position: CourtPosition, attacking_team_is_a: bool) -> bool:
-    """True if shot position is >= 3.0 cells from the target basket rim."""
+    """Informa se a posição está distante o suficiente para uma cesta de três."""
     rim = get_target_rim(attacking_team_is_a)
     return position.distance_to(rim) >= THREE_POINT_DISTANCE_THRESHOLD
 
 
 def get_initial_center_positions(is_team_a: bool) -> list[CourtPosition]:
-    """Initial positions for 5 players starting near center court."""
+    """Retorna as cinco posições iniciais para o saque no centro da quadra."""
     if is_team_a:
         # Team A offensive side (columns 3-4, facing right towards 9)
         return [

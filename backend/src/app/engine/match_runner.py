@@ -1,4 +1,4 @@
-"""High-level simulation runner orchestrating the match."""
+"""Orquestração de alto nível de uma partida completa."""
 
 from __future__ import annotations
 
@@ -9,7 +9,10 @@ from app.engine.schemas import MatchLog, QuarterLog, FinalScore
 
 
 class MatchRunner:
+    """Prepara o estado e executa os quatro quartos da partida."""
+
     def __init__(self, home_team: LiveTeam, away_team: LiveTeam, seed: int = 42):
+        """Inicializa times, posições e aleatoriedade determinística."""
         self.state = GameState(home_team, away_team)
         self.rng = random.Random(seed)
         self.fsm = StateMachine(self.rng)
@@ -21,6 +24,7 @@ class MatchRunner:
         away_team.setup_court_positions(is_team_a=False)
 
     def run_match(self) -> MatchLog:
+        """Executa os quartos e retorna o log estruturado da partida."""
         quarters = []
 
         for q in range(1, 5):
@@ -31,14 +35,14 @@ class MatchRunner:
                 quarter_log.possessions.append(possession)
                 self.state.possession_count += 1
 
-                # Tick player fatigue for the duration
+                    # Toda posse também atualiza o tempo em quadra e a fadiga.
                 self.state.tick_players_on_court(possession.duration_s)
 
             quarter_log.score_home = self.state.home_team.score
             quarter_log.score_away = self.state.away_team.score
             quarters.append(quarter_log)
 
-            # Reset clock for next period
+            # Entre quartos, reiniciamos tempo e faltas coletivas.
             if q < 4:
                 self.state.clock.start_next_period(is_overtime=False)
                 self.state.home_team.reset_quarter_fouls()

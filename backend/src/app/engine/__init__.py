@@ -1,3 +1,5 @@
+"""API pública dos principais componentes do simulador de partidas."""
+
 from app.engine.schemas import MatchLog
 from app.engine.entities import GameState, LiveTeam, LivePlayer
 from app.engine.state_machine import StateMachine

@@ -1,9 +1,8 @@
-"""Heuristic resolution of possession actions and state machine edge probabilities.
+"""Heurísticas que resolvem ações e probabilidades de uma posse.
 
-Phase 1 implementation:
-- Deterministic random sampling guided by real player statistics (shooting %,
-  turnover rates, steal rates, rebound rates, usage, clutch, and fatigue).
-- Hooks in place for Phase 2 spatial distance and geometric spacing adjustments.
+Nesta fase, o sorteio usa uma instância de ``random.Random`` com estatísticas
+dos jogadores. A grade espacial já fornece pontos de extensão para regras de
+distância e espaçamento mais detalhadas.
 """
 
 from __future__ import annotations
@@ -16,9 +15,9 @@ from app.engine.grid import CourtPosition, Direction, is_three_pointer
 
 
 def decide_handler_action(state: GameState, rng: random.Random) -> str:
-    """Decides between PASS, MOVE, or SHOOT.
+    """Escolhe entre ``PASS``, ``MOVE`` e ``SHOOT``.
 
-    As shot clock winds down, shot probability rises steeply.
+    Quanto menor o relógio de posse, maior a urgência para arremessar.
     """
     shot_clock = state.clock.shot_clock_remaining
 
@@ -45,7 +44,7 @@ def decide_handler_action(state: GameState, rng: random.Random) -> str:
 def resolve_pass_teammate(
     attacking_team: LiveTeam, current_handler_id: str, rng: random.Random
 ) -> LivePlayer:
-    """Selects one of the other 4 teammates on court."""
+    """Escolhe um dos quatro companheiros em quadra, ponderando uso."""
     teammates = [
         p
         for p in attacking_team.get_on_court_players()
@@ -61,7 +60,7 @@ def resolve_pass_outcome(
     defending_team: LiveTeam,
     rng: random.Random,
 ) -> Tuple[bool, LivePlayer | None]:
-    """Returns (success, intercepting_defender_or_none)."""
+    """Resolve o passe e retorna sucesso ou o defensor que interceptou."""
     avg_steal = (
         sum(p.attributes.steal_rate for p in defending_team.get_on_court_players())
         / 5.0
@@ -71,7 +70,7 @@ def resolve_pass_outcome(
     )
 
     if rng.random() < p_turnover:
-        # Intercepted
+        # Em uma falha, o defensor é sorteado pela taxa de roubos.
         defenders = defending_team.get_on_court_players()
         steal_weights = [max(0.01, d.attributes.steal_rate) for d in defenders]
         stealer = rng.choices(defenders, weights=steal_weights, k=1)[0]
@@ -83,9 +82,9 @@ def resolve_pass_outcome(
 def decide_move_direction(
     handler_pos: CourtPosition, is_team_a: bool, rng: random.Random
 ) -> Direction:
-    """Selects 1 of the 8 directions or IDLE.
+    """Escolhe uma das oito direções ou ``IDLE``.
 
-    Slightly biases movement toward the opponent's rim (Phase 1 court awareness).
+    O peso maior aponta para a cesta adversária.
     """
     directions = [
         Direction.N,
@@ -99,7 +98,7 @@ def decide_move_direction(
         Direction.IDLE,
     ]
 
-    # Weights: Team A attacks toward X=9 (East); Team B attacks toward X=0 (West)
+    # O time A avança para X=9; o time B avança para X=0.
     if is_team_a:
         # Favor NE, E, SE
         weights = [1.0, 2.0, 3.0, 2.0, 1.0, 0.5, 0.2, 0.5, 1.2]
@@ -116,9 +115,9 @@ def resolve_move_outcome(
     direction: Direction,
     rng: random.Random,
 ) -> Tuple[str, LivePlayer | None]:
-    """Resolves MOVE action: 'SUCCESS', 'STRIPPED', 'FOUL_DRAWN', or 'HOLDS_BALL'."""
+    """Resolve o movimento: ``SUCCESS``, ``STRIPPED``, ``FOUL_DRAWN`` ou ``HOLDS_BALL``."""
     if direction == Direction.IDLE:
-        # Idle options: holds ball (80%), stripped (10%), foul drawn (10%)
+        # Parado, o jogador pode sofrer falta, ser desarmado ou manter a bola.
         roll = rng.random()
         if roll < 0.10:
             defenders = defending_team.get_on_court_players()
@@ -133,7 +132,7 @@ def resolve_move_outcome(
         else:
             return "HOLDS_BALL", None
 
-    # Active directional movement: risk of turnover
+    # Um movimento ativo também pode terminar em perda de bola.
     avg_steal = (
         sum(p.attributes.steal_rate for p in defending_team.get_on_court_players())
         / 5.0
@@ -154,25 +153,24 @@ def resolve_shot(
     game_state: GameState,
     rng: random.Random,
 ) -> Tuple[bool, bool, int]:
-    """Resolves a shot attempt.
+    """Resolve um arremesso aplicando distância, fadiga e clutch.
 
-    Returns:
-        (is_made, is_three_pt, points_awarded)
+    Retorna ``(convertido, e_de_tres, pontos_conquistados)``.
     """
     is_three = is_three_pointer(shooter.court_pos, is_team_a)
     points = 3 if is_three else 2
 
-    # Base shooting percentage
+    # A distância define se usamos o aproveitamento de dois ou três pontos.
     base_pct = (
         shooter.attributes.three_pt_pct if is_three else shooter.attributes.two_pt_pct
     )
 
-    # Fatigue modifier: below 0.4 stamina degrades up to 10%
+    # A fadiga abaixo de 0,4 reduz gradualmente a chance de conversão.
     if shooter.current_stamina < 0.40:
         stamina_penalty = (0.40 - shooter.current_stamina) * 0.25
         base_pct = max(0.15, base_pct - stamina_penalty)
 
-    # Clutch modifier: quarter 4/OT with score margin <= 5
+    # Em momentos decisivos, o atributo de clutch ajusta a probabilidade.
     score_diff = abs(game_state.home_team.score - game_state.away_team.score)
     if game_state.clock.quarter >= 4 and score_diff <= 5:
         clutch_bonus = (shooter.attributes.clutch_factor - 0.5) * 0.12
@@ -185,15 +183,14 @@ def resolve_shot(
 def resolve_rebound(
     game_state: GameState, rng: random.Random
 ) -> Tuple[LivePlayer, bool]:
-    """All 10 on-court players dispute the rebound.
+    """Sorteia o rebote entre os dez jogadores em quadra.
 
-    Returns:
-        (rebounder, is_offensive)
+    Retorna ``(rebotador, e_rebote_ofensivo)``.
     """
     off_players = game_state.attacking_team.get_on_court_players()
     def_players = game_state.defending_team.get_on_court_players()
 
-    # Offensive rebound rates from data; defense gets standard advantage (~75% league norm)
+    # O peso defensivo inclui a vantagem média de rebote da defesa.
     off_weights = [max(0.02, p.attributes.rebound_rate * 1.0) for p in off_players]
     def_weights = [
         max(0.05, (0.15 + (1.0 - p.attributes.rebound_rate * 0.5)) * 1.8)

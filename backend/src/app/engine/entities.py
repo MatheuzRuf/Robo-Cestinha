@@ -1,4 +1,4 @@
-"""Runtime entity models and state tracking for an active basketball simulation."""
+"""Entidades em memória e estado corrente de uma simulação de basquete."""
 
 from __future__ import annotations
 
@@ -14,6 +14,8 @@ from app.engine.schemas import PlayerBoxScore
 
 @dataclass
 class LivePlayer:
+    """Estado mutável de um jogador durante uma partida em andamento."""
+
     player_id: str
     name: str
     team_id: str
@@ -30,6 +32,7 @@ class LivePlayer:
 
     @classmethod
     def from_player(cls, player: Player) -> LivePlayer:
+        """Converte o modelo estático de ingestão em um jogador ativo."""
         return cls(
             player_id=player.player_id,
             name=player.name,
@@ -42,6 +45,7 @@ class LivePlayer:
         )
 
     def record_minutes(self, duration_s: float) -> None:
+        """Acumula tempo de quadra e reduz a stamina proporcionalmente."""
         self.box_score.seconds_played += duration_s
         # Fatigue decay: roughly 0.0005 per second on court
         self.current_stamina = max(0.20, self.current_stamina - 0.0005 * duration_s)
@@ -49,6 +53,8 @@ class LivePlayer:
 
 @dataclass
 class LiveTeam:
+    """Estado de um time, incluindo elenco, quinteto e placar."""
+
     team_id: str
     name: str
     abbreviation: str
@@ -60,12 +66,13 @@ class LiveTeam:
 
     @classmethod
     def from_team_and_players(cls, team: Team, player_models: list[Player]) -> LiveTeam:
+        """Monta um time ativo a partir do catálogo de times e jogadores."""
         team_players = [p for p in player_models if p.team_id == team.team_id]
         live_players = {p.player_id: LivePlayer.from_player(p) for p in team_players}
 
-        # Select 5 starters
+        # Prioriza os titulares marcados no catálogo.
         starters = [p.player_id for p in team_players if p.is_starter][:5]
-        # Fallback if fewer than 5 flagged starters
+        # Completa o quinteto com reservas quando faltarem titulares marcados.
         if len(starters) < 5:
             remaining = [
                 p.player_id for p in team_players if p.player_id not in starters
@@ -89,23 +96,26 @@ class LiveTeam:
         )
 
     def get_player(self, player_id: str) -> LivePlayer:
+        """Retorna um jogador pelo identificador do catálogo."""
         return self.players[player_id]
 
     def get_on_court_players(self) -> list[LivePlayer]:
+        """Retorna os jogadores atualmente em quadra."""
         return [self.players[pid] for pid in self.on_court]
 
     def reset_quarter_fouls(self) -> None:
+        """Zera as faltas coletivas no início de um novo quarto."""
         self.quarter_fouls = 0
 
     def select_ball_handler(self, rng: random.Random) -> str:
-        """Weighted selection of active on-court players based on usage_rate."""
+        """Escolhe o condutor ponderando o ``usage_rate`` de cada jogador."""
         active = self.get_on_court_players()
         weights = [max(0.01, p.attributes.usage_rate) for p in active]
         chosen = rng.choices(active, weights=weights, k=1)[0]
         return chosen.player_id
 
     def setup_court_positions(self, is_team_a: bool) -> None:
-        """Places the 5 active players in the initial center court positions."""
+        """Distribui o quinteto ativo nas posições iniciais da quadra."""
         initial_coords = get_initial_center_positions(is_team_a)
         for i, pid in enumerate(self.on_court[:5]):
             if i < len(initial_coords):
@@ -114,6 +124,7 @@ class LiveTeam:
 
 @dataclass
 class GameState:
+    """Estado global necessário para resolver a próxima posse."""
     home_team: LiveTeam
     away_team: LiveTeam
     clock: GameClock = field(default_factory=GameClock)
@@ -145,7 +156,7 @@ class GameState:
     def flip_possession(
         self, new_handler_id: Optional[str] = None, rng: Optional[random.Random] = None
     ) -> None:
-        """Flips offense and defense, resetting shot clock and assigning ball handler."""
+        """Troca ataque e defesa, reinicia o relógio e escolhe novo condutor."""
         prev_attacking = self.possession_team_id
         self.possession_team_id = self.defending_team_id
         self.defending_team_id = prev_attacking
@@ -158,7 +169,7 @@ class GameState:
             self.active_handler_id = self.attacking_team.select_ball_handler(rng)
 
     def tick_players_on_court(self, duration_s: float) -> None:
-        """Ticks playing time for all 10 players on the court."""
+        """Registra a duração da posse para os dez jogadores em quadra."""
         for p in self.home_team.get_on_court_players():
             p.record_minutes(duration_s)
         for p in self.away_team.get_on_court_players():
