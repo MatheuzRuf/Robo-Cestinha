@@ -17,12 +17,10 @@
     '10d-entities.html',
     '10i-state_machine.html',
     '10j-match_runner.html',
-    'heuristics_overview.html',
-    '10e-state_graph.html',
+    '10o-heuristics_overview.html',
     '10f-heuristics_decision.html',
     '10g-heuristics_pass_move.html',
     '10h-heuristics_shot_rebound.html',
-    '10k-roadmap.html',
     '10l-heuristics_move.html',
     '10m-heuristics_rebound.html',
   ];

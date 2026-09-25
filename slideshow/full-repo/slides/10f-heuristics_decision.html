@@ -4,14 +4,18 @@
     <h2 class="title">A posse escolhe uma <span>ação</span></h2>
     <p class="lede">O relógio aumenta a urgência; os atributos resolvem o resultado.</p>
 
-    <div class="state-diagram">
-        <div class="state-node start-state"><code>handler</code><small>com a bola</small></div>
-        <span class="state-arrow">→</span>
-        <div class="state-node decision-state"><code>decide_handler_action()</code><small>pesos + random</small></div>
-        <span class="state-arrow">→</span>
-        <div class="state-node"><b>PASS</b><small>troca o condutor</small></div>
-        <div class="state-node"><b>MOVE</b><small>avança na grade</small></div>
-        <div class="state-node"><b>SHOOT</b><small>resolve o arremesso</small></div>
+    <div class="mini-diagram" aria-label="Trecho do grafo que escolhe a ação do condutor">
+        <div class="diagram-wrap">
+<pre class="mermaid">
+flowchart LR
+  H["Handler<br/><small>com a bola</small>"] --> D{"Relógio + atributos"}
+  D --> P["PASS"]
+  D --> M["MOVE"]
+  D --> S["SHOOT"]
+  classDef focus stroke:#e2661a,stroke-width:2px;
+  class D,P,M,S focus;
+</pre>
+        </div>
     </div>
 
     <div class="two-col">
@@ -22,6 +26,7 @@
             <div class="stat"><b>35–74%</b><span>2–7s · SHOOT</span></div>
         </div>
         <div class="formula">≤ 2s → SHOOT obrigatório</div>
+        <div class="playcall">22% é a chance base de arremesso; os 35–74% aparecem quando o relógio aperta. Menos tempo = mais urgência.</div>
         </div>
 
         <div class="card">
@@ -33,6 +38,7 @@
             <span class="arrow">→</span>
             <div class="chain-node hl"><span class="chain-orb">clutch</span><span class="chain-sub">Q4 + jogo ≤ 5</span></div>
         </div>
+        <div class="playcall"><code>base_pct</code> é o aproveitamento normal; fadiga reduz e <i>clutch</i> ajusta só no fim apertado.</div>
         </div>
     </div>
     </div>

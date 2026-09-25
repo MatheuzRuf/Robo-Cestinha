@@ -13,13 +13,25 @@
         <div class="stage">
         <div class="stage-head"><span class="stage-num">2</span><b>Aplicar contexto</b></div>
         <div class="outputs">
-            <span class="chip">stamina &lt; 0,40 → penalidade</span>
-            <span class="chip">Q4 + diferença ≤ 5 → clutch</span>
+            <span class="chip"><b>Fadiga:</b>&nbsp;&nbsp;Quanto - a stamina, + desconto.<br />&nbsp;&nbsp;Fator 0.25 · piso da chance: 0.15.</span>
+            <span class="chip"><b>Clutch:</b>&nbsp;&nbsp;Em Q4 apertado, o atributo ajusta a chance.<br />&nbsp;&nbsp;Fator 0.12 · teto: 0.95.</span>
         </div>
         </div>
         <div class="stage">
         <div class="stage-head"><span class="stage-num">3</span><b>Sortear</b></div>
         <div class="formula">rng.random() &lt; base_pct → cesta</div>
+        </div>
+    </div>
+    <div class="mini-diagram" aria-label="Trecho do grafo de arremesso, entre cesta, erro e rebote">
+        <div class="diagram-wrap">
+<pre class="mermaid">
+flowchart LR
+  SHOOT["SHOOT"] --> RESULT{"Arremesso"}
+  RESULT -->|Cesta| MADE["+2 / +3<br/><small>placar atualiza</small>"]
+  RESULT -->|Erro| MISS["Rebound Dispute"]
+  classDef focus stroke:#e2661a,stroke-width:2px;
+  class SHOOT,RESULT focus;
+</pre>
         </div>
     </div>
     </div>

@@ -28,6 +28,19 @@
         </div>
     </div>
 
+    <div class="mini-diagram" aria-label="Trecho do grafo de passe, entre passe completo e interceptação">
+        <div class="diagram-wrap">
+<pre class="mermaid">
+flowchart LR
+  PASS["PASS"] --> TEST{"Interceptado?"}
+  TEST -->|Não| KEEP["Completed<br/><small>novo handler</small>"]
+  TEST -->|Sim| TURN["Steal<br/><small>posse vira</small>"]
+  classDef focus stroke:#e2661a,stroke-width:2px;
+  class PASS,TEST focus;
+</pre>
+        </div>
+    </div>
+
     <div class="formula">p_turnover = clamp(0.04, 0.35, turnover_rate × 0.7 + avg_steal × 1.5)</div>
     </div>
 </section>

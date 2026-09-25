@@ -20,9 +20,24 @@
         <div class="vertical-flow">
             <div class="flow-step">IDLE</div>
             <span class="connector connector--down"></span>
-            <div class="flow-step"><b>10%</b> falta · <b>8%</b> desarme</div>
+            <div class="flow-step"><b>10%</b>&nbsp;sofrer falta<br /><b>8%</b>&nbsp;perder a bola (desarme)</div>
             <div class="flow-step end-step">ativo → SUCCESS / STRIPPED</div>
         </div>
+        </div>
+    </div>
+
+    <div class="mini-diagram" aria-label="Trecho do grafo de movimento, com direção, sucesso e perda de bola">
+        <div class="diagram-wrap">
+<pre class="mermaid">
+flowchart LR
+  MOVE["MOVE"] --> DIR{"Direção"}
+  DIR --> ACTIVE["8 direções"]
+  DIR --> IDLE["IDLE"]
+  ACTIVE --> OUT["SUCCESS / STRIPPED"]
+  IDLE --> HOLD["Holds / Foul / Steal"]
+  classDef focus stroke:#e2661a,stroke-width:2px;
+  class MOVE,DIR focus;
+</pre>
         </div>
     </div>
 
