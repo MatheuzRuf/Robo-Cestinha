@@ -303,7 +303,7 @@
 .reference-list code { color: var(--color-opponent); }
 .compact-pipeline { gap: var(--space-2); }
 .compact-pipeline .stage { padding: var(--space-4); gap: var(--space-3); }
-.compact-pipeline .flow-row { grid-template-columns: minmax(0, auto) minmax(60px, 1fr) minmax(0, auto); }
+.compact-pipeline .flow-row { grid-template-columns: 170px minmax(60px, 1fr) 108px; }
 .compact-pipeline .edge { text-transform: none; }
 .compact-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .compact-stats .stat { padding: var(--space-3); }
