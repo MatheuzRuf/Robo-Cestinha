@@ -23,6 +23,17 @@
     '10h-heuristics_shot_rebound.html',
     '10l-heuristics_move.html',
     '10m-heuristics_rebound.html',
+    '11-state-machine.html',
+    '12-heuristics.html',
+    '13-limitations.html',
+    '14-ingestion.html',
+    '15-status.html',
+    '16-integration.html',
+    '17-next.html',
+    '18-close.html',
+    'a1-shrinkage.html',
+    'a2-action-probabilities.html',
+    'a3-heuristic-limitations.html',
   ];
   const baseUrl = new URL('./', document.currentScript.src);
   const track = document.getElementById('track');
