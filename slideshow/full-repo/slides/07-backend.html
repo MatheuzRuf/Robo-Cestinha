@@ -1,8 +1,17 @@
-<section class="slide" id="s-backend" data-title="Backend: camadas" data-kicker="BACKEND" data-budget="1:05" data-group="core">
+<section class="slide" id="s-backend" data-title="Backend: visão geral e padrões" data-kicker="BACKEND" data-budget="1:45" data-group="core">
       <div class="slide-inner">
-        <div class="kicker">06 · Backend · camadas</div>
-        <h2 class="title">Backend: <span>camadas</span></h2>
-        <div class="diagram-wrap" role="img" aria-label="Endpoints de saúde, sessões, times, jogadores, chave e partidas chamam os serviços correspondentes. Os serviços usam repositories para acessar PostgreSQL, e o serviço de partidas coordena a simulação pelo engine.">
+        <div class="kicker">06 · Backend · visão geral e padrões</div>
+        <h2 class="title">Backend: <span>visão geral e padrões</span></h2>
+        <div class="backend-overview">
+          <div class="backend-patterns">
+            <div class="pattern-card"><span class="pattern-num">01</span><div><b>Arquitetura em camadas</b><p>As responsabilidades são divididas entre API, serviços de domínio e repositórios favorecendo a reutilização de código e facilitando a manutenção.</p><code>API → Serviços → Repositórios</code></div></div>
+            <div class="pattern-card"><span class="pattern-num">02</span><div><b>Factory</b><p>Usamos o padrão Factory para criar os serviços e montar suas dependências, como repositórios e outros serviços.</p><code>ServiceFactory</code></div></div>
+            <div class="pattern-card"><span class="pattern-num">03</span><div><b>Injeção de dependências</b><p>O FastAPI injeta a sessão do banco na <code>ServiceFactory</code> a cada requisição; ela a repassa aos repositórios usados pelos serviços. Assim, eles não precisam criar suas dependências.</p><code>FastAPI · Depends</code></div></div>
+            <div class="pattern-card"><span class="pattern-num">04</span><div><b>Máquina de estados</b><p>Define os estados e as transições possíveis de uma posse, tornando o fluxo explícito e previsível.</p><code>engine/StateMachine</code></div></div>
+            <div class="pattern-card"><span class="pattern-num">05</span><div><b>Schemas como contratos</b><p>Validam o formato dos dados que entram e saem da API, ajudando módulos diferentes a se comunicarem.</p><code>Pydantic schemas</code></div></div>
+          </div>
+          <div class="backend-diagram">
+            <div class="diagram-wrap" role="img" aria-label="A API FastAPI encaminha requisições aos serviços de domínio. Os serviços usam repositories para acessar PostgreSQL e o MatchService coordena a simulação pelo engine.">
 <pre class="mermaid">
 flowchart TB
   API["API · FastAPI<br/><small>Health · Sessions · Teams · Players · Bracket · Matches</small><br/><small>REST · SSE</small>"]
@@ -20,8 +29,10 @@ flowchart TB
   classDef engine stroke:#e2661a,stroke-width:2px;
   class ENGINE engine
 </pre>
+            </div>
+          </div>
         </div>
-        <div class="callout"><b>Fluxo:</b> endpoints FastAPI direcionam cada operação ao serviço de domínio; serviços coordenam regras, repositories e, nas partidas, o engine. `SessionService` coordena a sessão e a criação da chave; `MatchService` executa a simulação e publica eventos via SSE.</div>
+        <div class="callout"><b>Fluxo:</b> API → serviço → repository → banco. Nas partidas, `MatchService` chama o engine e publica eventos via SSE.</div>
       </div>
-      <aside class="notes"><blockquote>A API expõe operações de sessão, catálogo, chave e partidas. Os routers encaminham cada endpoint ao serviço responsável: SessionService cuida do ciclo de vida da sessão; TeamService e PlayerService entregam catálogo e elenco; BracketService monta e avança a chave; MatchService coordena a partida. Os serviços usam repositories para consultas e persistência. Para simular, MatchService chama o engine e disponibiliza resultado e eventos da partida, inclusive por SSE.</blockquote></aside>
+      <aside class="notes"><blockquote>O diagrama mostra o fluxo principal do backend: a API encaminha cada operação para um serviço de domínio, que aplica as regras e usa repositories para persistir ou consultar dados. Essa separação em camadas divide o sistema em responsabilidades menores, favorecendo reuso e evolução. A ServiceFactory compõe os serviços com suas dependências, que o FastAPI injeta por requisição. No fluxo de partidas, o MatchService chama o engine e envia eventos por SSE. A máquina de estados organiza as transições de cada posse; schemas Pydantic validam dados nas fronteiras da API. São responsabilidades identificáveis no código atual.</blockquote></aside>
     </section>

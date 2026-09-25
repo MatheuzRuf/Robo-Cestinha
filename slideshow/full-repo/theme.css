@@ -247,6 +247,16 @@
 .contract-pattern { grid-column: 1 / -1; }
 .pattern-foot { margin: var(--space-2) 0 0; text-align: center; font-size: 0.82rem; }
 
+.backend-overview { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); align-items: stretch; gap: var(--space-4); }
+#s-backend .slide-inner { width: min(1680px, 100%); }
+.backend-patterns { display: grid; grid-template-columns: 1fr; align-content: center; gap: var(--space-2); }
+.backend-patterns .pattern-card { padding: var(--space-3); }
+.backend-patterns .pattern-card p { line-height: 1.35; }
+.backend-patterns .pattern-card code { font-size: 0.73rem; }
+.backend-diagram { display: flex; min-width: 0; align-items: center; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: rgba(31, 25, 19, 0.55); padding: var(--space-2); }
+.backend-diagram .diagram-wrap { width: 100%; min-height: 0; padding: 0; }
+.backend-diagram .diagram-wrap svg { max-width: 100% !important; max-height: clamp(300px, calc(100vh - 410px), 620px) !important; }
+
 .engine-map { justify-content: space-between; }
 .engine-map .arch-node { min-height: 92px; justify-content: center; }
 .engine-input { border-color: var(--color-opponent); }
@@ -317,7 +327,9 @@
   .status-columns { grid-template-columns: 1fr; }
   .status-card ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .model-map,
-  .integration-compare { grid-template-columns: 1fr; }
+  .integration-compare,
+  .backend-overview { grid-template-columns: 1fr; }
+  .backend-patterns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .system-lane { flex-wrap: wrap; justify-content: center; }
   .lane-label { width: 100%; text-align: center; }
   .backend-lane { flex-wrap: wrap; }
@@ -366,6 +378,8 @@
   .journey > .connector--right { transform: rotate(90deg); }
   .flow-split,
   .pattern-map { grid-template-columns: 1fr; }
+  .backend-patterns { grid-template-columns: 1fr; }
+  .backend-diagram .diagram-wrap svg { max-height: 360px !important; }
   .contract-pattern { grid-column: auto; }
   .status-card ul { grid-template-columns: 1fr; }
   .frontend-map .page-row { flex-direction: column; }
