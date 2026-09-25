@@ -7,8 +7,6 @@
             <div class="pattern-card"><span class="pattern-num">01</span><div><b>Arquitetura em camadas</b><p>As responsabilidades são divididas entre API, serviços de domínio e repositórios favorecendo a reutilização de código e facilitando a manutenção.</p><code>API → Serviços → Repositórios</code></div></div>
             <div class="pattern-card"><span class="pattern-num">02</span><div><b>Factory</b><p>Usamos o padrão Factory para criar os serviços e montar suas dependências, como repositórios e outros serviços.</p><code>ServiceFactory</code></div></div>
             <div class="pattern-card"><span class="pattern-num">03</span><div><b>Injeção de dependências</b><p>O FastAPI injeta a sessão do banco na <code>ServiceFactory</code> a cada requisição; ela a repassa aos repositórios usados pelos serviços. Assim, eles não precisam criar suas dependências.</p><code>FastAPI · Depends</code></div></div>
-            <div class="pattern-card"><span class="pattern-num">04</span><div><b>Máquina de estados</b><p>Define os estados e as transições possíveis de uma posse, tornando o fluxo explícito e previsível.</p><code>engine/StateMachine</code></div></div>
-            <div class="pattern-card"><span class="pattern-num">05</span><div><b>Schemas como contratos</b><p>Validam o formato dos dados que entram e saem da API, ajudando módulos diferentes a se comunicarem.</p><code>Pydantic schemas</code></div></div>
           </div>
           <div class="backend-diagram">
             <div class="diagram-wrap" role="img" aria-label="A API FastAPI encaminha requisições aos serviços de domínio. Os serviços usam repositories para acessar PostgreSQL e o MatchService coordena a simulação pelo engine.">
