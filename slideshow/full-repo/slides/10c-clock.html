@@ -1,0 +1,26 @@
+<section class="slide" id="s-clock" data-title="Gerenciamento de Tempo" data-kicker="TEMPO DE JOGO" data-budget="1:00" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine/clock.py</div>
+    <h2 class="title">Controle de Relógios: <span>tick()</span></h2>
+    <p class="lede">A classe <code>GameClock</code> controla simultaneamente o tempo do quarto (720s) e da posse (24s ou 14s).</p>
+
+    <div class="gate-grid">
+        <div class="card">
+        <div class="kicker">Lógica de decremento seguro</div>
+        <p>O método <code>tick(duration_s)</code> avança o tempo limitando o consumo à menor fronteira disponível: tempo restante da posse ou tempo restante do quarto.</p>
+        <p>Uma violação de 24s é disparada apenas se o relógio de posse atingir zero e o relógio do quarto for <code>> 0</code>.</p>
+        </div>
+        <div class="terminal">
+        <div class="terminal-head"><span class="chip-tiny">Código base (tick)</span></div>
+        <div class="term-body">
+            <div><span class="dim"># Limita o delta de tempo consumido</span></div>
+            <div>actual_elapsed = min(duration, game_clock, shot_clock)</div>
+            <br>
+            <div><span class="dim"># Decremento</span></div>
+            <div>game_clock -= actual_elapsed</div>
+            <div>shot_clock -= actual_elapsed</div>
+        </div>
+        </div>
+    </div>
+    </div>
+</section>

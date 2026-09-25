@@ -1,0 +1,24 @@
+<section class="slide" id="s-match-runner" data-title="Runner e Schemas" data-kicker="ORQUESTRAÇÃO E CONTRATOS" data-budget="1:15" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine/match_runner.py e schemas.py</div>
+    <h2 class="title">Runner e <span>Modelos Pydantic</span></h2>
+    <p class="lede">A classe <code>MatchRunner</code> itera sobre os 4 quartos e retorna os dados de saída validados por esquemas rígidos do Pydantic.</p>
+
+    <div class="two-col">
+        <div class="card slim">
+        <div class="kicker">MatchRunner.run_match()</div>
+        <p>Loop em <code>range(1, 5)</code> invocando <code>fsm.resolve_possession()</code> repetidamente. Entre quartos, invoca <code>start_next_period()</code> e reseta faltas coletivas. Ao final da posse, atualiza os minutos em quadra no <i>box score</i> de todos os jogadores.</p>
+        </div>
+        
+        <div class="card slim">
+        <div class="kicker">Estrutura JSON / Contrato de Saída</div>
+        <div class="master-rows">
+            <div class="mrow"><span class="mono">MatchLog</span><i>Placar e agregação final</i></div>
+            <div class="mrow"><span class="mono">QuarterLog</span><i>Agrupa 1..N posses</i></div>
+            <div class="mrow"><span class="mono">PossessionLog</span><i>Metadados + lista de ações</i></div>
+            <div class="mrow"><span class="mono">ActionLog</span><i>Atômica. Tipo, posições e resultados</i></div>
+        </div>
+        </div>
+    </div>
+    </div>
+</section>

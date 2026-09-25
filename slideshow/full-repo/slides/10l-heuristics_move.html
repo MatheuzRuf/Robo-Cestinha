@@ -1,0 +1,46 @@
+<section class="slide" id="s-heuristics-move" data-title="Resolução de Drible" data-kicker="HEURÍSTICAS · DRIBLE" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine/heuristics.py</div>
+    <h2 class="title">Drible: <span>avançar ou perder</span></h2>
+    <p class="lede">A direção tem viés para a cesta. O confronto decide o desfecho.</p>
+
+    <div class="flow-split">
+        <div class="card flow-panel">
+        <div class="kicker">DIREÇÃO · 9 OPÇÕES</div>
+        <div class="vertical-flow">
+            <div class="flow-step"><code>N · NE · E · SE · S · SW · W · NW · IDLE</code></div>
+            <span class="connector connector--down"></span>
+            <div class="flow-step"><b>Time A</b> → E / NE / SE</div>
+            <div class="flow-step"><b>Time B</b> → W / NW / SW</div>
+        </div>
+        </div>
+
+        <div class="card flow-panel">
+        <div class="kicker">DESFECHO DO MOVIMENTO</div>
+        <div class="vertical-flow">
+            <div class="flow-step">IDLE</div>
+            <span class="connector connector--down"></span>
+            <div class="flow-step"><b>10%</b>&nbsp;sofrer falta<br /><b>8%</b>&nbsp;perder a bola (desarme)</div>
+            <div class="flow-step end-step">ativo → SUCCESS / STRIPPED</div>
+        </div>
+        </div>
+    </div>
+
+    <div class="mini-diagram" aria-label="Trecho do grafo de movimento, com direção, sucesso e perda de bola">
+        <div class="diagram-wrap">
+<pre class="mermaid">
+flowchart LR
+  MOVE["MOVE"] --> DIR{"Direção"}
+  DIR --> ACTIVE["8 direções"]
+  DIR --> IDLE["IDLE"]
+  ACTIVE --> OUT["SUCCESS / STRIPPED"]
+  IDLE --> HOLD["Holds / Foul / Steal"]
+  classDef focus stroke:#e2661a,stroke-width:2px;
+  class MOVE,DIR focus;
+</pre>
+        </div>
+    </div>
+
+    <div class="formula">p_strip = clamp(0.03, 0.25, turnover_rate × 0.5 + avg_steal)</div>
+    </div>
+</section>

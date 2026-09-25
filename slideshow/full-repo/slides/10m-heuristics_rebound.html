@@ -1,0 +1,39 @@
+<section class="slide" id="s-heuristics-rebound" data-title="Disputa de Rebote" data-kicker="HEURÍSTICAS · REBOTE" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine/heuristics.py</div>
+    <h2 class="title">Rebote: <span>a posse continua</span></h2>
+    <p class="lede">Depois do erro, dez jogadores disputam uma nova decisão.</p>
+
+    <div class="integration-compare">
+        <div class="integration-state current-state">
+        <div class="kicker">HOJE · FLUXO ATUAL</div>
+        <div class="target-flow">
+            <span>SHOOT miss</span><span class="connector connector--right">→</span><span><code>flip_possession()</code></span>
+        </div>
+        <p>Erro vira troca de posse automaticamente.</p>
+        </div>
+
+        <div class="integration-state target-state">
+        <div class="kicker">PRÓXIMO · REBOTE REAL</div>
+        <div class="target-flow">
+            <span>5 ataque + 5 defesa</span><span class="connector connector--right">→</span><span><code>resolve_rebound()</code></span>
+            <span class="connector connector--right"></span><span>offensive? 14s : 24s</span>
+        </div>
+        <p>O rebotador e o tipo de rebote decidem o próximo estado.</p>
+        </div>
+    </div>
+
+    <div class="mini-diagram" aria-label="Trecho do grafo de rebote, com disputa ofensiva ou defensiva">
+        <div class="diagram-wrap">
+<pre class="mermaid">
+flowchart LR
+  MISS["SHOOT miss"] --> REBOUND{"Rebound Dispute"}
+  REBOUND -->|Ofensivo| KEEP["Posse mantida<br/><small>14s</small>"]
+  REBOUND -->|Defensivo| FLIP["Posse vira<br/><small>24s</small>"]
+  classDef focus stroke:#e2661a,stroke-width:2px;
+  class MISS,REBOUND focus;
+</pre>
+        </div>
+    </div>
+    </div>
+</section>

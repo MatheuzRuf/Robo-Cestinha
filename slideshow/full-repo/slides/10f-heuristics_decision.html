@@ -1,0 +1,45 @@
+<section class="slide" id="s-heuristics-decision" data-title="Heurísticas: Tomada de Decisão" data-kicker="HEURÍSTICAS · AÇÃO" data-budget="1:15" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine/heuristics.py</div>
+    <h2 class="title">A posse escolhe uma <span>ação</span></h2>
+    <p class="lede">O relógio aumenta a urgência; os atributos resolvem o resultado.</p>
+
+    <div class="mini-diagram" aria-label="Trecho do grafo que escolhe a ação do condutor">
+        <div class="diagram-wrap">
+<pre class="mermaid">
+flowchart LR
+  H["Handler<br/><small>com a bola</small>"] --> D{"Relógio + atributos"}
+  D --> P["PASS"]
+  D --> M["MOVE"]
+  D --> S["SHOOT"]
+  classDef focus stroke:#e2661a,stroke-width:2px;
+  class D,P,M,S focus;
+</pre>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+        <div class="kicker">URGENCIA DO RELÓGIO</div>
+        <div class="stats compact-stats">
+            <div class="stat"><b>22%</b><span>&gt; 7s · SHOOT</span></div>
+            <div class="stat"><b>35–74%</b><span>2–7s · SHOOT</span></div>
+        </div>
+        <div class="formula">≤ 2s → SHOOT obrigatório</div>
+        <div class="playcall">22% é a chance base de arremesso; os 35–74% aparecem quando o relógio aperta. Menos tempo = mais urgência.</div>
+        </div>
+
+        <div class="card">
+        <div class="kicker">RESULTADO DO SHOT</div>
+        <div class="chain compact">
+            <div class="chain-node"><span class="chain-orb">base_pct</span><span class="chain-sub">2PT / 3PT</span></div>
+            <span class="arrow">→</span>
+            <div class="chain-node"><span class="chain-orb">fadiga</span><span class="chain-sub">stamina &lt; 0,40</span></div>
+            <span class="arrow">→</span>
+            <div class="chain-node hl"><span class="chain-orb">clutch</span><span class="chain-sub">Q4 + jogo ≤ 5</span></div>
+        </div>
+        <div class="playcall"><code>base_pct</code> é o aproveitamento normal; fadiga reduz e <i>clutch</i> ajusta só no fim apertado.</div>
+        </div>
+    </div>
+    </div>
+</section>

@@ -1,0 +1,30 @@
+<section class="slide" id="s-grid" data-title="Grade Espacial" data-kicker="MODELO ESPACIAL" data-budget="1:15" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine/grid.py</div>
+    <h2 class="title">Discretização da Quadra: <span>Matriz 10x5</span></h2>
+    <p class="lede">Coordenadas da quadra mapeadas para 50 células. Facilita o cálculo de distâncias euclidianas e vetores de movimento.</p>
+
+    <div class="two-col">
+        <div class="card">
+        <div class="file-head"><span class="file-name">Dataclass CourtPosition</span></div>
+        <pre class="tree">y=4  · · · · · · · · · ·
+y=3  · · · · · · · · · ·
+y=2  <span class="tk">A</span> · · · · · · · · <span class="tk">B</span>
+y=1  · · · · · · · · · ·
+y=0  · · · · · · · · · ·
+    0 1 2 3 4 5 6 7 8 9</pre>
+        <p class="dim">Alvos: (0, 2) e (9, 2). Validação de limites (clamp) feita no <code>__post_init__</code>.</p>
+        </div>
+
+        <div class="card">
+        <div class="kicker">Implementação</div>
+        <ul class="check">
+            <li><b>Imutabilidade:</b> O objeto <code>CourtPosition</code> retorna uma nova instância ao mover.</li>
+            <li><b>Direções:</b> 8 vetores fixos + IDLE definidos na enum <code>Direction</code>.</li>
+            <li><b>is_three_pointer:</b> Retorna True se a distância euclidiana até a cesta for <code>>= 3.0</code> células.</li>
+            <li>Sem exceções de <i>out-of-bounds</i>: valores excedentes são contidos em <code>[0, 9]</code> e <code>[0, 4]</code>.</li>
+        </ul>
+        </div>
+    </div>
+    </div>
+</section>

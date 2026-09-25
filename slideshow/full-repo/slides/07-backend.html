@@ -32,7 +32,6 @@ flowchart TB
             </div>
           </div>
         </div>
-        <div class="callout"><b>Fluxo:</b> API → serviço → repository → banco. Nas partidas, `MatchService` chama o engine e publica eventos via SSE.</div>
       </div>
       <aside class="notes"><blockquote>O diagrama mostra o fluxo principal do backend: a API encaminha cada operação para um serviço de domínio, que aplica as regras e usa repositories para persistir ou consultar dados. Essa separação em camadas divide o sistema em responsabilidades menores, favorecendo reuso e evolução. A ServiceFactory compõe os serviços com suas dependências, que o FastAPI injeta por requisição. No fluxo de partidas, o MatchService chama o engine e envia eventos por SSE. A máquina de estados organiza as transições de cada posse; schemas Pydantic validam dados nas fronteiras da API. São responsabilidades identificáveis no código atual.</blockquote></aside>
     </section>

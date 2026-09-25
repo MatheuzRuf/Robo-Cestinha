@@ -1,0 +1,38 @@
+<section class="slide" id="s-heuristics-shot" data-title="Resolução de Arremesso" data-kicker="HEURÍSTICAS · ARREMESSO" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine/heuristics.py</div>
+    <h2 class="title">Arremesso: a chance é <span>ajustada</span></h2>
+    <p class="lede">A distância escolhe a base. O estado do jogador e o momento mexem nela.</p>
+
+    <div class="pipeline compact-pipeline">
+        <div class="stage">
+        <div class="stage-head"><span class="stage-num">1</span><b>Escolher base</b></div>
+        <div class="flow-row"><div class="fnode src"><code>distance_to(rim)</code></div><span class="edge">≥ 3,0 células</span><div class="fnode dst"><code>three_pt_pct</code></div></div>
+        <div class="flow-row"><div class="fnode src">perto da cesta</div><span class="edge">caso contrário</span><div class="fnode dst"><code>two_pt_pct</code></div></div>
+        </div>
+        <div class="stage">
+        <div class="stage-head"><span class="stage-num">2</span><b>Aplicar contexto</b></div>
+        <div class="outputs">
+            <span class="chip"><b>Fadiga:</b>&nbsp;&nbsp;Quanto - a stamina, + desconto.<br />&nbsp;&nbsp;Fator 0.25 · piso da chance: 0.15.</span>
+            <span class="chip"><b>Clutch:</b>&nbsp;&nbsp;Em Q4 apertado, o atributo ajusta a chance.<br />&nbsp;&nbsp;Fator 0.12 · teto: 0.95.</span>
+        </div>
+        </div>
+        <div class="stage">
+        <div class="stage-head"><span class="stage-num">3</span><b>Sortear</b></div>
+        <div class="formula">rng.random() &lt; base_pct → cesta</div>
+        </div>
+    </div>
+    <div class="mini-diagram" aria-label="Trecho do grafo de arremesso, entre cesta, erro e rebote">
+        <div class="diagram-wrap">
+<pre class="mermaid">
+flowchart LR
+  SHOOT["SHOOT"] --> RESULT{"Arremesso"}
+  RESULT -->|Cesta| MADE["+2 / +3<br/><small>placar atualiza</small>"]
+  RESULT -->|Erro| MISS["Rebound Dispute"]
+  classDef focus stroke:#e2661a,stroke-width:2px;
+  class SHOOT,RESULT focus;
+</pre>
+        </div>
+    </div>
+    </div>
+</section>

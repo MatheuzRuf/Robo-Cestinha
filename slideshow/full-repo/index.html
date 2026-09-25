@@ -10,6 +10,38 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" />
 <link rel="stylesheet" href="../styles.css" />
 <link rel="stylesheet" href="theme.css" />
+<style>
+  .full-repo-deck .slide .diagram-wrap {
+    min-height: 0;
+    padding-block: clamp(4px, 1vh, 12px);
+  }
+
+  .full-repo-deck .slide .diagram-wrap .mermaid svg {
+    width: auto !important;
+    height: auto !important;
+    max-width: min(100%, 1100px) !important;
+    max-height: max(0px, calc(100dvh - 380px)) !important;
+  }
+
+  .full-repo-deck .slide .ui-example img {
+    max-height: max(0px, calc(100dvh - 440px));
+  }
+
+  @media (max-height: 700px) {
+    .full-repo-deck .slide {
+      padding-top: 112px;
+      padding-bottom: 76px;
+    }
+
+    .full-repo-deck .slide-inner {
+      gap: clamp(12px, 2.3vh, var(--space-6));
+    }
+
+    .full-repo-deck .slide .diagram-wrap .mermaid svg {
+      max-height: max(0px, calc(100dvh - 320px)) !important;
+    }
+  }
+</style>
 </head>
 <body class="full-repo-deck" data-deck-label="VISÃO GERAL">
 <div class="court-bg" aria-hidden="true">
