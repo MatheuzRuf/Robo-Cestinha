@@ -34,7 +34,7 @@
     '18-llm-narration.html',
     // '19-status.html',
     // '20-next.html',
-    // '21-close.html',
+    '21-close.html',
     // 'a1-shrinkage.html',
     // 'a2-action-probabilities.html',
     // 'a3-heuristic-limitations.html',
