@@ -1,32 +1,21 @@
-<section class="slide" id="s-heuristics-rebound" data-title="Disputa de rebote (planejada)" data-kicker="HEURÍSTICAS · REBOTE" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+<section class="slide" id="s-heuristics-rebound" data-title="Disputa de Rebote" data-kicker="HEURÍSTICAS · REBOTE" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
-    <div class="kicker">app/engine/heuristics.py · resolve_rebound()</div>
-    <h2 class="title">Disputa de <span>rebote</span> (planejada)</h2>
-    <p class="lede">resolve_rebound já existe e pondera os dez jogadores em quadra, mas nenhum chamador a aciona ainda.</p>
-
-    <div class="backend-diagram">
-        <div class="diagram-wrap" role="img" aria-label="Fluxo planejado de disputa de rebote: rebote ofensivo mantém a posse com relógio de 14 segundos, rebote defensivo troca a posse; hoje todo arremesso errado troca a posse diretamente.">
-<pre class="mermaid">
-flowchart TD
-  MISS["Arremesso errado"] --> REB{"resolve_rebound()<br/><small>planejado</small>"}
-  REB -->|ofensivo| HANDLER["Posse continua<br/>shot clock: 14s"]
-  REB -->|defensivo| TURNOVER["Troca de posse"]
-  MISS -.->|hoje| TURNOVER
-
-  classDef plannedNode stroke-dasharray: 4 3,stroke:#999,color:#999;
-  class REB plannedNode
-</pre>
-        </div>
-    </div>
+    <div class="kicker">app/engine/heuristics.py</div>
+    <h2 class="title">Disputa de <span>Rebote (Planejado)</span></h2>
+    <p class="lede">A função resolve_rebound() já cruza pesos estatísticos dos 10 jogadores, mas o fluxo na State Machine ainda engatilha turnover direto.</p>
 
     <div class="card">
-        <p>A função pondera o <b>rebound_rate</b> dos cinco atacantes contra os cinco defensores em quadra, com vantagem extra para a defesa.</p>
-        <p class="dim">Exemplo: Rocha, pivô com rebound_rate alto, entraria na disputa contra toda a defesa dos Águias — hoje essa disputa não acontece.</p>
+        <div class="kicker">Mecânica Implementada (Aguardando Chamada)</div>
+        <ul class="check">
+            <li>Agrega os 5 atacantes e 5 defensores em um <i>pool</i> único de sorteio de rebotador.</li>
+            <li><b>Ataque:</b> Peso direto do <code>rebound_rate</code> (piso de 0.02).</li>
+            <li><b>Defesa:</b> Peso ajustado para garantir vantagem natural de posicionamento defensivo. Fator: <code>(0.15 + (1.0 - p.attributes.rebound_rate * 0.5)) * 1.8</code>.</li>
+            <li>Retorna a tupla <code>(LivePlayer, bool)</code> para a State Machine decidir se o relógio de posse recomeça de 14s ou de 24s com troca de posse.</li>
+        </ul>
     </div>
 
     <div class="playcall">
-        <span class="tag warn">planejado</span> hoje, todo arremesso perdido devolve a posse direto ao adversário, como se fosse sempre rebote defensivo.
+        <span class="tag warn">Status Atual</span> Em <code>state_machine.py</code> (bloco SHOOT miss), o fluxo executa um <code>state.flip_possession()</code> cru, forçando turnover incondicional.
     </div>
     </div>
-    <aside class="notes"><blockquote>resolve_rebound está implementada e testável isoladamente — só falta ser chamada por state_machine.py. Ponto de extensão natural, não bug escondido.</blockquote></aside>
 </section>

@@ -1,49 +1,24 @@
-<section class="slide" id="s-heuristics-decision" data-title="decide_handler_action" data-kicker="HEURÍSTICAS · AÇÃO" data-budget="1:15" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+<section class="slide" id="s-heuristics-decision" data-title="Heurísticas: Tomada de Decisão" data-kicker="HEURÍSTICAS · AÇÃO" data-budget="1:15" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
-    <div class="kicker">app/engine/heuristics.py · decide_handler_action()</div>
-    <h2 class="title">decide_handler_action: <span>passar, driblar ou arremessar</span></h2>
-    <p class="lede">O condutor da bola escolhe entre PASS, MOVE e SHOOT a cada instante. O peso de cada opção muda conforme o relógio de posse aperta.</p>
-
-    <div class="backend-diagram">
-        <div class="diagram-wrap" role="img" aria-label="Fluxo de decisão do condutor da bola conforme o tempo restante no relógio de posse, terminando em um sorteio ponderado entre passe, drible e arremesso.">
-<pre class="mermaid">
-flowchart TD
-  Q{"Quanto falta no relógio de posse?"}
-  Q -->|"≤ 2s"| FORCE["SHOOT obrigatório<br/><small>sem sorteio</small>"]
-  Q -->|"2s – 7s"| URG["Urgência cresce<br/><small>mais peso para SHOOT</small>"]
-  Q -->|"> 7s"| BASE["Baseline<br/><small>passe e drible dominam</small>"]
-  URG --> ROLL{"Sorteio ponderado"}
-  BASE --> ROLL
-  ROLL --> PASS[PASS]
-  ROLL --> MOVE[MOVE]
-  ROLL --> SHOOT[SHOOT]
-
-  classDef forced stroke:#e2661a,stroke-width:2px;
-  class FORCE forced
-</pre>
-        </div>
-    </div>
+    <div class="kicker">app/engine/heuristics.py</div>
+    <h2 class="title">Resolução Estocástica: <span>Ações do Condutor</span></h2>
+    <p class="lede">As decisões e eventos dependem de instâncias padronizadas do módulo <code>random</code> e dos pesos dos atributos dos jogadores.</p>
 
     <div class="two-col">
-        <div class="terminal">
-        <div class="terminal-head"><span class="chip-tiny">exemplo</span><span class="dim">22s no relógio de posse</span></div>
-        <div class="term-body">
-            <div>Duda (armador) segura a bola</div>
-            <div>urgência baixa → <span class="hl">p(SHOOT) ≈ 22%</span></div>
-            <div class="dim">passe e drible dominam o sorteio</div>
+        <div class="card">
+        <div class="kicker">decide_handler_action()</div>
+        <p>Se o relógio for <code>&lt;= 2s</code>, retorna SHOOT forçadamente. Para tempos <code>&lt;= 7s</code>, p(SHOOT) escala linearmente através do fator de urgência.</p>
+        <div class="formula">p_shoot = 0.35 + 0.55 * ((7 - clock) / 7)</div>
         </div>
-        </div>
-        <div class="terminal">
-        <div class="terminal-head"><span class="chip-tiny">exemplo</span><span class="dim">4s no relógio de posse</span></div>
-        <div class="term-body">
-            <div>mesma jogada, tempo esgotando</div>
-            <div>urgência = (7−4)/7 → <span class="hl">p(SHOOT) ≈ 57%</span></div>
-            <div class="dim">abaixo de 2s, SHOOT deixa de ser sorteio</div>
-        </div>
+
+        <div class="card">
+        <div class="kicker">resolve_shot()</div>
+        <p>A taxa de acerto-base cai com a penalidade por fadiga (stamina <code>&lt; 0.40</code>). Bônus de <i>clutch</i> aplicado se <code>quarter >= 4</code> e <code>diff &lt;= 5</code>.</p>
         </div>
     </div>
 
-    <div class="formula">p(SHOOT) = 0,35 + 0,55 × urgência · urgência = (7 − shot_clock) / 7</div>
+    <div class="card">
+        <p class="dim"><b>Passes e Roubos:</b> O cálculo de turnover usa a taxa individual do passador/condutor (0.7 de peso) combinada à média de <code>steal_rate</code> dos 5 defensores ativos em quadra (1.5 de peso).</p>
     </div>
-    <aside class="notes"><blockquote>A mesma função produz comportamentos diferentes conforme o contexto, sem nenhuma regra especial de quarto ou placar: é só o valor do shot_clock mudando o peso do sorteio. Os dois exemplos (22s e 4s) mostram o mesmo cálculo em dois momentos da posse.</blockquote></aside>
+    </div>
 </section>

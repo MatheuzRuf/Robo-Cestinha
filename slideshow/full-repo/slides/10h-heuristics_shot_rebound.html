@@ -1,36 +1,17 @@
-<section class="slide" id="s-heuristics-shot" data-title="Resolução do arremesso" data-kicker="HEURÍSTICAS · ARREMESSO" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+<section class="slide" id="s-heuristics-shot" data-title="Resolução de Arremesso" data-kicker="HEURÍSTICAS · ARREMESSO" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
-    <div class="kicker">app/engine/heuristics.py · resolve_shot()</div>
-    <h2 class="title">Resolução do <span>arremesso</span></h2>
-    <p class="lede">resolve_shot ajusta o aproveitamento base do arremessador em três passos: distância, fadiga e contexto de placar.</p>
-
-    <div class="backend-diagram">
-        <div class="diagram-wrap" role="img" aria-label="Fluxo de resolução de um arremesso: distância define dois ou três pontos, fadiga penaliza, clutch ajusta no fim de jogo apertado, e o sorteio final decide entre cesta convertida ou rebote.">
-<pre class="mermaid">
-flowchart TD
-  A["Posição do arremessador"] --> B{"distância ≥ 3 células?"}
-  B -->|sim| C["aproveitamento base = three_pt_pct"]
-  B -->|não| D["aproveitamento base = two_pt_pct"]
-  C --> E{"stamina < 40%?"}
-  D --> E
-  E -->|sim| F["penalidade de fadiga"]
-  E -->|não| G["sem penalidade"]
-  F --> H{"4º quarto e diferença ≤ 5?"}
-  G --> H
-  H -->|sim| I["ajuste de clutch_factor"]
-  H -->|não| J["sem ajuste"]
-  I --> K["sorteio final"]
-  J --> K
-  K -->|convertido| SCORE["+2 / +3"]
-  K -->|errado| REB["rebote<br/><small>slide seguinte</small>"]
-</pre>
-        </div>
-    </div>
+    <div class="kicker">app/engine/heuristics.py</div>
+    <h2 class="title">Resolução de <span>Arremesso</span></h2>
+    <p class="lede">A função resolve_shot() muta a probabilidade base do jogador aplicando debuffs de fadiga e buffs de clutch.</p>
 
     <div class="card">
-        <div class="kicker">exemplo: arremesso de virada no fim do jogo</div>
-        <p>Duda arremessa de longe no 4º quarto, jogo empatado. <code>is_three_pointer()</code> confirma a distância de três; seu <b>clutch_factor</b> alto empurra o aproveitamento para cima — mas ele jogou a partida inteira e sua <b>stamina</b> caiu para 32%, o que desconta parte desse bônus antes do sorteio decidir a cesta.</p>
+        <div class="kicker">Pipeline de Modificadores (resolve_shot)</div>
+        <ul class="check">
+            <li><b>Base:</b> Define <code>two_pt_pct</code> ou <code>three_pt_pct</code> checando se <code>distance_to() &gt;= 3.0</code> na matriz.</li>
+            <li><b>Penalidade por Fadiga:</b> Se <code>current_stamina &lt; 0.40</code>, o base_pct sofre redução proporcional ao déficit de energia (<code>base_pct - penalty</code>).</li>
+            <li><b>Bônus de Clutch:</b> Condicionado a: (1) quarto &gt;= 4 e (2) diferença de pontos &lt;= 5. Multiplica o <code>clutch_factor</code> e ajusta o base_pct final (teto de 0.95).</li>
+            <li><b>Sorteio:</b> <code>rng.random() &lt; base_pct</code>.</li>
+        </ul>
     </div>
     </div>
-    <aside class="notes"><blockquote>Os quatro sinais (distância, aproveitamento base, fadiga, clutch) são avaliados em sequência, ajustando o mesmo número antes do sorteio final — não são escolhas alternativas.</blockquote></aside>
 </section>

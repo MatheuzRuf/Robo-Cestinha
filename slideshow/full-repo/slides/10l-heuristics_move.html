@@ -1,28 +1,20 @@
-<section class="slide" id="s-heuristics-move" data-title="Resolução do drible" data-kicker="HEURÍSTICAS · DRIBLE" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+<section class="slide" id="s-heuristics-move" data-title="Resolução de Drible" data-kicker="HEURÍSTICAS · DRIBLE" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
-    <div class="kicker">decide_move_direction() · resolve_move_outcome()</div>
-    <h2 class="title">Resolução do <span>drible</span></h2>
-    <p class="lede">O jogador escolhe uma entre 8 direções ou fica parado. O resultado depende de estar parado ou em movimento.</p>
+    <div class="kicker">app/engine/heuristics.py</div>
+    <h2 class="title">Resolução de <span>Movimento</span></h2>
+    <p class="lede">A movimentação (MOVE) sorteia deslocamentos na grade e calcula roubos de bola em condução.</p>
 
-    <div class="backend-diagram">
-        <div class="diagram-wrap" role="img" aria-label="Fluxo de resolução do drible: parado pode sofrer falta, ser desarmado ou segurar a bola; em movimento pode avançar ou perder a bola.">
-<pre class="mermaid">
-flowchart TD
-  M1{"Direção sorteada"} -->|IDLE| M2{"Resultado parado"}
-  M2 -->|10%| M3["Falta sofrida"]
-  M2 -->|8%| M4["Desarmado"]
-  M2 -->|82%| M5["Segura a bola"]
-  M1 -->|8 direções| M6{"Perde a bola?"}
-  M6 -->|não| M7["Anda na grade"]
-  M6 -->|sim| M8["Desarmado"]
-</pre>
+    <div class="two-col">
+        <div class="card">
+        <div class="kicker">decide_move_direction()</div>
+        <p>Sorteio entre 8 vetores radiais e IDLE. O array de pesos força viés direcional: o Time A (atacando x=9) tem pesos maiores para E/NE/SE. O Time B (atacando x=0) foca em W/NW/SW.</p>
+        </div>
+
+        <div class="card">
+        <div class="kicker">resolve_move_outcome()</div>
+        <p>Se <b>IDLE</b>: 10% chance de sofrer falta (<code>FOUL_DRAWN</code>) ou 8% de desarme (<code>STRIPPED</code>).</p>
+        <p>Se <b>Ativo</b>: Cruza o <code>turnover_rate</code> (0.5) contra o <code>avg_steal</code> defensivo (1.0). Caso interceptado, a posse troca imediatamente na State Machine.</p>
         </div>
     </div>
-
-    <div class="card">
-        <p>As 8 direções têm viés para a cesta adversária (time A favorece NE/E/SE; time B favorece NW/W/SW). Parado, o risco é fixo; em movimento, ele escala com <b>turnover_rate</b> do jogador contra o <b>steal_rate</b> da defesa.</p>
-        <p class="dim">Exemplo: o mesmo drible de Duda é mais seguro contra uma defesa com steal_rate baixo do que contra a linha de frente dos Águias.</p>
     </div>
-    </div>
-    <aside class="notes"><blockquote>Contrastar os dois blocos: parado (10%/8%/82%, fixos, regra de jogo) e em movimento (dinâmico, dependente de atributos, heurística). É a diferença entre uma regra e uma heurística no mesmo módulo.</blockquote></aside>
 </section>

@@ -1,30 +1,24 @@
-<section class="slide" id="s-state-machine" data-title="Execução de uma posse" data-kicker="ORQUESTRAÇÃO DA POSSE" data-budget="1:00" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+<section class="slide" id="s-state-machine" data-title="Máquina de Estados" data-kicker="ORQUESTRAÇÃO DA POSSE" data-budget="1:00" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
     <div class="kicker">app/engine/state_machine.py</div>
-    <h2 class="title">Execução de <span>uma posse</span></h2>
-    <p class="lede">resolve_possession() percorre o grafo do slide anterior em um laço: a cada volta, pergunta a heuristics.py o que aconteceu e aplica a mudança de estado.</p>
+    <h2 class="title">Loop Principal: <span>resolve_possession()</span></h2>
+    <p class="lede">Muta o <code>GameState</code> em um laço <code>while outcome == "continue"</code>. Cada volta do loop é uma transição registrada em <code>ActionLog</code>.</p>
 
     <div class="pipeline">
         <div class="stage">
-        <div class="stage-head"><span class="stage-num">1</span><b>Pergunta a heuristics.py</b></div>
-        <p class="dim">decide_handler_action() devolve PASS, MOVE ou SHOOT para o condutor atual.</p>
+        <div class="stage-head"><span class="stage-num">1</span><b>Aciona Heurística</b></div>
+        <p class="dim">Retorna PASS, MOVE ou SHOOT com base em pesos da árvore estocástica.</p>
         </div>
         <div class="pipe-arrow"><span class="arrow">↓</span></div>
         <div class="stage">
-        <div class="stage-head"><span class="stage-num">2</span><b>Aplica o resultado</b></div>
-        <p class="dim">Atualiza court_pos, active_handler_id ou placar, e registra tudo em um ActionLog.</p>
+        <div class="stage-head"><span class="stage-num">2</span><b>Muta Estado & Consome Tempo</b></div>
+        <p class="dim">Aplica deslocamento (<code>court_pos</code>) ou troca condutor. Subtrai a duração padrão do relógio.</p>
         </div>
         <div class="pipe-arrow"><span class="arrow">↓</span></div>
         <div class="stage">
-        <div class="stage-head"><span class="stage-num">3</span><b>Avança o relógio</b></div>
-        <p class="dim">clock.tick() consome o tempo da ação. Se estourar o shot clock, vira violação de 24s e a posse muda de mãos mesmo fora dos estados terminais normais.</p>
-        </div>
-        <div class="pipe-arrow"><span class="arrow">↓</span></div>
-        <div class="stage">
-        <div class="stage-head"><span class="stage-num">4</span><b>Repete ou encerra</b></div>
-        <p class="dim">O laço volta ao passo 1 até um estado terminal (cesta ou turnover) ou fim de quarto. A posse inteira vira um PossessionLog.</p>
+        <div class="stage-head"><span class="stage-num">3</span><b>Checagem de Término</b></div>
+        <p class="dim">Se houver interceptação, cesta, violação de relógio ou final de quarto, a posse é invertida (<code>flip_possession</code>) e o laço se encerra, retornando um <code>PossessionLog</code>.</p>
         </div>
     </div>
     </div>
-    <aside class="notes"><blockquote>resolve_possession() não decide nada sozinha — só orquestra o que heuristics.py decide e traduz isso em mudanças de estado (posição, placar, relógio, posse). A violação de 24s é um terceiro caminho para sair do laço, independente do que a heurística escolheu na rodada.</blockquote></aside>
 </section>

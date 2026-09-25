@@ -1,35 +1,34 @@
-<section class="slide" id="s-engine-overview" data-title="Engine de simulação" data-kicker="ENGINE DE SIMULAÇÃO" data-budget="1:00" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+<section class="slide" id="s-engine-overview" data-title="Visão Geral do Engine" data-kicker="ENGINE DE SIMULAÇÃO" data-budget="1:00" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
-    <div class="kicker">app/engine · seis módulos, um pipeline único</div>
-    <h2 class="title">Engine de simulação: <span>visão geral</span></h2>
-    <p class="lede">O engine recebe dois elencos e uma seed e devolve uma partida completa, posse a posse, sem depender de interface gráfica.</p>
+    <div class="kicker">app/engine · 6 módulos principais</div>
+    <h2 class="title">Engine de simulação: <span>Pipeline</span></h2>
+    <p class="lede">Execução determinística de uma partida baseada em seed. Não possui dependências gráficas.</p>
 
     <div class="card">
         <div class="chain compact">
-        <div class="chain-node"><div class="chain-orb">grid.py</div><span class="chain-sub">espaço</span></div>
+        <div class="chain-node"><div class="chain-orb">grid.py</div><span class="chain-sub">coordenadas</span></div>
         <span class="arrow">→</span>
-        <div class="chain-node"><div class="chain-orb">entities.py</div><span class="chain-sub">estado</span></div>
+        <div class="chain-node"><div class="chain-orb">entities.py</div><span class="chain-sub">estado em memória</span></div>
         <span class="arrow">→</span>
-        <div class="chain-node"><div class="chain-orb">heuristics.py</div><span class="chain-sub">decisão</span></div>
+        <div class="chain-node"><div class="chain-orb">heuristics.py</div><span class="chain-sub">rng / lógica</span></div>
         <span class="arrow">→</span>
-        <div class="chain-node hl"><div class="chain-orb">state_machine.py</div><span class="chain-sub">posse</span></div>
+        <div class="chain-node hl"><div class="chain-orb">state_machine.py</div><span class="chain-sub">loop de posse</span></div>
         <span class="arrow">→</span>
-        <div class="chain-node"><div class="chain-orb">match_runner.py</div><span class="chain-sub">partida</span></div>
+        <div class="chain-node"><div class="chain-orb">match_runner.py</div><span class="chain-sub">loop de quartos</span></div>
         <span class="arrow">→</span>
-        <div class="chain-node"><div class="chain-orb">schemas.py</div><span class="chain-sub">contrato</span></div>
+        <div class="chain-node"><div class="chain-orb">schemas.py</div><span class="chain-sub">modelos pydantic</span></div>
         </div>
     </div>
 
     <div class="stats">
-        <div class="stat"><b>4</b><span>quartos por partida</span></div>
+        <div class="stat"><b>4</b><span>quartos / partida</span></div>
         <div class="stat"><b>24s</b><span>relógio de posse</span></div>
-        <div class="stat"><b>50</b><span>células na quadra</span></div>
-        <div class="stat"><b>1</b><span>seed → 1 partida reprodutível</span></div>
+        <div class="stat"><b>10x5</b><span>matriz da quadra</span></div>
+        <div class="stat"><b>O(1)</b><span>reprodutibilidade (seed)</span></div>
     </div>
 
     <div class="quote-banner">
-        <p>Cada módulo resolve um problema: onde o jogador está, quem ele é, o que ele decide fazer, e o que isso muda no placar e no relógio. Heurísticas e o grafo de decisões aparecem em detalhe nos slides seguintes.</p>
+        <p>A arquitetura isola o estado mutável (`GameState`) das regras de decisão (`heuristics`), orquestrando as mutações através da máquina de estados. Saída em JSON validada via Pydantic.</p>
     </div>
     </div>
-    <aside class="notes"><blockquote>Slide de transição para a seção do engine. Passar rápido pelos seis módulos — heurísticas e o grafo de decisão têm vários slides próprios a seguir. Vale enfatizar o determinismo: a mesma seed sempre produz a mesma partida, o que é a base para comparar heurísticas e depurar resultados.</blockquote></aside>
 </section>
