@@ -931,28 +931,6 @@ ul.check li b { color: var(--color-text); }
 .timer-chip { border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 2px 8px; background: var(--color-surface); }
 .timer-chip.over { color: var(--color-live); border-color: var(--color-live); }
 
-/* ---------- hint ---------- */
-.hint {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 44px;
-  z-index: 14;
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-align: center;
-  background: rgba(20, 16, 13, 0.72);
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  padding: 4px 14px;
-  white-space: nowrap;
-  opacity: 0.75;
-  transition: opacity 300ms ease;
-  pointer-events: none;
-}
-body.nav-hide .hint { opacity: 0; }
-
 .invisible { visibility: hidden; }
 
 /* ---------- notes drawer ---------- */
@@ -1072,7 +1050,6 @@ body.nav-hide .hint { opacity: 0; }
   .warn-list ul { grid-template-columns: 1fr; }
   .report-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .nav-arrow { display: none; }
-  .hint { display: none; }
   .brandSubtitle { white-space: nowrap; }
 }
 
