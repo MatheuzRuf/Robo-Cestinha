@@ -2,7 +2,7 @@
     <div class="slide-inner">
     <div class="kicker">app/engine/state_machine.py</div>
     <h2 class="title">Loop Principal: <span>resolve_possession()</span></h2>
-    <p class="lede">Muda o <code>GameState</code> em um laço <code>while outcome == "continue"</code>. Cada volta do loop é uma transição registrada em <code>ActionLog</code>.</p>
+    <p class="lede">Muda o <code>GameState</code> em um loop "infinito". Cada iteração é uma transição registrada em <code>ActionLog</code>.</p>
 
     <div class="pipeline">
         <div class="stage">
@@ -11,7 +11,7 @@
         </div>
         <div class="pipe-arrow"><span class="arrow">↓</span></div>
         <div class="stage">
-        <div class="stage-head"><span class="stage-num">2</span><b>Muta Estado & Consome Tempo</b></div>
+        <div class="stage-head"><span class="stage-num">2</span><b>Muda Estado & Consome Tempo</b></div>
         <p class="dim">Aplica deslocamento (<code>court_pos</code>) ou troca condutor. Subtrai a duração padrão do relógio.</p>
         </div>
         <div class="pipe-arrow"><span class="arrow">↓</span></div>
