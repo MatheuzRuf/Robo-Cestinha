@@ -1,0 +1,32 @@
+<section class="slide" id="s-heuristics-rebound" data-title="Disputa de rebote (planejada)" data-kicker="HEURÍSTICAS · REBOTE" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine/heuristics.py · resolve_rebound()</div>
+    <h2 class="title">Disputa de <span>rebote</span> (planejada)</h2>
+    <p class="lede">resolve_rebound já existe e pondera os dez jogadores em quadra, mas nenhum chamador a aciona ainda.</p>
+
+    <div class="backend-diagram">
+        <div class="diagram-wrap" role="img" aria-label="Fluxo planejado de disputa de rebote: rebote ofensivo mantém a posse com relógio de 14 segundos, rebote defensivo troca a posse; hoje todo arremesso errado troca a posse diretamente.">
+<pre class="mermaid">
+flowchart TD
+  MISS["Arremesso errado"] --> REB{"resolve_rebound()<br/><small>planejado</small>"}
+  REB -->|ofensivo| HANDLER["Posse continua<br/>shot clock: 14s"]
+  REB -->|defensivo| TURNOVER["Troca de posse"]
+  MISS -.->|hoje| TURNOVER
+
+  classDef plannedNode stroke-dasharray: 4 3,stroke:#999,color:#999;
+  class REB plannedNode
+</pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <p>A função pondera o <b>rebound_rate</b> dos cinco atacantes contra os cinco defensores em quadra, com vantagem extra para a defesa.</p>
+        <p class="dim">Exemplo: Rocha, pivô com rebound_rate alto, entraria na disputa contra toda a defesa dos Águias — hoje essa disputa não acontece.</p>
+    </div>
+
+    <div class="playcall">
+        <span class="tag warn">planejado</span> hoje, todo arremesso perdido devolve a posse direto ao adversário, como se fosse sempre rebote defensivo.
+    </div>
+    </div>
+    <aside class="notes"><blockquote>resolve_rebound está implementada e testável isoladamente — só falta ser chamada por state_machine.py. Ponto de extensão natural, não bug escondido.</blockquote></aside>
+</section>

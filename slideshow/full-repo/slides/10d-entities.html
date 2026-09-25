@@ -1,20 +1,20 @@
-<section class="slide" id="s-entities" data-title="entities.py" data-kicker="MODELO DE ESTADO" data-budget="1:15" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+<section class="slide" id="s-entities" data-title="Jogadores e times em estado de jogo" data-kicker="MODELO DE ESTADO" data-budget="1:15" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
     <div class="kicker">app/engine/entities.py</div>
-    <h2 class="title">O catálogo estático vira <span>estado vivo</span></h2>
-    <p class="lede">Os jogadores e times que vêm da ingestão de dados são imutáveis; entities.py cria as versões "em jogo" deles, com placar, fadiga e posição que mudam a cada posse.</p>
+    <h2 class="title">Jogadores e times em <span>estado de jogo</span></h2>
+    <p class="lede">Jogadores e times vindos da ingestão de dados são imutáveis. entities.py cria versões mutáveis deles: placar, fadiga e posição mudam a cada posse.</p>
 
     <div class="two-col">
         <div class="card">
-        <div class="file-head"><span class="file-name">LivePlayer</span><span class="chip-tiny">de_player()</span></div>
+        <div class="file-head"><span class="file-name">LivePlayer</span><span class="chip-tiny">from_player()</span></div>
         <ul class="check">
-            <li>Nasce de um <b>Player</b> estático da ingestão — mesmos atributos, agora com <b>current_stamina</b> e <b>court_pos</b> mutáveis.</li>
+            <li>Nasce de um <b>Player</b> estático da ingestão — mesmos atributos (three_pt_pct, steal_rate, ...), agora com <b>current_stamina</b> e <b>court_pos</b> mutáveis.</li>
             <li><b>record_minutes()</b> acumula tempo em quadra e reduz a stamina em ritmo constante (≈0,0005/s), com piso de 20%.</li>
             <li>Carrega seu próprio <b>box_score</b> — pontos, rebotes, assistências, faltas — atualizado durante a partida.</li>
         </ul>
         </div>
         <div class="card">
-        <div class="file-head"><span class="file-name">LiveTeam</span><span class="chip-tiny">de_team_and_players()</span></div>
+        <div class="file-head"><span class="file-name">LiveTeam</span><span class="chip-tiny">from_team_and_players()</span></div>
         <ul class="check">
             <li>Monta o quinteto titular priorizando quem já vem marcado como <b>is_starter</b> no catálogo, completando com reservas se faltar.</li>
             <li><b>select_ball_handler()</b> sorteia quem fica com a bola, ponderado pelo <b>usage_rate</b> de cada jogador em quadra.</li>
@@ -24,7 +24,7 @@
     </div>
 
     <div class="card">
-        <div class="kicker">GameState conecta as três peças</div>
+        <div class="kicker">GameState reúne as três peças</div>
         <div class="chain compact">
         <div class="chain-node"><div class="chain-orb">home_team</div><span class="chain-sub">LiveTeam</span></div>
         <span class="arrow">+</span>
@@ -32,8 +32,8 @@
         <span class="arrow">+</span>
         <div class="chain-node"><div class="chain-orb">away_team</div><span class="chain-sub">LiveTeam</span></div>
         </div>
-        <p class="dim">mais quatro ponteiros de controle: <code>possession_team_id</code>, <code>defending_team_id</code>, <code>active_handler_id</code> e <code>last_passer_id</code> (para créditos de assistência).</p>
+        <p class="dim">mais quatro ponteiros de controle: <code>possession_team_id</code>, <code>defending_team_id</code>, <code>active_handler_id</code> e <code>last_passer_id</code> (para créditos de assistência) — trocados a cada posse por <code>flip_possession()</code>, no slide do grafo de decisões.</p>
     </div>
     </div>
-    <aside class="notes"><blockquote>O ponto pedagógico aqui é a separação entre dado estático (o catálogo da ingestão) e estado mutável (o que muda durante a simulação). GameState não guarda lógica própria — ele é essencialmente um contêiner que dá aos outros módulos acesso a "quem ataca agora", "quem defende agora" e "quanto tempo resta". flip_possession(), que troca esses ponteiros a cada mudança de posse, aparece com mais detalhe no slide da máquina de estados.</blockquote></aside>
+    <aside class="notes"><blockquote>O ponto pedagógico é a separação entre dado estático (o catálogo da ingestão) e estado mutável (o que muda durante a simulação). GameState não guarda lógica própria — é um contêiner que dá aos outros módulos acesso a "quem ataca agora", "quem defende agora" e "quanto tempo resta". flip_possession() aparece com mais detalhe no slide do grafo de decisões.</blockquote></aside>
 </section>

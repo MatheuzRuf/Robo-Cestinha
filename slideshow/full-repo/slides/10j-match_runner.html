@@ -1,0 +1,43 @@
+<section class="slide" id="s-match-runner" data-title="MatchRunner: executando a partida" data-kicker="ORQUESTRAÇÃO E CONTRATO" data-budget="1:15" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine/match_runner.py · app/engine/schemas.py</div>
+    <h2 class="title">MatchRunner: <span>executando a partida</span></h2>
+    <p class="lede">MatchRunner é a camada mais alta do engine: prepara o estado, repete state_machine quarto após quarto, e devolve o objeto que qualquer consumidor externo — frontend, narrador, replay — vai ler.</p>
+
+    <div class="contracts">
+        <div class="contract card in">
+        <div class="kicker">entrada</div>
+        <p><b>home_team, away_team</b> — dois LiveTeam já com titulares definidos e posições montadas.</p>
+        <p><b>seed</b> — trava toda a aleatoriedade; mesma seed, mesma partida.</p>
+        </div>
+        <div class="contract card out">
+        <div class="kicker">saída</div>
+        <p><b>MatchLog</b> — placar final, vencedor e os quatro quartos, cada um com sua lista de posses.</p>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card slim">
+        <p><b>run_match()</b> repete quatro quartos; entre eles reinicia o relógio e zera as faltas coletivas de cada time, e a cada posse atualiza a fadiga dos dez jogadores em quadra.</p>
+        </div>
+        <div class="card slim">
+        <p><span class="tag warn">planejado</span> o loop sempre chama <b>start_next_period(is_overtime=False)</b>. O relógio já sabe montar uma prorrogação de 5 minutos, mas o orquestrador nunca aciona esse caminho — hoje toda partida termina no 4º quarto, mesmo empatada.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="kicker">o contrato aninhado de schemas.py</div>
+        <div class="master-rows">
+        <div class="mrow"><span class="mono">MatchLog</span><i>placar, vencedor, quartos, box_score, key_moments</i></div>
+        <div class="mrow"><span class="mono">QuarterLog</span><i>número do quarto + posses + placar parcial</i></div>
+        <div class="mrow"><span class="mono">PossessionLog</span><i>time, ações, resultado, pontos, duração</i></div>
+        <div class="mrow"><span class="mono">ActionLog</span><i>tipo, jogador, resultado, direção, duração — a unidade atômica do log</i></div>
+        </div>
+    </div>
+
+    <div class="playcall">
+        <span class="tag warn">planejado</span> <b>box_score</b> e <b>key_moments</b> já existem no contrato de MatchLog, mas match_runner ainda não os preenche — são o ponto de extensão esperado para agregação de estatísticas e narrativa. A API pública dessas peças fica exposta em <code>__init__.py</code>.
+    </div>
+    </div>
+    <aside class="notes"><blockquote>match_runner é orquestração fina sobre o que já foi apresentado — não introduz lógica de jogo nova. O contrato de schemas.py é o que desacopla o engine de qualquer consumidor futuro. Os planejados (prorrogação, box_score/key_moments) são fechados no slide de roadmap.</blockquote></aside>
+</section>

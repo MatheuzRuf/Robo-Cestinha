@@ -1,0 +1,37 @@
+<section class="slide" id="s-roadmap" data-title="Evolução das heurísticas" data-kicker="EVOLUÇÃO DAS HEURÍSTICAS" data-budget="1:00" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine · próximos passos da decisão</div>
+    <h2 class="title">Evolução das <span>heurísticas de decisão</span></h2>
+    <p class="lede">heuristics.py hoje combina várias variáveis por fórmula. O próximo passo natural é substituir a fórmula por um modelo treinado nos mesmos dados de jogadores.</p>
+
+    <div class="backend-diagram">
+        <div class="diagram-wrap" role="img" aria-label="Três fases de evolução das heurísticas de decisão: fase 1 quase aleatória, fase 2 com múltiplas variáveis (atual), fase 3 com machine learning treinado nos dados de jogadores.">
+<pre class="mermaid">
+flowchart LR
+  F1["Fase 1<br/><small>pesos uniformes,<br/>validar o grafo</small>"] --> F2["Fase 2 — atual<br/><small>usage_rate, steal_rate,<br/>fadiga, clutch_factor</small>"]
+  F2 --> F3["Fase 3<br/><small>modelo treinado com<br/>dados de jogadores</small>"]
+
+  classDef current stroke:#e2661a,stroke-width:3px;
+  class F2 current
+</pre>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card">
+        <div class="kicker">o que muda na fase 3</div>
+        <p>Hoje, <b>resolve_shot()</b> combina distância, aproveitamento base, fadiga e clutch com pesos escolhidos à mão. Na fase 3, um modelo treinado sobre os mesmos atributos já catalogados na ingestão substituiria essa combinação por uma probabilidade aprendida.</p>
+        <p class="dim">Só heuristics.py muda de implementação — grid, entities, clock e state_machine continuam recebendo a mesma assinatura de função.</p>
+        </div>
+        <div class="card">
+        <div class="kicker">outros planejados já mapeados</div>
+        <ul class="check">
+            <li><b>resolve_rebound()</b> — pronta, ainda não chamada.</li>
+            <li><b>Prorrogação</b> — suportada pelo relógio, nunca acionada pelo orquestrador.</li>
+            <li><b>box_score / key_moments</b> — já existem no contrato de MatchLog, ainda não preenchidos.</li>
+        </ul>
+        </div>
+    </div>
+    </div>
+    <aside class="notes"><blockquote>Slide de fechamento da seção do engine. O contrato de funções em heuristics.py já isola a decisão do resto do pipeline, então trocar fórmula por modelo treinado na fase 3 não deveria exigir tocar em outro módulo do engine. Os outros planejados (rebote, prorrogação, box_score) são extensões de fluxo, separadas da evolução de decisão.</blockquote></aside>
+</section>

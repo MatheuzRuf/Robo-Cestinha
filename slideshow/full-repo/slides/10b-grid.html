@@ -1,8 +1,8 @@
-<section class="slide" id="s-grid" data-title="grid.py" data-kicker="MODELO ESPACIAL" data-budget="1:15" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+<section class="slide" id="s-grid" data-title="Quadra: grade de 50 células" data-kicker="MODELO ESPACIAL" data-budget="1:15" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
     <div class="kicker">app/engine/grid.py</div>
-    <h2 class="title">A quadra vira <span>50 células</span> discretas</h2>
-    <p class="lede">Em vez de coordenadas contínuas em pés, a NBA de 94×50 é discretizada em uma grade 10×5 — simples o bastante para sortear direções, e precisa o bastante para decidir arremessos de dois ou três pontos.</p>
+    <h2 class="title">A quadra como <span>grade de 50 células</span></h2>
+    <p class="lede">Em vez de coordenadas contínuas em pés, a quadra de 94×50 é discretizada em uma grade 10×5 — simples o bastante para sortear direções, precisa o bastante para decidir arremessos de dois ou três pontos.</p>
 
     <div class="two-col">
         <div class="card">
@@ -19,10 +19,10 @@ y=0  · · · · · · · · · ·
         <div class="card">
         <div class="kicker">o que o módulo garante</div>
         <ul class="check">
-            <li><b>CourtPosition</b> é um dataclass imutável: toda vez que alguém se move, a posição resultante é automaticamente limitada às 50 células — não existe "fora da quadra".</li>
+            <li><b>CourtPosition</b> é um dataclass imutável: qualquer movimento gera uma posição já limitada às 50 células — não existe posição fora da quadra.</li>
             <li><b>8 direções + IDLE</b>, cada uma com um vetor de deslocamento fixo (N, NE, E, SE, S, SW, W, NW).</li>
-            <li><b>distance_to()</b> mede a distância euclidiana até qualquer ponto — é a mesma função que decide se um arremesso vale dois ou três pontos.</li>
-            <li><b>get_initial_center_positions()</b> posiciona o quinteto titular de cada time no início da posse (armador, alas, ala-pivô e pivô).</li>
+            <li><b>distance_to()</b> mede a distância euclidiana até qualquer ponto — é a mesma função usada para decidir dois ou três pontos.</li>
+            <li><b>get_initial_center_positions()</b> posiciona o quinteto titular de cada time no início da posse.</li>
         </ul>
         </div>
     </div>
@@ -30,6 +30,7 @@ y=0  · · · · · · · · · ·
     <div class="playcall big">
         <b>distância ≥ 3,0 células</b> <span class="arrow">=</span> <b>arremesso de três</b>
     </div>
+    <p class="dim">Exemplo: um armador em (4, 2) que dribla três casas em direção ao Rim B chega em (7, 2) — a 2,0 células da cesta, ainda dentro do garrafão. Uma célula a mais e o mesmo lance já vira arremesso de três.</p>
     </div>
-    <aside class="notes"><blockquote>Deixar claro que a grade é uma simplificação deliberada: não há malha fina de coordenadas em pés, e sim 50 células que já embutem onde fica o garrafão e a linha de três. O clamp automático do CourtPosition é o detalhe de engenharia que vale destacar — ele elimina uma classe inteira de bugs de "jogador fora dos limites" só pela forma como o dataclass foi desenhado.</blockquote></aside>
+    <aside class="notes"><blockquote>A grade é uma simplificação deliberada: não há malha fina em pés, e sim 50 células que já embutem onde fica o garrafão e a linha de três. O clamp automático do CourtPosition elimina uma classe inteira de bugs de "jogador fora dos limites" só pela forma como o dataclass foi desenhado.</blockquote></aside>
 </section>

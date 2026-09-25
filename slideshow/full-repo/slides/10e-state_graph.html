@@ -1,0 +1,46 @@
+<section class="slide" id="s-state-graph" data-title="Grafo de decisões da posse" data-kicker="GRAFO DE DECISÕES" data-budget="1:15" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine/state_machine.py + heuristics.py</div>
+    <h2 class="title">O grafo de decisões de <span>uma posse</span></h2>
+    <p class="lede">Cada posse percorre um grafo de estados, do salto de bola até um resultado final. heuristics.py define o peso de cada aresta; state_machine.py percorre o grafo.</p>
+
+    <div class="backend-diagram">
+        <div class="diagram-wrap" role="img" aria-label="Grafo de decisões de uma posse: escolha do condutor, decisão entre PASS, MOVE e SHOOT, e os estados terminais de troca de posse ou cesta convertida.">
+<pre class="mermaid">
+flowchart TB
+  HANDLER["Escolhe o condutor<br/><small>select_ball_handler()</small>"] --> DECIDE{"decide_handler_action()"}
+
+  DECIDE -->|PASS| PASSOUT{"Passe chega?"}
+  PASSOUT -->|sim| HANDLER
+  PASSOUT -->|"não, interceptado"| TURNOVER
+
+  DECIDE -->|MOVE| MOVEOUT{"Resultado do drible"}
+  MOVEOUT -->|"segura a bola / falta sofrida"| DECIDE
+  MOVEOUT -->|desarmado| TURNOVER
+
+  DECIDE -->|SHOOT| SHOTOUT{"Aproveitamento"}
+  SHOTOUT -->|convertido| SCORE["+2 / +3<br/>flip_possession()"]
+  SHOTOUT -->|errado| REBOUND["rebote<br/><small>slide seguinte</small>"]
+
+  REBOUND -.-> TURNOVER
+  TURNOVER["Troca de posse<br/>flip_possession()"] --> HANDLER
+
+  classDef terminalNode stroke:#e2661a,stroke-width:2px;
+  class SCORE,TURNOVER terminalNode
+  classDef plannedNode stroke-dasharray: 4 3,stroke:#999,color:#999;
+  class REBOUND plannedNode
+</pre>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="card slim">
+        <p>As perguntas do grafo ("passe chega?", "aproveitamento") não têm resposta fixa: cada uma é um sorteio ponderado pelos atributos de quem está em quadra, dos dois lados.</p>
+        </div>
+        <div class="card slim">
+        <p><b>Exemplo:</b> Duda, armador dos Tubarões, recebe a bola em <code>HANDLER</code>. Com 22s de posse, <code>DECIDE</code> favorece PASS ou MOVE. Se ele driblar e segurar a bola, o grafo volta para <code>DECIDE</code> — a posse continua até um estado terminal.</p>
+        </div>
+    </div>
+    </div>
+    <aside class="notes"><blockquote>Este é o mapa da seção: state_machine.py não implementa esse grafo como uma estrutura de dados — é um laço com if/elif que caminha sobre esses mesmos estados. Os próximos slides abrem cada aresta (ação do condutor, passe, drible, arremesso, rebote) com o peso real por trás do sorteio.</blockquote></aside>
+</section>

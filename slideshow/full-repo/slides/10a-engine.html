@@ -1,8 +1,8 @@
-<section class="slide" id="s-engine-overview" data-title="Arquitetura do Engine" data-kicker="ENGINE DE SIMULAÇÃO" data-budget="1:00" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+<section class="slide" id="s-engine-overview" data-title="Engine de simulação" data-kicker="ENGINE DE SIMULAÇÃO" data-budget="1:00" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
-    <div class="kicker">app/engine · seis módulos, um contrato de saída</div>
-    <h2 class="title">Da grade da quadra ao <span>log estruturado</span> da partida</h2>
-    <p class="lede">O engine transforma dois elencos e uma semente aleatória em uma partida completa, posse a posse, sem depender de nenhuma interface gráfica.</p>
+    <div class="kicker">app/engine · seis módulos, um pipeline único</div>
+    <h2 class="title">Engine de simulação: <span>visão geral</span></h2>
+    <p class="lede">O engine recebe dois elencos e uma seed e devolve uma partida completa, posse a posse, sem depender de interface gráfica.</p>
 
     <div class="card">
         <div class="chain compact">
@@ -28,8 +28,8 @@
     </div>
 
     <div class="quote-banner">
-        <p>Cada módulo resolve <b>uma</b> pergunta: onde o jogador está, quem ele é, o que ele decide fazer, e o que isso muda no placar e no relógio.</p>
+        <p>Cada módulo resolve um problema: onde o jogador está, quem ele é, o que ele decide fazer, e o que isso muda no placar e no relógio. Heurísticas e o grafo de decisões aparecem em detalhe nos slides seguintes.</p>
     </div>
     </div>
-    <aside class="notes"><blockquote>Slide de transição para a seção do engine. Passar rápido pelos seis módulos como uma cadeia de responsabilidade única — cada um ganha seu próprio slide a seguir, então não entrar em detalhe aqui. Vale enfatizar o determinismo: a mesma seed sempre produz a mesma partida, o que é a base para comparar heurísticas e depurar resultados.</blockquote></aside>
+    <aside class="notes"><blockquote>Slide de transição para a seção do engine. Passar rápido pelos seis módulos — heurísticas e o grafo de decisão têm vários slides próprios a seguir. Vale enfatizar o determinismo: a mesma seed sempre produz a mesma partida, o que é a base para comparar heurísticas e depurar resultados.</blockquote></aside>
 </section>

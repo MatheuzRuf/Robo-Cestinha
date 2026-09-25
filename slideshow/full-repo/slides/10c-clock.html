@@ -1,8 +1,8 @@
-<section class="slide" id="s-clock" data-title="clock.py" data-kicker="TEMPO DE JOGO" data-budget="1:00" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+<section class="slide" id="s-clock" data-title="Relógio de partida e de posse" data-kicker="TEMPO DE JOGO" data-budget="1:00" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
     <div class="kicker">app/engine/clock.py</div>
-    <h2 class="title">Dois relógios <span>correndo juntos</span></h2>
-    <p class="lede">Toda ação da simulação tem que respeitar dois limites ao mesmo tempo: o tempo que falta no quarto e o tempo que falta na posse atual.</p>
+    <h2 class="title">Relógio de partida e <span>relógio de posse</span></h2>
+    <p class="lede">Toda ação da simulação respeita dois limites ao mesmo tempo: o tempo que falta no quarto e o tempo que falta na posse atual.</p>
 
     <div class="stats">
         <div class="stat"><b>4×12min</b><span>quartos regulares</span></div>
@@ -14,7 +14,7 @@
     <div class="gate-grid">
         <div class="card">
         <div class="kicker">a regra do tick()</div>
-        <p>A cada ação, o motor avança os dois relógios pelo mesmo tanto de tempo — mas nunca além de quem zerar primeiro.</p>
+        <p>A cada ação, os dois relógios avançam pelo mesmo tanto de tempo — mas nunca além de quem zerar primeiro.</p>
         <p>Se o relógio de posse chega a zero <b>antes</b> do relógio do quarto, é violação de 24 segundos: a posse muda de mãos automaticamente.</p>
         </div>
         <div class="terminal">
@@ -32,9 +32,9 @@
         <p><b>reset_for_new_possession()</b> — volta para 24s, ou 14s se a posse nasceu de um rebote ofensivo; nunca mais do que o tempo restante no quarto.</p>
         </div>
         <div class="card slim">
-        <p><b>start_next_period()</b> — soma o próximo quarto e já sabe montar uma prorrogação de 5 minutos. <span class="tag warn">planejado</span> hoje nenhum chamador aciona esse caminho — ver o slide de orquestração.</p>
+        <p><b>start_next_period()</b> — inicia o próximo quarto e sabe montar uma prorrogação de 5 minutos. <span class="tag warn">planejado</span> hoje nenhum chamador aciona esse caminho — ver o slide de orquestração.</p>
         </div>
     </div>
     </div>
-    <aside class="notes"><blockquote>O ponto central é que tick() sempre respeita o menor dos dois relógios — isso é o que faz o fim de quarto "engolir" uma posse sem gerar uma violação de 24 segundos indevida. Vale plantar a semente aqui de que a prorrogação já existe no relógio, mas ninguém ainda a aciona; isso é retomado no slide do match_runner.</blockquote></aside>
+    <aside class="notes"><blockquote>O ponto central é que tick() sempre respeita o menor dos dois relógios — isso faz o fim de quarto "engolir" uma posse sem gerar uma violação de 24 segundos indevida. A prorrogação já existe no relógio, mas ninguém ainda a aciona; retomado no slide do match_runner.</blockquote></aside>
 </section>

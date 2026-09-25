@@ -1,0 +1,26 @@
+<section class="slide" id="s-heuristics-pass" data-title="Resolução do passe" data-kicker="HEURÍSTICAS · PASSE" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">resolve_pass_teammate() · resolve_pass_outcome()</div>
+    <h2 class="title">Resolução do <span>passe</span></h2>
+    <p class="lede">O companheiro que recebe o passe é sorteado pelo usage_rate de cada um. Se o passe chega depende do turnover_rate de quem passa contra o steal_rate de quem defende.</p>
+
+    <div class="backend-diagram">
+        <div class="diagram-wrap" role="img" aria-label="Fluxo de resolução do passe: escolha do companheiro, verificação de interceptação, e resultado de novo condutor ou turnover.">
+<pre class="mermaid">
+flowchart TD
+  P1["Escolhe companheiro<br/><small>peso: usage_rate</small>"] --> P2{"Interceptado?"}
+  P2 -->|não| P3["Novo condutor<br/>posse continua"]
+  P2 -->|sim| P4["Turnover"]
+</pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <p>A defesa entra na conta pela média do <b>steal_rate</b> dos cinco jogadores em quadra — não de um único adversário.</p>
+        <p class="dim">Exemplo: Duda tenta lançar para o pivô Rocha. Se os Águias tiverem um roubador de bola forte em quadra, o mesmo passe fica mais arriscado — sem nenhuma mudança na estatística de Duda.</p>
+    </div>
+
+    <div class="formula">p(turnover) = clamp(0,04 a 0,35; turnover_rate × 0,7 + steal_médio × 1,5)</div>
+    </div>
+    <aside class="notes"><blockquote>O ponto é que a defesa não é decorativa: os atributos dos cinco jogadores adversários em quadra entram diretamente na conta de cada passe.</blockquote></aside>
+</section>
