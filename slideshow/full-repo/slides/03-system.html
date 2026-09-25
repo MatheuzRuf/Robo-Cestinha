@@ -2,10 +2,15 @@
       <div class="slide-inner">
         <div class="kicker">03 · Visão geral da arquitetura</div>
         <h2 class="title">Visão geral <span>da arquitetura</span></h2>
-        <div class="diagram-wrap architecture-diagram" role="img" aria-label="O Backend agrupa endpoints, serviços de domínio, repositórios, PostgreSQL e engine de simulação. O Frontend se comunica com os endpoints por REST e SSE. A ingestão offline fica fora do Backend e carrega o catálogo processado no banco.">
+        <div class="diagram-wrap architecture-diagram" role="img" aria-label="O Backend agrupa endpoints, serviços de domínio, repositórios, PostgreSQL e engine de simulação. Os serviços do Frontend se comunicam com os endpoints por REST e SSE e alimentam os componentes da interface. A ingestão offline fica fora do Backend e carrega o catálogo processado no banco.">
 <pre class="mermaid">
 flowchart TB
-  FE["Frontend React"]
+  subgraph FRONTEND["Frontend React"]
+    direction TB
+    FESVC["Services<br/><small>API client · hooks de dados</small>"]
+    FECOMP["Componentes<br/><small>Home · MatchBroadcast · Court · Scoreboard</small>"]
+    FESVC --> FECOMP
+  end
 
   subgraph BACKEND["Backend"]
     direction TB
@@ -19,7 +24,7 @@ flowchart TB
     SVC <-->|entrada da partida · stream de eventos| ENGINE
   end
 
-  FE <-->|REST · SSE| API
+  FESVC <-->|REST · SSE| API
 
   subgraph OFFLINE["Preparação do catálogo · offline"]
     direction LR
@@ -34,7 +39,7 @@ flowchart TB
   classDef storage stroke:#4c9a6a,stroke-width:2px;
   classDef engine stroke:#f2b705,stroke-width:2px;
   classDef offline stroke:#a78bfa,stroke-width:2px;
-  class FE,API frontend
+  class FESVC,FECOMP,API frontend
   class DB storage
   class ENGINE engine
   class SOURCES,ING,CATALOG offline

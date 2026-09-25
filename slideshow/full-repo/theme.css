@@ -10,15 +10,15 @@
   max-height: clamp(200px, calc(100vh - 500px), 600px) !important;
 }
 .diagram-wrap.architecture-diagram .mermaid svg {
-  width: min(100%, 760px) !important;
-  max-width: min(100%, 760px) !important;
-  max-height: min(68vh, 620px) !important;
+  width: min(100%, 1100px) !important;
+  max-width: min(100%, 1100px) !important;
+  max-height: min(82vh, 860px) !important;
 }
 @media (max-height: 800px) {
   .diagram-wrap.architecture-diagram .mermaid svg {
-    width: min(100%, 500px) !important;
-    max-width: min(100%, 500px) !important;
-    max-height: min(calc(100vh - 430px), 400px) !important;
+    width: min(100%, 800px) !important;
+    max-width: min(100%, 800px) !important;
+    max-height: min(calc(100vh - 260px), 620px) !important;
   }
 }
 .diagram-wrap .mermaid small { font-size: 0.78em; opacity: 0.82; }
