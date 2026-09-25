@@ -2,37 +2,72 @@
       <div class="slide-inner">
         <div class="kicker">07 · Backend · dados</div>
         <h2 class="title">Backend: <span>modelo de dados</span></h2>
-        <div class="diagram-wrap" role="img" aria-label="Team e Player formam o catálogo global; Session agrupa User e Match; Match referencia a próxima Match do bracket">
+        <div class="diagram-wrap" role="img" aria-label="Modelo atual de Team, Player, Session, User e Match, mais MatchEvent e MatchFrameChunk planejados para persistir eventos e frames">
 <pre class="mermaid">
 erDiagram
-  TEAM ||--o{ PLAYER : "1 ── 0..N"
-  SESSION ||--o{ USER : "1 ── 0..N"
-  SESSION ||--o{ MATCH : "1 ── 0..N"
-  MATCH ||--o| MATCH : "next_match_id"
+  TEAM ||--o{ PLAYER : roster
+  TEAM o|--o{ USER : claimed_by
+  TEAM o|--o{ MATCH : "home / away / winner"
+  SESSION ||--o{ USER : participants
+  SESSION o|--o| USER : owner_id
+  SESSION ||--o{ MATCH : bracket
+  MATCH ||--o| MATCH : next_match
+  MATCH ||--o{ MATCH_EVENT : "planned events"
+  MATCH ||--o{ MATCH_FRAME_CHUNK : "planned frames"
   TEAM {
-    string id PK
+    uuid id PK
     string name
   }
   PLAYER {
-    string team_id FK
+    uuid id PK
+    uuid team_id FK
+    string name
     json attributes
   }
   SESSION {
-    string hash PK
-    string owner_id
+    uuid id PK
+    string hash UK
+    uuid owner_id FK
   }
   USER {
+    uuid id PK
+    uuid session_id FK
     int join_sequence
-    string team_id "opcional"
+    string name
+    uuid team_id FK
   }
   MATCH {
-    string round
+    uuid id PK
+    uuid session_id FK
+    int round
+    int slot_in_round
+    uuid home_team_id FK
+    uuid away_team_id FK
+    uuid next_match_id FK
+    string next_match_slot
     string status
-    json score
+    int home_score
+    int away_score
+    uuid winner_team_id FK
+  }
+  MATCH_EVENT {
+    uuid id PK
+    uuid match_id FK
+    int sequence
+    string game_clock
+    string type
+    json payload
+    datetime created_at
+  }
+  MATCH_FRAME_CHUNK {
+    uuid id PK
+    uuid match_id FK
+    int chunk_index
+    json frames
   }
 </pre>
         </div>
-        <div class="callout"><b>Limite atual:</b> MatchEvent e MatchFrameChunk ainda não são tabelas/modelos implementados.</div>
+        <div class="callout"><b>Implementado:</b> Team, Player, Session, User e Match. <b>Planejado:</b> MatchEvent (eventos da partida) e MatchFrameChunk (frames em lotes); ainda sem modelos/migração no banco.</div>
       </div>
-      <aside class="notes"><blockquote>O catálogo de times e jogadores é global; jogadores apontam para times e guardam atributos em JSON. User e Match pertencem a uma Session. O bracket é representável pela referência de Match para outra Match, mas o fluxo de sessão não cria essas linhas atualmente. Eventos semânticos e lotes de frames ainda são desenho futuro, não parte do modelo implementado.</blockquote></aside>
+      <aside class="notes"><blockquote>Team e Player formam o catálogo global. Player guarda nome e atributos em JSON; User pode reivindicar um Team, e Session aponta para seu usuário proprietário. Match registra a posição no bracket, os times da casa e visitante, a próxima partida e o slot de avanço, status, placar separado e vencedor. MatchEvent é pensado para eventos semânticos em sequência, com relógio, tipo, payload e data de criação. MatchFrameChunk agrupa frames JSON por índice para animação e replay. Esses dois últimos ainda são planejados: não existem como modelos ou tabelas implementados, por isso aparecem marcados no diagrama.</blockquote></aside>
     </section>

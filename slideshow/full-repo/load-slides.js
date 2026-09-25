@@ -7,7 +7,7 @@
     '03-system.html',
     '04-flows.html',
     '05-frontend.html',
-    '06-frontend-flow.html',
+    // '06-frontend-flow.html',
     '07-backend.html',
     '08-model.html',
     '09-patterns.html',
@@ -23,7 +23,6 @@
     'a1-shrinkage.html',
     'a2-action-probabilities.html',
     'a3-heuristic-limitations.html',
-    'a4-references.html',
   ];
   const baseUrl = new URL('./', document.currentScript.src);
   const track = document.getElementById('track');
@@ -41,7 +40,7 @@
   async function start() {
     const fragments = await Promise.all(slideFiles.map(async (file) => {
       const url = new URL(`slides/${file}`, baseUrl);
-      const response = await fetch(url);
+      const response = await fetch(url, { cache: 'no-store' });
       if (!response.ok) throw new Error(`Could not load ${file}: ${response.status}`);
       return response.text();
     }));

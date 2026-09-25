@@ -2,30 +2,38 @@
       <div class="slide-inner">
         <div class="kicker">04 · Frontend · composição</div>
         <h2 class="title">Frontend: <span>páginas e componentes</span></h2>
-        <div class="diagram-wrap" role="img" aria-label="App.tsx escolhe entre Home e MatchBroadcast, que usam componentes compartilhados e de transmissão; a transmissão consome useGameFrames a partir do mockEngine">
+        <div class="diagram-wrap" role="img" aria-label="O App direciona para Home, Bracket Tree, MatchBroadcast ou BracketTeam. As páginas usam componentes privados e componentes compartilhados. Os serviços Session, Player, Team, Match e Bracket comunicam-se com a API por REST e SSE e fornecem dados e ações aos componentes da interface.">
 <pre class="mermaid">
 flowchart TB
-  APP["App.tsx<br/><small>seleção por pathname</small>"]
-  HOME["Home<br/><small>entrada de sessão · mock</small>"]
-  BCAST["MatchBroadcast<br/><small>quadra · placar · feeds</small>"]
-  SHARED["Componentes compartilhados<br/><small>Button · Card · Modal · AppShell</small>"]
-  BCOMP["Componentes da transmissão<br/><small>Court · Scoreboard · PlayByPlay</small>"]
-  MOCK["useGameFrames → mockEngine<br/><small>frames locais para animar a quadra</small>"]
+  subgraph FRONTEND["Frontend React"]
+    direction TB
+    APP["App · navegação"]
 
-  APP --> HOME
-  APP --> BCAST
-  HOME --> SHARED
-  BCAST --> SHARED
-  BCAST --> BCOMP
-  BCOMP --> MOCK
+    subgraph UI["Componentes da interface"]
+      direction TB
+      PAGES["Páginas<br/><small>Home · Bracket Tree · MatchBroadcast · BracketTeam</small>"]
+      PRIVATE["Componentes privados<br/><small>específicos de cada página</small>"]
+      SHARED["Componentes compartilhados<br/><small>AppShell · Button · Card · Modal</small>"]
+    end
 
-  classDef shared stroke:#22d3ee,stroke-width:2px;
-  classDef mock stroke:#f2b705,stroke-width:2px;
-  class SHARED,BCOMP shared
-  class MOCK mock
+    SERVICES["Services<br/><small>Session · Player · Team · Match · Bracket</small>"]
+
+    APP --> PAGES
+    PAGES --> PRIVATE
+    PAGES --> SHARED
+    SERVICES -->|dados e ações| UI
+  end
+
+  API["Backend API<br/><small>REST · SSE</small>"]
+  SERVICES <-->|REST · SSE| API
+
+  classDef frontend stroke:#22d3ee,stroke-width:2px;
+  classDef service stroke:#a78bfa,stroke-width:2px;
+  class PAGES,PRIVATE,SHARED frontend
+  class SERVICES,API service
 </pre>
         </div>
-        <div class="callout"><b>Observação:</b> o roteamento atual é uma verificação de caminho, não React Router; componentes da página ainda não buscam dados do backend.</div>
+        <div class="callout"><b>Separação por responsabilidade:</b> páginas organizam seus componentes próprios, reutilizam a base compartilhada e recebem e pedem dados pelos services.</div>
       </div>
-      <aside class="notes"><blockquote>O frontend separa duas páginas e um conjunto de componentes reaproveitáveis. A Home e a transmissão são páginas distintas; a App escolhe qual renderizar a partir do pathname. Na transmissão, o hook recebe frames do mock engine e atualiza componentes visuais. O desenho mostra a organização atual, não a estrutura futura recomendada em AGENTS.md.</blockquote></aside>
+      <aside class="notes"><blockquote>A interface é composta em três grupos: páginas, componentes privados por página e componentes compartilhados. O App direciona para Home, Bracket Tree, MatchBroadcast ou BracketTeam; as páginas compõem os elementos específicos de cada fluxo e também usam a base compartilhada. Os services de Session, Player, Team, Match e Bracket concentram as operações do domínio. Eles se comunicam com a API por REST e recebem os eventos da transmissão por SSE; os dados e ações alimentam os componentes da interface.</blockquote></aside>
     </section>

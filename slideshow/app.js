@@ -30,18 +30,18 @@
       },
       flowchart: { useMaxWidth: false, curve: 'basis', htmlLabels: true, padding: 30, nodeSpacing: 90, rankSpacing: 110 },
       state: { useMaxWidth: false },
-      er: { useMaxWidth: false, fontSize: 18, entityPadding: 18, minEntityWidth: 150, minEntityHeight: 90 },
+      er: { useMaxWidth: false, fontSize: 24, entityPadding: 28, minEntityWidth: 190, minEntityHeight: 110 },
       themeCSS: `
-        .node small, .nodeLabel small { color: #a69a87; font-size: 20px; }
-        .edgeLabel { color: #a69a87 !important; background-color: #14100d !important; font-size: 20px !important; }
-        .er.relationshipLabel { fill: #a69a87; font-size: 20px; }
+        .node small, .nodeLabel small { color: #a69a87; }
+        .edgeLabel { color: #a69a87 !important; background-color: #14100d !important; font-size: 15px !important; }
+        .er.relationshipLabel { fill: #a69a87; font-size: 18px; }
         .er.entityBox { fill: #2a221a; }
         .er.entityLabel { fill: #f0e6d2; font-size: 20px; }
         .er.attributeBoxOdd { fill: #1f1913; }
         .er.attributeBoxEven { fill: #241d16; }
-        text { font-size: 25px; }
-        .nodeLabel, .edgeLabel, .cluster-label { font-size: 25px; }
-      `,
+        text { font-size: 16px; }
+        .nodeLabel, .edgeLabel, .cluster-label { font-size: 16px; }
+`,
     });
   }
 

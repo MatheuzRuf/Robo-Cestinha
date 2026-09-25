@@ -6,8 +6,8 @@
 .diagram-wrap svg {
   width: auto !important;
   height: auto !important;
-  max-width: min(94%, 1180px) !important;
-  max-height: clamp(200px, calc(100vh - 500px), 600px) !important;
+  max-width: min(96%, 1500px) !important;
+  max-height: clamp(200px, calc(100vh - 400px), 780px) !important;
 }
 .diagram-wrap.architecture-diagram .mermaid svg {
   width: min(100%, 1100px) !important;
@@ -343,7 +343,7 @@
 }
 
 @media (max-width: 640px) {
-  body.full-repo-deck .slide { padding: 176px var(--space-4) 84px; }
+  body.full-repo-deck .slide { padding: 160px var(--space-4) 84px; }
   body.full-repo-deck .slide-inner { width: 100%; min-width: 0; }
   body.full-repo-deck .slide .title { font-size: clamp(1.55rem, 7vw, 2rem); overflow-wrap: anywhere; }
   body.full-repo-deck .slide .mega { font-size: clamp(2.5rem, 12vw, 3.25rem); overflow-wrap: anywhere; }
