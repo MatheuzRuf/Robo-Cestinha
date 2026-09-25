@@ -27,18 +27,18 @@ fetch stage, and only when a file is missing or `--refresh` is passed.
 
 ```
 ┌──────────────────────────  Stage 1: fetch.py  ──────────────────────────┐
-│ stats.nba.com (nba-api) ──throttled, retried──► data/raw/2025_26/*.csv │
-│ Basketball-Reference    ──manually saved html─► data/raw/2025_26/      │
-│                          bballref_nba_2026_totals.html (Cloudflare)    │
+│ stats.nba.com (nba-api) ──throttled, retried──► data/raw/2025_26/*.csv  │
+│ Basketball-Reference    ──manually saved html─► data/raw/2025_26/       │
+│                          bballref_nba_2026_totals.html (Cloudflare)     │
 └──────────────────────────────────┬──────────────────────────────────────┘
                                    ▼
 ┌──────────────────────────  Stage 2: derive.py  ─────────────────────────┐
-│ _build_master      : one row per player (identity + raw totals)        │
-│ _team_lookup       : per-team aggregates + pace/ratings                │
-│ _derive_attributes : the 12 attributes (see statistics.md)             │
-│ _build_players_json / _build_teams_json                                │
-│ schemas.validate_processed_output()   ◄── CONTRACT GATE, before writes │
-│ _quality_report    : data_quality.json                                 │
+│ _build_master      : one row per player (identity + raw totals)         │
+│ _team_lookup       : per-team aggregates + pace/ratings                 │
+│ _derive_attributes : the 12 attributes (see statistics.md)              │
+│ _build_players_json / _build_teams_json                                 │
+│ schemas.validate_processed_output()   ◄── CONTRACT GATE, before writes  │
+│ _quality_report    : data_quality.json                                  │
 └──────────────────────────┬──────────────────────────────────────────────┘
                            ▼
                data/processed/  (players.json, teams.json, …)
