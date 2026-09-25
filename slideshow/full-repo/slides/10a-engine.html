@@ -1,0 +1,35 @@
+<section class="slide" id="s-engine-overview" data-title="Arquitetura do Engine" data-kicker="ENGINE DE SIMULAÇÃO" data-budget="1:00" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine · seis módulos, um contrato de saída</div>
+    <h2 class="title">Da grade da quadra ao <span>log estruturado</span> da partida</h2>
+    <p class="lede">O engine transforma dois elencos e uma semente aleatória em uma partida completa, posse a posse, sem depender de nenhuma interface gráfica.</p>
+
+    <div class="card">
+        <div class="chain compact">
+        <div class="chain-node"><div class="chain-orb">grid.py</div><span class="chain-sub">espaço</span></div>
+        <span class="arrow">→</span>
+        <div class="chain-node"><div class="chain-orb">entities.py</div><span class="chain-sub">estado</span></div>
+        <span class="arrow">→</span>
+        <div class="chain-node"><div class="chain-orb">heuristics.py</div><span class="chain-sub">decisão</span></div>
+        <span class="arrow">→</span>
+        <div class="chain-node hl"><div class="chain-orb">state_machine.py</div><span class="chain-sub">posse</span></div>
+        <span class="arrow">→</span>
+        <div class="chain-node"><div class="chain-orb">match_runner.py</div><span class="chain-sub">partida</span></div>
+        <span class="arrow">→</span>
+        <div class="chain-node"><div class="chain-orb">schemas.py</div><span class="chain-sub">contrato</span></div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat"><b>4</b><span>quartos por partida</span></div>
+        <div class="stat"><b>24s</b><span>relógio de posse</span></div>
+        <div class="stat"><b>50</b><span>células na quadra</span></div>
+        <div class="stat"><b>1</b><span>seed → 1 partida reprodutível</span></div>
+    </div>
+
+    <div class="quote-banner">
+        <p>Cada módulo resolve <b>uma</b> pergunta: onde o jogador está, quem ele é, o que ele decide fazer, e o que isso muda no placar e no relógio.</p>
+    </div>
+    </div>
+    <aside class="notes"><blockquote>Slide de transição para a seção do engine. Passar rápido pelos seis módulos como uma cadeia de responsabilidade única — cada um ganha seu próprio slide a seguir, então não entrar em detalhe aqui. Vale enfatizar o determinismo: a mesma seed sempre produz a mesma partida, o que é a base para comparar heurísticas e depurar resultados.</blockquote></aside>
+</section>

@@ -1,0 +1,34 @@
+<section class="slide" id="s-state-machine" data-title="state_machine.py" data-kicker="MÁQUINA DE ESTADOS" data-budget="1:30" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">app/engine/state_machine.py</div>
+    <h2 class="title">Do salto de bola até o <span>fim da posse</span></h2>
+    <p class="lede">StateMachine.resolve_possession() é o laço que costura grid, entities e heuristics em uma única posse — e devolve um log estruturado no fim.</p>
+
+    <div class="pipeline">
+        <div class="stage">
+        <div class="stage-head"><span class="stage-num">1</span><b>Escolha do condutor</b></div>
+        <p class="dim">Se a posse ainda não tem um jogador com a bola, select_ball_handler() sorteia um entre os cinco em quadra, ponderado pelo usage_rate de cada um.</p>
+        </div>
+        <div class="pipe-arrow"><span class="arrow">↓</span></div>
+        <div class="stage">
+        <div class="stage-head"><span class="stage-num">2</span><b>Decisão da ação</b></div>
+        <div class="stage-rows inline-flow">
+            <div class="fnode src"><b>PASS</b><span>troca de condutor, ou interceptação encerra a posse</span></div>
+            <div class="fnode gate"><b>MOVE</b><span>avança na grade, ou perde a bola para a defesa</span></div>
+            <div class="fnode dst"><b>SHOOT</b><span>converte ou erra — sempre encerra a posse</span></div>
+        </div>
+        </div>
+        <div class="pipe-arrow"><span class="arrow">↓</span></div>
+        <div class="stage">
+        <div class="stage-head"><span class="stage-num">3</span><b>Relógio e violação</b></div>
+        <p class="dim">Cada ação consome o relógio de posse. Se ele zerar antes do relógio do quarto, a ação vira uma violação de 24 segundos e a posse muda de mãos.</p>
+        </div>
+        <div class="pipe-arrow"><span class="arrow">↓</span></div>
+        <div class="stage">
+        <div class="stage-head"><span class="stage-num">4</span><b>Fim da posse</b></div>
+        <p class="dim">O laço se repete até cesta convertida, perda de bola ou fim de quarto. Cada ação vira um ActionLog; a posse inteira vira um PossessionLog.</p>
+        </div>
+    </div>
+    </div>
+    <aside class="notes"><blockquote>O fio condutor é que resolve_possession() não decide nada sozinha — ela apenas orquestra o que heuristics.py decide e traduz isso em mudanças de estado (posição, placar, relógio, posse). Bom momento para reforçar o ponto do slide anterior: hoje um arremesso errado não passa por resolve_rebound(), a posse simplesmente troca de mãos.</blockquote></aside>
+</section>
