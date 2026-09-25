@@ -6,9 +6,9 @@
 
     <div class="gate-grid">
         <div class="card">
-        <div class="kicker">Lógica de decremento seguro</div>
-        <p>O método <code>tick(duration_s)</code> avança o tempo limitando o consumo à menor fronteira disponível: tempo restante da posse ou tempo restante do quarto.</p>
-        <p>Uma violação de 24s é disparada apenas se o relógio de posse atingir zero e o relógio do quarto for <code>> 0</code>.</p>
+        <div class="kicker">Lógica de decremento</div>
+        <p>O método <code>tick(duration_s)</code> avança o tempo de forma limitada ao tempo restante da posse ou ao tempo restante do quarto.</p>
+        <p>Uma violação de 24s é disparada apenas se o relógio de posse (<i>shot clock</i>) atingir zero e o relógio do quarto for <code>> 0</code>.</p>
         </div>
         <div class="terminal">
         <div class="terminal-head"><span class="chip-tiny">Código base (tick)</span></div>
