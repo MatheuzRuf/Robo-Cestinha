@@ -2,14 +2,14 @@
     <div class="slide-inner">
     <div class="kicker">app/engine/entities.py</div>
     <h2 class="title">Contêiner de Estado: <span>GameState</span></h2>
-    <p class="lede">Separa as estatísticas estáticas do catálogo dos atributos mutáveis em tempo de simulação (fadiga, faltas, posição).</p>
+    <p class="lede">Cria um estado dinâmico a partir das estatísticas do catálogo de atributos estáticos (fadiga, faltas, posição). Aciona registro de métricas (tempo jogado, pontos, rebotes) dos jogadores em um BoxScore.</p>
 
     <div class="two-col">
         <div class="card">
         <div class="file-head"><span class="file-name">LivePlayer e LiveTeam</span></div>
         <ul class="check">
             <li><b>LivePlayer:</b> Mantém um tracker de stamina decaindo à taxa de <code>0.0005/s</code> e armazena os stats na classe <code>PlayerBoxScore</code>.</li>
-            <li><b>LiveTeam:</b> Gerencia ponteiros para titulares (on_court) e reservas (bench).</li>
+            <li><b>LiveTeam:</b> Gerencia titulares (on_court) e reservas (bench).</li>
             <li><b>select_ball_handler():</b> Sorteia jogador baseado no atributo <code>usage_rate</code>.</li>
         </ul>
         </div>
