@@ -1,0 +1,46 @@
+<section class="slide" id="s-contract" data-title="Ingestão: contrato e qualidade" data-kicker="CONTRATO" data-budget="0:55"
+    data-group="core">
+    <div class="slide-inner">
+        <div class="kicker">14 · Ingestão · contrato e qualidade</div>
+        <h2 class="title">Contrato de saída e <span>relatório de qualidade</span></h2>
+        <div class="gate-grid">
+            <div class="card terminal">
+                <div class="terminal-head"><span class="tag live">GATE ANTES DA ESCRITA</span><code class="mono">validate_processed_output()</code></div>
+                <pre class="mono term-body">tudo é validado <span class="cm">antes de gravar qualquer arquivo</span>
+  ✗ valor fora da faixa     <span class="cm">ex.: two_pt_pct = 1.42</span>
+  ✗ id duplicado
+  ✗ time referenciado não existe
+  ✗ elenco aponta para jogador ausente
+→ lista <b>todos</b> os problemas · código de saída 1
+→ <span class="ok">último conjunto válido preservado</span></pre>
+                <div class="playcall"><b>melhor interromper do que gravar dados inválidos</b></div>
+            </div>
+            <div class="side-col">
+                <div class="card policies">
+                    <div class="file-head"><span class="tag warn">DUAS POLÍTICAS</span><span class="dim">integridade por construção</span></div>
+                    <p class="dim"><b>−5</b> jogadores com zero minutos não entram em nenhum elenco</p>
+                    <p class="dim"><b>+57</b> dispensados permanecem no time em que jogaram na temporada</p>
+                </div>
+                <div class="card report">
+                    <div class="file-head"><code class="mono file-name">data_quality.json</code></div>
+                    <div class="report-stats">
+                        <div class="rstat"><b>582</b><span>jogadores</span></div>
+                        <div class="rstat"><b>216</b><span>titulares</span></div>
+                        <div class="rstat"><b>76</b><span>amostras pequenas</span></div>
+                        <div class="rstat"><b>0</b><span>posições ausentes</span></div>
+                    </div>
+                    <p class="dim">+ distribuição de cada atributo (min · média · máx.) e alertas de cobertura</p>
+                </div>
+            </div>
+        </div>
+        <div class="card terminal run-term">
+            <div class="terminal-head"><span class="tag in">EXECUÇÃO</span><span class="dim">na raiz do repositório</span></div>
+            <pre class="mono term-body"><span class="cm">$</span> python -m app.data_ingestion            <span class="cm"># coletar + derivar</span>
+<span class="cm">$</span> python -m app.data_ingestion --no-fetch  <span class="cm"># derivar offline a partir do cache</span>
+<span class="cm">$</span> python -m app.data_ingestion --refresh   <span class="cm"># forçar nova coleta</span></pre>
+        </div>
+    </div>
+    <aside class="notes">
+        <blockquote>Antes de qualquer escrita, a saída inteira passa pela validação Pydantic: atributos na faixa 0–1, ids únicos, times existentes e elencos apontando para jogadores reais — nos dois sentidos. Qualquer falha lista todos os problemas de uma vez e encerra com código 1, preservando o último conjunto válido; é melhor interromper do que gravar dados corrompidos. Duas políticas fazem a integridade referencial valer por construção: jogadores com zero minutos são excluídos (5 a menos) e dispensados continuam associados ao time em que jogaram (57 a mais), fazendo os 582 registros de elenco e os 30 times concordarem nos dois sentidos. O data_quality.json resume cobertura, titulares e reservas, amostras pequenas marcadas e as distribuições de cada atributo. Na prática são três comandos: coletar e derivar, derivar offline com --no-fetch, ou forçar nova coleta com --refresh; --refresh e --no-fetch são mutuamente exclusivos.</blockquote>
+    </aside>
+</section>

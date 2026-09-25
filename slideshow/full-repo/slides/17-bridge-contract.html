@@ -1,0 +1,23 @@
+<section class="slide" id="s-bridge-contract" data-title="Contrato da timeline" data-kicker="INTEGRAÇÃO" data-budget="1:00" data-group="core">
+  <div class="slide-inner">
+    <div class="kicker">17 · Ponte de integração · contrato</div>
+    <h2 class="title">Contrato <span>da timeline</span></h2>
+    <div class="diagram-wrap" role="img" aria-label="Endpoint GET /matches/{id}/timeline retorna TimelineResponse com match_id, status, teams, players, events e frames; events contêm narração em en-US e pt-BR; frames contêm jogadores, bola, placar e relógio.">
+      <div class="card log-card" style="max-width: 600px; margin: 0 auto;">
+        <div class="file-head"><span class="tag in">BACKEND</span><code class="mono">GET /matches/{match_id}/timeline</code></div>
+        <div class="log-tree" style="font-size: 0.9rem;">
+          <span>TimelineResponse</span>
+          <span>├── match_id · status</span>
+          <span>├── teams[]</span>
+          <span>├── players[]</span>
+          <span>├── events[]</span>
+          <span>│   └── narration {"en-US", "pt-BR"}</span>
+          <span>└── frames[]</span>
+          <span>    └── players · ball · score · clock</span>
+        </div>
+      </div>
+    </div>
+    <div class="callout">O backend e o frontend compartilham um contrato único; a interface consome <code>frames[]</code> no mesmo formato que já conhece.</div>
+  </div>
+  <aside class="notes"><blockquote>O contrato é o ponto central desta etapa. No backend, um router novo expõe GET /matches/{match_id}/timeline e devolve times, jogadores, eventos com narração em dois idiomas e frames no mesmo formato que a interface já usa. O serviço de timeline é determinístico e o de narração usa cache. No frontend, os tipos espelham o schema, o cliente usa VITE_API_BASE_URL e o useGameFrames ramifica por flag; o MatchBroadcast continua com a mesma renderização e só troca a fonte.</blockquote></aside>
+</section>

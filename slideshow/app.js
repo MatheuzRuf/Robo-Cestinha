@@ -102,7 +102,7 @@
       }
       const d = document.createElement('button');
       d.className = 'dot' + (groupOf(s) === 'appendix' ? ' appendix' : '');
-      d.textContent = groupOf(s) === 'appendix' ? `A${groupIndex(s)}` : String(idx + 1);
+      d.textContent = groupOf(s) === 'appendix' ? `A${groupIndex(s)}` : String(idx);
       d.dataset.index = String(idx);
       d.title = slideHeader(s);
       d.setAttribute('role', 'tab');
@@ -224,7 +224,7 @@
     slides.forEach((s, idx) => {
       const card = document.createElement('button');
       card.className = 'ocard' + (groupOf(s) === 'appendix' ? ' appendix-card' : '');
-      const num = groupOf(s) === 'appendix' ? `A${groupIndex(s)}` : String(idx + 1);
+      const num = groupOf(s) === 'appendix' ? `A${groupIndex(s)}` : String(idx);
       card.innerHTML =
         `<span class="ocard-num">${num}</span>` +
         `<h3>${slideHeader(s)}</h3>` +
