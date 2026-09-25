@@ -1,0 +1,48 @@
+<section class="slide" id="s-fetch" data-title="Ingestão: coleta de dados brutos" data-kicker="COLETA"
+    data-budget="0:50" data-group="core">
+    <div class="slide-inner">
+        <div class="kicker">11 · Ingestão · coleta de dados brutos</div>
+        <h2 class="title">Coleta <span>de dados brutos</span></h2>
+        <div class="two-col">
+            <div class="card discipline">
+                <div class="file-head"><span class="tag in">CONTROLE DE REQUISIÇÕES</span><span class="chip-tiny">39
+                        chamadas</span></div>
+                <ul class="check">
+                    <li><b>39 chamadas</b> — jogadores · 30 elencos · totais por jogador (base + avançadas) · clutch ·
+                        titulares × reservas · totais por time</li>
+                    <li><b>0,7&nbsp;s</b> de intervalo entre chamadas para evitar bloqueios</li>
+                    <li>até <b>4 tentativas</b> com espera exponencial e timeout de <b>30&nbsp;s</b></li>
+                    <li>respostas salvas sem transformação - CSV puro</li>
+                </ul>
+                <div class="playcall"><b>tolerante a falhas</b> - um elenco que falha não derruba os outros 29</div>
+            </div>
+            <div class="card raw-cache">
+                <div class="file-head"><span class="tag out">FONTES E CAMINHOS</span><span class="chip-tiny">rede →
+                        disco</span></div>
+                <div class="pos-flow">
+                    <span class="chip mono">APIs</span>
+                    <b class="arrow">→ 39 chamadas →</b>
+                    <span class="chip mono">data/raw/2025_26/</span>
+                </div>
+                <ul class="check">
+                    <li>elencos em <span class="mono">rosters/{ABV}.csv</span> · Basketball-Reference salvo à parte
+                        (próximo slide)</li>
+                    <li>reprocessar <b>não acessa a rede</b> — lê o cache local</li>
+                    <li><code class="mono">--no-fetch</code> falha rápido e lista o que estiver faltando</li>
+                    <li><code class="mono">--refresh</code> descarta o cache e refaz a coleta</li>
+                </ul>
+            </div>
+        </div>
+        <div class="callout"><b>Reprodutibilidade:</b> a rede é paga uma vez por temporada — a derivação inteira roda
+            offline sobre o cache.</div>
+    </div>
+    <aside class="notes">
+        <blockquote>O fetch faz 38 chamadas à API da NBA — lista de jogadores, 30 elencos, totais básicos e avançados
+            por jogador, recorte de clutch, divisão titular/reserva e totais por time — mais uma tentativa na página do
+            Basketball-Reference, que costuma falhar (ver próximo slide). Toda chamada espera 0,7 s antes de sair, tem
+            até 4 tentativas com espera exponencial a partir de 2 s e timeout de 30 s; a resposta é gravada verbatim em
+            CSV. Reprocessar a derivação nunca toca a rede: com --no-fetch o pipeline lê somente o disco e falha rápido
+            se algum arquivo estiver faltando; --refresh descarta o cache e recomeça a coleta. Falhas pontuais, como um
+            elenco que não responde, são reportadas sem interromper as demais 29 equipes.</blockquote>
+    </aside>
+</section>

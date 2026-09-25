@@ -1,0 +1,37 @@
+<section class="slide" id="s-derive" data-title="Ingestão: derivação de atributos" data-kicker="DERIVAÇÃO" data-budget="1:00"
+    data-group="core">
+    <div class="slide-inner">
+        <div class="kicker">13 · Ingestão · derivação de atributos</div>
+        <h2 class="title">Derivação: <span>tabela mestra → atributos</span></h2>
+        <div class="two-col stage2">
+            <div class="card master">
+                <div class="file-head"><span class="tag in">TABELA MESTRA</span><span class="chip-tiny">1 linha por jogador</span></div>
+                <div class="master-rows">
+                    <div class="mrow"><span class="mono">totais da temporada</span><i>deduplicados por id · máximo de minutos</i></div>
+                    <div class="mrow"><span class="mono">identidade</span><i>nome · slug · time</i></div>
+                    <div class="mrow"><span class="mono">posição e altura</span><i>dos elencos (CommonTeamRoster)</i></div>
+                    <div class="mrow"><span class="mono">posição clássica</span><i>Basketball-Reference · slide anterior</i></div>
+                    <div class="mrow"><span class="mono">titular × reserva</span><i>minutos em cada papel</i></div>
+                    <div class="mrow"><span class="mono">recorte clutch</span><i>últimos 5 min · margem ≤ 5</i></div>
+                    <div class="mrow"><span class="mono">avançadas</span><i>USG% · OREB% · taxas oficiais</i></div>
+                </div>
+                <div class="playcall"><b>sem minutos = fora da pipeline</b> · time canônico = clube em que atuou</div>
+            </div>
+            <div class="card deriv">
+                <div class="file-head"><span class="tag out">12 ATRIBUTOS</span><span class="chip-tiny">escala 0–1</span></div>
+                <ol class="deriv-list">
+                    <li><b>Arremesso</b> — <span class="mono">2PT · 3PT · FT</span> com <b>shrinkage</b>: 10 tentativas fictícias da média da liga<br /><code class="math mono">(acertos + 10 × média) ÷ (tentativas + 10)</code></li>
+                    <li><b>Controle e defesa</b> — <span class="mono">turnover · steal · block · foul</span> por <b>posse defendida</b> estimada <span class="cm">(FGA + 0,44·FTA + TOV)</span></li>
+                    <li><b>Rebote e criação</b> — <span class="mono">rebound · assist</span> · rebote vem do <span class="mono">OREB%</span> oficial</li>
+                    <li><b>Fôlego</b> — modelo por minutos por jogo + penalidade de idade após 34 anos</li>
+                    <li><b>Clutch</b> — aproveitamento em finais equilibrados × geral, ponderado pelo tamanho da amostra</li>
+                    <li><b>Uso</b> — <span class="mono">USG%</span> oficial da liga, normalizado</li>
+                </ol>
+            </div>
+        </div>
+        <div class="callout"><b>config.py</b> concentra todos os parâmetros — ajustar uma fórmula e rodar <b>--no-fetch</b> basta para comparar.</div>
+    </div>
+    <aside class="notes">
+        <blockquote>A derivação monta uma linha por jogador a partir de sete conjuntos brutos: totais da temporada — deduplicados por id e mantendo o máximo de minutos —, identidade, posição e altura vindos dos elencos, posição clássica do Basketball-Reference, divisão titular/reserva, recorte de clutch e estatísticas avançadas oficiais. Jogadores sem nenhum minuto não entram, e o time de cada jogador é o clube em que ele atuou na temporada, mesmo que tenha sido dispensado no meio do ano. Os 12 atributos nascem de cinco ideias: shrinkage de amostras pequenas nas taxas de arremesso, estatísticas defensivas por posse defendida estimada, rebote e uso herdados das colunas oficiais, fôlego como modelo de minutos e idade — 0,5% de penalidade por ano acima de 34 — e clutch comparando o aproveitamento em situações decisivas com a temporada inteira, com peso proporcional à amostra. Tudo é normalizado para 0–1 e arredondado para quatro casas; os parâmetros vivem no config.py para experimentação sem tocar na rede.</blockquote>
+    </aside>
+</section>

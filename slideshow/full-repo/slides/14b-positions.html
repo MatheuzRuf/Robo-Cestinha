@@ -1,0 +1,38 @@
+<section class="slide" id="s-positions" data-title="Ingestão: posições clássicas" data-kicker="POSIÇÕES" data-budget="0:45"
+    data-group="core">
+    <div class="slide-inner">
+        <div class="kicker">12 · Ingestão · posições clássicas</div>
+        <h2 class="title">Posições <span>clássicas</span></h2>
+        <div class="pos-flow">
+            <span class="chip mono">G · F · C</span>
+            <b class="arrow">← a API não publica as 5 posições →</b>
+            <span class="chip mono">PG · SG · SF · PF · C</span>
+        </div>
+        <div class="two-col">
+            <div class="card bbref">
+                <div class="file-head"><span class="tag in">FONTE PROTEGIDA</span><span class="chip-tiny">salvar uma vez</span></div>
+                <ul class="check">
+                    <li>a página do Basketball-Reference está atrás de <b>Cloudflare</b> — script não coleta</li>
+                    <li>salvar <b>uma vez no navegador</b> → <code class="mono">bballref_nba_2026_totals.html</code></li>
+                    <li>análise com <b>HTMLParser da stdlib</b> — sem lxml nem bs4</li>
+                    <li>resultado em cache <span class="mono">bballref_positions.json</span> para derivação offline</li>
+                </ul>
+                <div class="playcall">células compostas como <span class="mono">SF-PF</span> → posição primária <span class="mono">SF</span></div>
+            </div>
+            <div class="card names">
+                <div class="file-head"><span class="tag out">CASAMENTO DE NOMES</span><span class="chip-tiny">582 / 582</span></div>
+                <ul class="check">
+                    <li>junção por <b>slug normalizado</b> com os jogadores da API</li>
+                    <li>sufixos descartados: <span class="mono">(TW)</span> · <span class="mono">Jr</span> · <span class="mono">Sr</span> · <span class="mono">II–IV</span></li>
+                    <li>iniciais e diacríticos: <span class="mono">A.J. → aj</span> · <span class="mono">Porziņģis → porzingis</span></li>
+                    <li>3 aliases manuais cobrem variações restantes de nome</li>
+                    <li><b>0</b> jogadores sem posição clássica (<span class="mono">position5_missing</span>)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="callout"><b>--refresh</b> re-analisa a página salva e reconstrói o cache — nunca tenta baixar de novo.</div>
+    </div>
+    <aside class="notes">
+        <blockquote>A API da NBA publica apenas três grupos de posição — guarda, ala e pivô. A taxonomia clássica de cinco posições vem do Basketball-Reference, mas a página fica atrás do Cloudflare e não pode ser coletada por script; o único trabalho manual é salvá-la uma vez no navegador. A partir daí a pipeline analisa o HTML com um parser da biblioteca padrão, extrai a posição primária de cada jogador e guarda em JSON para os reprocessamentos. A junção com os jogadores da API é feita por nome normalizado: sufixos entre parênteses e geracionais são removidos, iniciais e acentos são colapsados, e três aliases manuais resolvem variações de apelido. O relatório de qualidade confirma que nenhum dos 582 jogadores ficou sem posição clássica.</blockquote>
+    </aside>
+</section>
