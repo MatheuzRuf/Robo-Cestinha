@@ -1,21 +1,33 @@
 <section class="slide" id="s-heuristics-rebound" data-title="Disputa de Rebote" data-kicker="HEURÍSTICAS · REBOTE" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
     <div class="kicker">app/engine/heuristics.py</div>
-    <h2 class="title">Disputa de <span>Rebote (Planejado)</span></h2>
-    <p class="lede">A função resolve_rebound() já cruza pesos estatísticos dos 10 jogadores, mas o fluxo na State Machine ainda engatilha turnover direto.</p>
+    <h2 class="title">Rebote: <span>a posse continua</span></h2>
+    <p class="lede">Depois do erro, dez jogadores disputam uma nova decisão.</p>
 
-    <div class="card">
-        <div class="kicker">Mecânica Implementada (Aguardando Chamada)</div>
-        <ul class="check">
-            <li>Agrega os 5 atacantes e 5 defensores em um <i>pool</i> único de sorteio de rebotador.</li>
-            <li><b>Ataque:</b> Peso direto do <code>rebound_rate</code> (piso de 0.02).</li>
-            <li><b>Defesa:</b> Peso ajustado para garantir vantagem natural de posicionamento defensivo. Fator: <code>(0.15 + (1.0 - p.attributes.rebound_rate * 0.5)) * 1.8</code>.</li>
-            <li>Retorna a tupla <code>(LivePlayer, bool)</code> para a State Machine decidir se o relógio de posse recomeça de 14s ou de 24s com troca de posse.</li>
-        </ul>
+    <div class="integration-compare">
+        <div class="integration-state current-state">
+        <div class="kicker">HOJE · FLUXO ATUAL</div>
+        <div class="target-flow">
+            <span>SHOOT miss</span><span class="connector connector--right">→</span><span><code>flip_possession()</code></span>
+        </div>
+        <p>Erro vira troca de posse automaticamente.</p>
+        </div>
+
+        <div class="integration-state target-state">
+        <div class="kicker">PRÓXIMO · REBOTE REAL</div>
+        <div class="target-flow">
+            <span>5 ataque + 5 defesa</span><span class="connector connector--right">→</span><span><code>resolve_rebound()</code></span>
+            <span class="connector connector--down"></span><span>offensive? 14s : 24s</span>
+        </div>
+        <p>O rebotador e o tipo de rebote decidem o próximo estado.</p>
+        </div>
     </div>
 
-    <div class="playcall">
-        <span class="tag warn">Status Atual</span> Em <code>state_machine.py</code> (bloco SHOOT miss), o fluxo executa um <code>state.flip_possession()</code> cru, forçando turnover incondicional.
+    <div class="stats compact-stats">
+        <div class="stat"><b>10</b><span>jogadores no pool</span></div>
+        <div class="stat"><b>rate</b><span>peso ofensivo</span></div>
+        <div class="stat"><b>× 1,8</b><span>vantagem defensiva</span></div>
+        <div class="stat"><b>bool</b><span>offensive rebound?</span></div>
     </div>
     </div>
 </section>

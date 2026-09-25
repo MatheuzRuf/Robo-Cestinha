@@ -1,17 +1,26 @@
 <section class="slide" id="s-heuristics-shot" data-title="Resolução de Arremesso" data-kicker="HEURÍSTICAS · ARREMESSO" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
     <div class="kicker">app/engine/heuristics.py</div>
-    <h2 class="title">Resolução de <span>Arremesso</span></h2>
-    <p class="lede">A função resolve_shot() muta a probabilidade base do jogador aplicando debuffs de fadiga e buffs de clutch.</p>
+    <h2 class="title">Arremesso: a chance é <span>ajustada</span></h2>
+    <p class="lede">A distância escolhe a base. O estado do jogador e o momento mexem nela.</p>
 
-    <div class="card">
-        <div class="kicker">Pipeline de Modificadores (resolve_shot)</div>
-        <ul class="check">
-            <li><b>Base:</b> Define <code>two_pt_pct</code> ou <code>three_pt_pct</code> checando se <code>distance_to() &gt;= 3.0</code> na matriz.</li>
-            <li><b>Penalidade por Fadiga:</b> Se <code>current_stamina &lt; 0.40</code>, o base_pct sofre redução proporcional ao déficit de energia (<code>base_pct - penalty</code>).</li>
-            <li><b>Bônus de Clutch:</b> Condicionado a: (1) quarto &gt;= 4 e (2) diferença de pontos &lt;= 5. Multiplica o <code>clutch_factor</code> e ajusta o base_pct final (teto de 0.95).</li>
-            <li><b>Sorteio:</b> <code>rng.random() &lt; base_pct</code>.</li>
-        </ul>
+    <div class="pipeline compact-pipeline">
+        <div class="stage">
+        <div class="stage-head"><span class="stage-num">1</span><b>Escolher base</b></div>
+        <div class="flow-row"><div class="fnode src"><code>distance_to(rim)</code></div><span class="edge">≥ 3,0 células</span><div class="fnode dst"><code>three_pt_pct</code></div></div>
+        <div class="flow-row"><div class="fnode src">perto da cesta</div><span class="edge">caso contrário</span><div class="fnode dst"><code>two_pt_pct</code></div></div>
+        </div>
+        <div class="stage">
+        <div class="stage-head"><span class="stage-num">2</span><b>Aplicar contexto</b></div>
+        <div class="outputs">
+            <span class="chip">stamina &lt; 0,40 → penalidade</span>
+            <span class="chip">Q4 + diferença ≤ 5 → clutch</span>
+        </div>
+        </div>
+        <div class="stage">
+        <div class="stage-head"><span class="stage-num">3</span><b>Sortear</b></div>
+        <div class="formula">rng.random() &lt; base_pct → cesta</div>
+        </div>
     </div>
     </div>
 </section>

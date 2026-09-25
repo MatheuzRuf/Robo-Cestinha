@@ -1,23 +1,15 @@
 <section class="slide" id="s-roadmap" data-title="Evolução e Próximos Passos" data-kicker="EVOLUÇÃO DAS HEURÍSTICAS" data-budget="1:00" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
     <div class="kicker">Próximos passos do Engine</div>
-    <h2 class="title">Evolução do <span>Simulador</span></h2>
-    <p class="lede">O isolamento entre a state machine (orquestração) e as heurísticas (pesos) permite plugar novos módulos sem refatorar o loop do jogo.</p>
+    <h2 class="title">Próximos passos: <span>mais realidade</span></h2>
+    <p class="lede">O contrato fica estável; a inteligência dentro dele evolui.</p>
 
-    <div class="two-col">
-        <div class="card">
-        <div class="kicker">Fase 3: Modelos de ML</div>
-        <p>A substituição das fórmulas hardcoded em <code>heuristics.py</code> por um modelo preditivo (Regressão / Árvores). A assinatura do contrato (ex: <code>resolve_shot</code>) permanece idêntica, apenas os pesos internos passariam a derivar de um modelo treinado.</p>
-        </div>
-        
-        <div class="card">
-        <div class="kicker">Pendências Estruturais</div>
-        <ul class="check">
-            <li><b>Prorrogação (Overtime):</b> A mecânica de 5 minutos (300s) já existe em <code>clock.py</code>, mas requer gatilho condicional no <code>run_match()</code> em caso de empate.</li>
-            <li><b>Acionamento do Rebote:</b> Integrar a tupla de retorno de <code>resolve_rebound()</code> na máquina de estados.</li>
-            <li><b>Box Score e Key Moments:</b> Populá-los durante a geração do objeto <code>MatchLog</code> ao final das posses.</li>
-        </ul>
-        </div>
+    <div class="roadmap">
+        <div class="road-step"><span class="road-num">01</span><div><b>Fechar o fluxo de jogo</b><p><code>resolve_rebound()</code> entra na State Machine após um arremesso errado.</p></div></div>
+        <div class="road-step"><span class="road-num">02</span><div><b>Completar a partida</b><p>Overtime, box score e key moments no <code>MatchLog</code>.</p></div></div>
+        <div class="road-step"><span class="road-num">03</span><div><b>Trocar fórmulas por modelos</b><p>Regressão ou árvores aprendem os pesos; as assinaturas continuam iguais.</p></div></div>
     </div>
+
+    <div class="quote-banner"><p><b>State Machine</b> orquestra. <b>Heuristics</b> decide. O contrato permite evoluir sem reescrever o jogo.</p></div>
     </div>
 </section>

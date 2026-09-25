@@ -1,0 +1,51 @@
+<section class="slide" id="s-heuristics-overview" data-title="Visão Geral das Heurísticas" data-kicker="HEURÍSTICAS · VISÃO GERAL" data-budget="1:15" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
+    <div class="slide-inner">
+    <div class="kicker">plan.md · seção 2.2.2 · State Graph Topography</div>
+    <h2 class="title">A posse nasce no grafo e termina em <span>uma decisão</span></h2>
+    <p class="lede">O plano define os estados; <code>heuristics.py</code> sorteia os caminhos com os atributos dos jogadores.</p>
+
+    <div class="backend-diagram">
+        <div class="diagram-wrap" role="img" aria-label="Grafo geral das heurísticas: início da partida, posse, escolha entre passe, movimento e arremesso, e resultados">
+<pre class="mermaid">
+flowchart TB
+  TIP["Tip-off / Ball Dispute"] --> POS_A["POSSESSION: TEAM A<br/><small>A ataca · B defende</small>"]
+  TIP --> POS_B["POSSESSION: TEAM B<br/><small>B ataca · A defende</small>"]
+
+  POS_A --> HANDLER["Active Handler"]
+  POS_B --> HANDLER
+  HANDLER --> ACTION{"Escolha da ação"}
+
+  ACTION --> PASS["PASS<br/><small>4 companheiros · usage_rate</small>"]
+  ACTION --> MOVE["MOVE<br/><small>8 direções + IDLE</small>"]
+  ACTION --> SHOOT["SHOOT<br/><small>2PT ou 3PT</small>"]
+
+  PASS --> PASS_OK["Completed<br/><small>novo handler · posse mantida</small>"]
+  PASS --> PASS_LOSS["Intercepted<br/><small>steal · posse vira</small>"]
+
+  MOVE --> MOVE_DIR["8 direções<br/><small>N · NE · E · SE · S · SW · W · NW</small>"]
+  MOVE --> IDLE["Idle / Parado"]
+  MOVE_DIR --> MOVE_OK["Moves Successfully<br/><small>(x, y) clampado</small>"]
+  MOVE --> MOVE_LOSS["Stripped / Turnover<br/><small>posse vira</small>"]
+  IDLE --> HOLDS["Holds Ball<br/><small>clock avança 2–4s</small>"]
+  IDLE --> FOUL["Defensive Foul<br/><small>falta pessoal</small>"]
+  IDLE --> IDLE_LOSS["Stripped / Turnover<br/><small>posse vira</small>"]
+
+  SHOOT --> MADE["Made<br/><small>+2 / +3 · score atualizado</small>"]
+  SHOOT --> MISS["Missed"]
+  MISS --> REBOUND{"Rebound Dispute<br/><small>10 jogadores</small>"}
+  REBOUND --> OFF["Offensive<br/><small>posse mantida · 14s</small>"]
+  REBOUND --> DEF["Defensive<br/><small>posse vira · 24s</small>"]
+
+  classDef root stroke:#f2b705,stroke-width:2px;
+  classDef action stroke:#e2661a,stroke-width:2px;
+  classDef terminal stroke:#22c55e,stroke-width:2px;
+  class TIP,POS_A,POS_B root;
+  class ACTION,PASS,MOVE,SHOOT,REBOUND action;
+  class PASS_OK,MOVE_OK,MADE,OFF,DEF terminal;
+</pre>
+        </div>
+    </div>
+
+    <div class="quote-banner"><p><b>PASS</b> troca o handler · <b>MOVE</b> altera a quadra · <b>SHOOT</b> decide pontos e rebote</p></div>
+    </div>
+</section>

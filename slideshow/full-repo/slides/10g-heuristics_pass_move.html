@@ -1,22 +1,33 @@
 <section class="slide" id="s-heuristics-pass" data-title="Resolução de Passe" data-kicker="HEURÍSTICAS · PASSE" data-budget="0:45" data-group="core" data-deck-label="ENGINE DE SIMULAÇÃO">
     <div class="slide-inner">
     <div class="kicker">app/engine/heuristics.py</div>
-    <h2 class="title">Resolução de <span>Passe</span></h2>
-    <p class="lede">Decide quem recebe a bola e avalia colisões contra a defesa para calcular turnovers.</p>
+    <h2 class="title">Passe: <span>alvo + risco</span></h2>
+    <p class="lede">A bola procura um companheiro. A defesa transforma o passe em probabilidade de perda.</p>
 
-    <div class="two-col">
-        <div class="card">
-        <div class="kicker">Alvo do Passe</div>
-        <p>A função <code>resolve_pass_teammate()</code> filtra o condutor atual e sorteia um dos 4 companheiros restantes usando <code>usage_rate</code> como peso estatístico para a escolha (piso de 0.05).</p>
+    <div class="flow-split">
+        <div class="card flow-panel">
+        <div class="kicker">1 · ESCOLHER RECEBEDOR</div>
+        <div class="vertical-flow">
+            <div class="flow-step">4 companheiros elegíveis</div>
+            <span class="connector connector--down"></span>
+            <div class="flow-step"><code>usage_rate</code> como peso</div>
+            <span class="connector connector--down"></span>
+            <div class="flow-step end-step">novo condutor</div>
+        </div>
         </div>
 
-        <div class="card">
-        <div class="kicker">Interceptação</div>
-        <p><code>resolve_pass_outcome()</code> calcula a chance de perda. A conta cruza o <code>turnover_rate</code> do passador contra a média de <code>steal_rate</code> dos 5 defensores.</p>
-        <p class="dim">Se falhar, o roubo é atribuído a um defensor sorteado por sua própria taxa de roubo.</p>
+        <div class="card flow-panel">
+        <div class="kicker">2 · TESTAR INTERCEPTAÇÃO</div>
+        <div class="vertical-flow">
+            <div class="flow-step"><code>turnover_rate</code> do passador</div>
+            <span class="connector connector--down"></span>
+            <div class="flow-step"><code>avg_steal</code> dos 5 defensores</div>
+            <span class="connector connector--down"></span>
+            <div class="flow-step planned-step">sucesso ou roubo</div>
+        </div>
         </div>
     </div>
 
-    <div class="formula">p_turnover = clamp(0.04, 0.35, turnover_rate * 0.7 + avg_steal * 1.5)</div>
+    <div class="formula">p_turnover = clamp(0.04, 0.35, turnover_rate × 0.7 + avg_steal × 1.5)</div>
     </div>
 </section>
