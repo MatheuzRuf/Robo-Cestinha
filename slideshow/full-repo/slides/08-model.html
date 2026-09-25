@@ -1,19 +1,10 @@
 <section class="slide" id="s-model" data-title="Backend: modelo de dados" data-kicker="BACKEND" data-budget="0:55" data-group="core">
       <div class="slide-inner">
-        <div class="kicker">05 · Backend · dados</div>
+        <div class="kicker">Backend · dados</div>
         <h2 class="title">Backend: <span>modelo de dados</span></h2>
         <div class="diagram-wrap" role="img" aria-label="Modelo atual de Team, Player, Session, User e Match, mais MatchEvent e MatchFrameChunk planejados para persistir eventos e frames">
 <pre class="mermaid">
 erDiagram
-  TEAM ||--o{ PLAYER : roster
-  TEAM o|--o{ USER : claimed_by
-  TEAM o|--o{ MATCH : "home / away / winner"
-  SESSION ||--o{ USER : participants
-  SESSION o|--o| USER : owner_id
-  SESSION ||--o{ MATCH : bracket
-  MATCH ||--o| MATCH : next_match
-  MATCH ||--o{ MATCH_EVENT : "planned events"
-  MATCH ||--o{ MATCH_FRAME_CHUNK : "planned frames"
   TEAM {
     uuid id PK
     string name
@@ -67,7 +58,6 @@ erDiagram
   }
 </pre>
         </div>
-        <div class="callout"><b>Implementado:</b> Team, Player, Session, User e Match. <b>Planejado:</b> MatchEvent (eventos da partida) e MatchFrameChunk (frames em lotes); ainda sem modelos/migração no banco.</div>
       </div>
       <aside class="notes"><blockquote>Team e Player formam o catálogo global. Player guarda nome e atributos em JSON; User pode reivindicar um Team, e Session aponta para seu usuário proprietário. Match registra a posição no bracket, os times da casa e visitante, a próxima partida e o slot de avanço, status, placar separado e vencedor. MatchEvent é pensado para eventos semânticos em sequência, com relógio, tipo, payload e data de criação. MatchFrameChunk agrupa frames JSON por índice para animação e replay. Esses dois últimos ainda são planejados: não existem como modelos ou tabelas implementados, por isso aparecem marcados no diagrama.</blockquote></aside>
     </section>

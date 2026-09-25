@@ -266,6 +266,13 @@
 .backend-diagram .diagram-wrap { width: 100%; min-height: 0; padding: 0; }
 .backend-diagram .diagram-wrap svg { max-width: 100% !important; max-height: clamp(300px, calc(100vh - 410px), 620px) !important; }
 
+#s-model .slide-inner { width: min(1440px, 100%); }
+#s-model .diagram-wrap .mermaid svg {
+  width: min(100%, 1360px) !important;
+  max-width: min(100%, 1360px) !important;
+  max-height: max(0px, calc(100dvh - 330px)) !important;
+}
+
 .engine-map { justify-content: space-between; }
 .engine-map .arch-node { min-height: 92px; justify-content: center; }
 .engine-input { border-color: var(--color-opponent); }

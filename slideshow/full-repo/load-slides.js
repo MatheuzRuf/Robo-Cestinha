@@ -10,7 +10,7 @@
     // '06-frontend-flow.html',
     '07-backend.html',
     '08-model.html',
-    '10-engine.html',
+    // '10-engine.html',
     '10a-engine.html',
     '10b-grid.html',
     '10c-clock.html',
@@ -23,9 +23,6 @@
     '10h-heuristics_shot_rebound.html',
     '10l-heuristics_move.html',
     '10m-heuristics_rebound.html',
-    '11-state-machine.html',
-    '12-heuristics.html',
-    '13-limitations.html',
     '14-ingestion.html',
     '14a-fetch.html',
     '14b-positions.html',
@@ -37,10 +34,10 @@
     '18-llm-narration.html',
     // '19-status.html',
     // '20-next.html',
-    '21-close.html',
-    'a1-shrinkage.html',
-    'a2-action-probabilities.html',
-    'a3-heuristic-limitations.html',
+    // '21-close.html',
+    // 'a1-shrinkage.html',
+    // 'a2-action-probabilities.html',
+    // 'a3-heuristic-limitations.html',
   ];
   const baseUrl = new URL('./', document.currentScript.src);
   const track = document.getElementById('track');
