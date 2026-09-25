@@ -2,21 +2,26 @@
       <div class="slide-inner">
         <div class="kicker">06 · Backend · camadas</div>
         <h2 class="title">Backend: <span>camadas</span></h2>
-        <div class="diagram-wrap" role="img" aria-label="FastAPI routers chamam services; services chamam repositories; repositories usam sessão SQLAlchemy para acessar PostgreSQL">
+        <div class="diagram-wrap" role="img" aria-label="Endpoints de saúde, sessões, times, jogadores, chave e partidas chamam os serviços correspondentes. Os serviços usam repositories para acessar PostgreSQL, e o serviço de partidas coordena a simulação pelo engine.">
 <pre class="mermaid">
 flowchart TB
-  API["01 · API · FastAPI<br/><small>GET /health · POST /sessions</small>"]
-  SVC["02 · Services de domínio<br/><small>SessionService · BracketService separado</small>"]
-  REPO["03 · Repositories<br/><small>BaseRepository · Session · Bracket</small>"]
-  DB[("04 · SQLAlchemy async → PostgreSQL<br/><small>sessão por requisição · migrações Alembic</small>")]
+  API["API · FastAPI<br/><small>Health · Sessions · Teams · Players · Bracket · Matches</small><br/><small>REST · SSE</small>"]
+  SVC["Serviços de domínio<br/><small>Sessions · Teams · Players · Bracket · Matches</small><br/><small>Sessões e participantes · catálogo e elenco</small><br/><small>Chave e avanço · simulação e eventos</small>"]
+  REPO["Repositories<br/><small>Sessions · Teams · Players · Bracket · Matches</small><br/><small>Persistência · consultas por domínio</small>"]
+  DB[("SQLAlchemy async → PostgreSQL<br/><small>sessão por requisição · migrações Alembic</small>")]
+  ENGINE["Engine de simulação<br/><small>MatchRunner · StateMachine · MatchLog</small><br/><small>execução da partida · eventos e resultado</small>"]
 
-  API --> SVC --> REPO --> DB
+  API -->|REST · SSE| SVC
+  SVC -->|persistência| REPO --> DB
+  SVC -->|MatchService| ENGINE
 
   classDef storage stroke:#4c9a6a,stroke-width:2px;
   class DB storage
+  classDef engine stroke:#e2661a,stroke-width:2px;
+  class ENGINE engine
 </pre>
         </div>
-        <div class="callout"><b>Factory:</b> `ServiceFactory` monta services e repositories com a sessão da requisição. `SessionService` recebe `BracketService`, mas ainda não aciona a criação do bracket.</div>
+        <div class="callout"><b>Fluxo:</b> endpoints FastAPI direcionam cada operação ao serviço de domínio; serviços coordenam regras, repositories e, nas partidas, o engine. `SessionService` coordena a sessão e a criação da chave; `MatchService` executa a simulação e publica eventos via SSE.</div>
       </div>
-      <aside class="notes"><blockquote>O desenho destaca as fronteiras da persistência: routers não fazem consultas SQL; services coordenam regras e workflows; repositories são a única camada do domínio que usa a sessão assíncrona. ServiceFactory é o composition root por requisição. Hoje os endpoints implementados são health e criação de sessão.</blockquote></aside>
+      <aside class="notes"><blockquote>A API expõe operações de sessão, catálogo, chave e partidas. Os routers encaminham cada endpoint ao serviço responsável: SessionService cuida do ciclo de vida da sessão; TeamService e PlayerService entregam catálogo e elenco; BracketService monta e avança a chave; MatchService coordena a partida. Os serviços usam repositories para consultas e persistência. Para simular, MatchService chama o engine e disponibiliza resultado e eventos da partida, inclusive por SSE.</blockquote></aside>
     </section>
