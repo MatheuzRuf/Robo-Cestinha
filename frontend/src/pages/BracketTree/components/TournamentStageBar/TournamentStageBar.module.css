@@ -1,0 +1,29 @@
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.label {
+  color: var(--color-text-muted);
+  font: 600 0.75rem var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bar strong {
+  flex: 1;
+  color: var(--color-warning);
+}
+
+@media (max-width: 620px) {
+  .bar strong {
+    flex-basis: 100%;
+    order: 1;
+  }
+}

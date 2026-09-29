@@ -94,4 +94,87 @@ export const ptBR = {
     },
     momentum: { title: 'MOTOR DE MOMENTO' },
   },
+  bracket_tree: {
+    sections: {
+      bracket: 'Chaveamento do torneio',
+      stats_and_log: 'Estatísticas das equipes e registro da quadra',
+    },
+    overview: {
+      title: 'CLÁSSICO ALL-HARDWOOD',
+      description:
+        'Transmissão em horário nobre de torneio eliminatório com 8 equipes. Mecânicas arcade de hardwood, quartos de 4 minutos e relógio de arremesso de 24 segundos.',
+      status: 'QUARTAS DE FINAL CONCLUÍDAS · SEMIFINAIS EM ANDAMENTO',
+      facts: {
+        format: { label: 'FORMATO', value: '8 equipes em eliminação simples' },
+        regulation: { label: 'REGULAMENTO', value: '4 × quartos de 4 min' },
+        shot_clock: { label: 'RELÓGIO DE ARREMESSO', value: '24 segundos mecânico' },
+        prize_pool: { label: 'PREMIAÇÃO', value: '$10.000 + Taça Dourada' },
+      },
+    },
+    stage: {
+      label: 'FASE DO TORNEIO',
+      current: 'RODADA SEMIFINAL (PARTIDA SF-1 AO VIVO)',
+      sync: 'Sincronizando telemetria Hardwood (1s)',
+    },
+    rounds: {
+      quarterfinals: { title: 'QUARTAS DE FINAL', summary: '4 PARTIDAS CONCLUÍDAS' },
+      semifinals: { title: 'SEMIFINAIS', summary: '1 AO VIVO AGORA' },
+    },
+    match: {
+      status: {
+        final: 'FINAL',
+        live: 'AO VIVO',
+        upcoming: 'INÍCIO ÀS 21:00 EST',
+        warmup: 'AQUECIMENTO EM ANDAMENTO',
+      },
+      details: {
+        quarterfinal_1: 'V: CHI +15 (Q4)',
+        quarterfinal_2: 'V: BKN +3 (OT1)',
+        quarterfinal_3: 'V: ATX +6 (Q4)',
+        quarterfinal_4: 'V: SEA +6 (Q4)',
+        live: 'RELÓGIO DE ARREMESSO: 14s',
+        upcoming: 'SINAL DA QUADRA 02 PRONTO',
+      },
+      replay: 'REVER PARTIDA',
+      watch_stream: 'ASSISTIR À TRANSMISSÃO',
+    },
+    championship: {
+      eyebrow: 'DECISÃO FINAL DE HARDWOOD',
+      title: 'TÍTULO GOLDEN HOOP',
+      description: 'O vencedor recebe o Troféu Golden Hardwood de 1984 e convite garantido para o Global Circuit.',
+      series: 'Série melhor de 3 partidas',
+      pending: 'A DEFINIR',
+      semifinal_1: 'VENCEDOR SF-1 (CHI / BKN)',
+      semifinal_2: 'VENCEDOR SF-2 (ATX / SEA)',
+    },
+    stats: {
+      title: 'MATRIZ DE ESTATÍSTICAS E EFICIÊNCIA',
+      meta: '4 MELHORES EQUIPES RESTANTES',
+      footnote: 'Estatísticas atualizadas em tempo real com sensores arcade da quadra.',
+      columns: { team: 'EQUIPE', ppg: 'PPG', fg: 'FG%', three_pt: '3PT%', steals: 'ROUBOS', status: 'STATUS' },
+      status: { live_sf_1: 'AO VIVO SF-1', sf_2_ready: 'SF-2 PRONTA' },
+    },
+    action_log: {
+      title: 'REGISTRO DE AÇÕES DA QUADRA 01',
+      live: 'Ações ao vivo na quadra',
+      broadcaster: 'Narradores: M. Vance e K. Jax',
+      audio: 'COMENTÁRIOS DE ÁUDIO',
+      events: {
+        pull_up: 'Cesta de 2 pontos em suspensão após bloqueio. Assistência de M. Vance.',
+        rebound: 'Rebote defensivo garantido em disputa no garrafão.',
+        inbound: 'Roubo de bola no passe de reposição cruzado. Conversão em contra-ataque.',
+        three_pointer: 'Cesta de 3 pontos do lado direito. Chicago pediu tempo.',
+      },
+    },
+    teams: {
+      chicago_steel: 'Chicago Steel',
+      detroit_dynamos: 'Detroit Dynamos',
+      brooklyn_breakers: 'Brooklyn Breakers',
+      miami_surge: 'Miami Surge',
+      austin_armadillos: 'Austin Armadillos',
+      pacific_waves: 'Pacific Waves',
+      seattle_circuit: 'Seattle Circuit',
+      atlanta_volts: 'Atlanta Volts',
+    },
+  },
 } as const;

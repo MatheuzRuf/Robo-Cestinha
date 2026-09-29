@@ -1,0 +1,72 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  text-align: center;
+}
+
+.trophy {
+  display: grid;
+  width: var(--space-12);
+  aspect-ratio: 1;
+  place-items: center;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  font-size: 1.6rem;
+}
+
+.eyebrow {
+  color: var(--color-warning);
+  font: 700 0.7rem var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.card h2,
+.card p {
+  margin: 0;
+}
+
+.card p {
+  color: var(--color-text-muted);
+}
+
+.slots {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-bg);
+}
+
+.slot,
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.slot {
+  padding: var(--space-2);
+  font-size: 0.8rem;
+}
+
+.slot span,
+.footer span {
+  color: var(--color-text-muted);
+}
+
+.footer {
+  width: 100%;
+  margin-top: auto;
+  font-size: 0.75rem;
+}
+
+.footer strong {
+  color: var(--color-primary);
+}

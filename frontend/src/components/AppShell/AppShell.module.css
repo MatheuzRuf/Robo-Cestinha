@@ -46,16 +46,23 @@
   padding: var(--space-2);
 }
 
-.nav span {
+.navItem {
+  display: block;
   padding: var(--space-2) var(--space-4);
   font-weight: 800;
   color: var(--color-text-muted);
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-.nav span[data-active='true'] {
+.navItem[data-active='true'] {
   background: var(--color-primary);
   color: var(--color-text-inverse);
   border-radius: var(--radius-sm);
+}
+
+.navItem[aria-disabled='true'] {
+  cursor: not-allowed;
 }
 
 .utilityRow {

@@ -80,4 +80,87 @@ export const enUS = {
     },
     momentum: { title: 'MOMENTUM SHIFT ENGINE' },
   },
+  bracket_tree: {
+    sections: {
+      bracket: 'Tournament bracket',
+      stats_and_log: 'Team statistics and court action log',
+    },
+    overview: {
+      title: 'THE ALL-HARDWOOD CLASSIC',
+      description:
+        'Prime-time 8-team single-elimination tournament broadcast. Hardwood arcade mechanics, 4-minute quarters, 24-second shot clocks.',
+      status: 'QUARTERFINALS COMPLETE · SEMIFINALS IN PROGRESS',
+      facts: {
+        format: { label: 'FORMAT', value: '8 Teams Single-Elimination' },
+        regulation: { label: 'REGULATION', value: '4 × 4-Min Qtrs' },
+        shot_clock: { label: 'SHOT CLOCK', value: '24 Sec Mechanical' },
+        prize_pool: { label: 'PRIZE POOL', value: '$10,000 + Golden Cup' },
+      },
+    },
+    stage: {
+      label: 'TOURNAMENT STAGE',
+      current: 'SEMI-FINAL ROUND (MATCH SF-1 LIVE)',
+      sync: 'Auto-Syncing Hardwood Telemetry (1s)',
+    },
+    rounds: {
+      quarterfinals: { title: 'QUARTERFINALS', summary: '4 MATCHES COMPLETED' },
+      semifinals: { title: 'SEMIFINALS', summary: '1 LIVE NOW' },
+    },
+    match: {
+      status: {
+        final: 'FINAL',
+        live: 'LIVE',
+        upcoming: 'TIP-OFF AT 21:00 EST',
+        warmup: 'WARMUP SESSION UNDERWAY',
+      },
+      details: {
+        quarterfinal_1: 'W: CHI +15 (Q4)',
+        quarterfinal_2: 'W: BKN +3 (OT1)',
+        quarterfinal_3: 'W: ATX +6 (Q4)',
+        quarterfinal_4: 'W: SEA +6 (Q4)',
+        live: 'SHOT CLOCK: 14s',
+        upcoming: 'COURT 02 FEED READY',
+      },
+      replay: 'REPLAY MATCH',
+      watch_stream: 'WATCH STREAM',
+    },
+    championship: {
+      eyebrow: 'GRAND FINALS HARDWOOD DECIDER',
+      title: 'THE GOLDEN HOOP TITLE',
+      description: 'Winner receives the 1984 Golden Hardwood Trophy and guaranteed invite to Global Circuit.',
+      series: 'Best of 3 Games Series',
+      pending: 'TBD',
+      semifinal_1: 'WINNER SF-1 (CHI / BKN)',
+      semifinal_2: 'WINNER SF-2 (ATX / SEA)',
+    },
+    stats: {
+      title: 'TEAM STAT MATRIX & EFFICIENCIES',
+      meta: 'TOP 4 REMAINING SEEDS',
+      footnote: 'Stats updated in real time based on on-court arcade sensors.',
+      columns: { team: 'TEAM NAME', ppg: 'PPG', fg: 'FG%', three_pt: '3PT%', steals: 'STEALS', status: 'STATUS' },
+      status: { live_sf_1: 'LIVE SF-1', sf_2_ready: 'SF-2 READY' },
+    },
+    action_log: {
+      title: 'COURT 01 ACTION LOG',
+      live: 'Live court action',
+      broadcaster: 'Broadcaster: M. Vance & K. Jax',
+      audio: 'AUDIO COMMENTARY',
+      events: {
+        pull_up: 'Made 2PT pull-up jumper off pick & roll. Assist by M. Vance.',
+        rebound: 'Defensive rebound secured in contested paint.',
+        inbound: 'Steal on cross-court inbound pass. Fastbreak conversion.',
+        three_pointer: '3PT made from right wing arc. Timeout called by Chicago.',
+      },
+    },
+    teams: {
+      chicago_steel: 'Chicago Steel',
+      detroit_dynamos: 'Detroit Dynamos',
+      brooklyn_breakers: 'Brooklyn Breakers',
+      miami_surge: 'Miami Surge',
+      austin_armadillos: 'Austin Armadillos',
+      pacific_waves: 'Pacific Waves',
+      seattle_circuit: 'Seattle Circuit',
+      atlanta_volts: 'Atlanta Volts',
+    },
+  },
 } as const;

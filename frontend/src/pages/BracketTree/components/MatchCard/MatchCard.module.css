@@ -1,0 +1,84 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+}
+
+.matchMeta,
+.statusGroup,
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.matchMeta,
+.footer {
+  flex-wrap: wrap;
+}
+
+.venue,
+.gameClock,
+.detail,
+.shotClock,
+.action {
+  font: 600 0.7rem var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.venue,
+.detail {
+  color: var(--color-text-muted);
+}
+
+.teams {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.team {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-2);
+  background: var(--color-bg);
+}
+
+.winner .teamName {
+  color: var(--color-text);
+  font-weight: 800;
+}
+
+.seed {
+  color: var(--color-primary);
+  font: 700 0.8rem var(--font-mono);
+}
+
+.teamName {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score {
+  color: var(--color-warning);
+  font: 800 1.2rem var(--font-mono);
+}
+
+.shotClock,
+.action {
+  color: var(--color-primary);
+}
+
+.action {
+  margin-left: auto;
+}

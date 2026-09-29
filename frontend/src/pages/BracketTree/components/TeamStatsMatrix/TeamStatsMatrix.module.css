@@ -1,0 +1,72 @@
+.card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.heading h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.heading span,
+.footnote {
+  color: var(--color-text-muted);
+  font: 600 0.7rem var(--font-mono);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.tableWrap table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: right;
+}
+
+.tableWrap th,
+.tableWrap td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.tableWrap thead th {
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  font: 600 0.65rem var(--font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.tableWrap thead th:first-child,
+.tableWrap tbody th {
+  text-align: left;
+}
+
+.tableWrap tbody th {
+  font-weight: 700;
+}
+
+.tableWrap tbody th span,
+.tableWrap tbody td:nth-child(2) {
+  color: var(--color-warning);
+}
+
+.status {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.footnote {
+  margin: 0;
+}
