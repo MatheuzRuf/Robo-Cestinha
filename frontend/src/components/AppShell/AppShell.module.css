@@ -1,4 +1,6 @@
 .shell {
+  display: flex;
+  flex-direction: column;
   min-height: 100svh;
   background: var(--color-bg);
   color: var(--color-text);
@@ -93,12 +95,27 @@
 
 .ticker {
   display: flex;
+  align-items: center;
   gap: var(--space-4);
   padding: var(--space-2) var(--space-4);
-  margin: 0 var(--space-4) var(--space-4);
+  margin: auto var(--space-4) var(--space-4);
   color: var(--color-text-muted);
   font-size: 0.8rem;
+  overflow: hidden;
 }
+
+.ticker strong {
+  flex: 0 0 auto;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+.ticker span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (max-width: 900px) {
   .header {
     grid-template-columns: 1fr;
@@ -106,5 +123,9 @@
   }
   .nav {
     grid-template-columns: repeat(2, max-content);
+  }
+
+  .ticker {
+    margin-inline: var(--space-3);
   }
 }

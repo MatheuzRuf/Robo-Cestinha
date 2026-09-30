@@ -11,15 +11,15 @@ interface AppShellProps {
   children: ReactNode;
 }
 
-export function AppShell({ activeNavItem, onlineCount, sessionCode, children }: AppShellProps) {
+export function AppShell({ activeNavItem, onlineCount, sessionCode, tickerText, children }: AppShellProps) {
   const { t } = useTranslation();
   const navItems: {
     id: AppShellProps['activeNavItem'];
     label: string;
-    path?: string;
+    path: string;
   }[] = [
     { id: 'home', label: t('shell.nav_home'), path: '/' },
-    { id: 'teamLocker', label: t('shell.nav_team_locker') },
+    { id: 'teamLocker', label: t('shell.nav_team_locker'), path: '/team-locker' },
     { id: 'bracketTree', label: t('shell.nav_bracket_tree'), path: '/bracket-tree' },
     { id: 'liveBroadcast', label: t('shell.nav_live_broadcast'), path: '/match-demo' },
   ];
@@ -32,29 +32,18 @@ export function AppShell({ activeNavItem, onlineCount, sessionCode, children }: 
           <div className={styles.brandSubtitle}>{t('shell.brand_subtitle')}</div>
         </div>
         <nav className={styles.nav}>
-          {navItems.map((item) =>
-            item.path ? (
-              <NavLink
-                key={item.id}
-                to={item.path}
-                end={item.id === 'home'}
-                className={styles.navItem}
-                data-active={activeNavItem === item.id}
-                aria-current={activeNavItem === item.id ? 'page' : undefined}
-              >
-                {item.label}
-              </NavLink>
-            ) : (
-              <span
-                key={item.id}
-                className={styles.navItem}
-                data-active={activeNavItem === item.id}
-                aria-disabled="true"
-              >
-                {item.label}
-              </span>
-            ),
-          )}
+          {navItems.map((item) => (
+            <NavLink
+              key={item.id}
+              to={item.path}
+              end={item.id === 'home'}
+              className={styles.navItem}
+              data-active={activeNavItem === item.id}
+              aria-current={activeNavItem === item.id ? 'page' : undefined}
+            >
+              {item.label}
+            </NavLink>
+          ))}
         </nav>
         <div className={styles.utilityRow}>
           {onlineCount ? (
@@ -66,6 +55,12 @@ export function AppShell({ activeNavItem, onlineCount, sessionCode, children }: 
         </div>
       </header>
       {children}
+      {tickerText ? (
+        <footer className={styles.ticker} aria-label={t('shell.ticker_label')}>
+          <strong>{t('shell.ticker_label')}</strong>
+          <span>{tickerText}</span>
+        </footer>
+      ) : null}
     </div>
   );
 }

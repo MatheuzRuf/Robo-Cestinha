@@ -1,0 +1,185 @@
+.page {
+  display: grid;
+  width: min(100%, 1800px);
+  align-content: start;
+  gap: var(--space-6);
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-4) var(--space-8);
+}
+
+.sessionBar {
+  display: grid;
+  grid-template-columns: auto auto minmax(16rem, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.sessionTools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.sessionCode {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.sessionCode strong {
+  color: var(--color-warning);
+}
+
+.sessionIcon {
+  color: var(--color-primary);
+  font-size: 1.1rem;
+}
+
+.sessionTools button {
+  padding: var(--space-2);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.copyError {
+  color: var(--color-live);
+  font-size: 0.75rem;
+}
+
+.lockSummary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: fit-content;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.summaryDot {
+  width: 0.65rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+.instruction {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.instruction span {
+  color: var(--color-warning);
+  font-size: 1rem;
+}
+
+.lockerGrid {
+  display: grid;
+  grid-template-columns: minmax(17rem, 0.76fr) minmax(0, 1.24fr);
+  align-items: start;
+  gap: var(--space-6);
+}
+
+.detailsColumn {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.statusMessage,
+.emptyState,
+.errorState {
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+.errorState {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+  color: var(--color-text);
+}
+
+.errorState p {
+  margin: 0;
+}
+
+.emptyState {
+  min-height: 12rem;
+}
+
+@media (max-width: 1120px) {
+  .sessionBar {
+    grid-template-columns: auto auto;
+  }
+
+  .instruction {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .lockerGrid {
+    grid-template-columns: minmax(15rem, 0.7fr) minmax(0, 1.3fr);
+    gap: var(--space-4);
+  }
+}
+
+@media (max-width: 820px) {
+  .lockerGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sessionBar {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+
+  .instruction {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .page {
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-3) var(--space-6);
+  }
+
+  .sessionTools {
+    flex-wrap: wrap;
+  }
+
+  .sessionCode {
+    white-space: normal;
+  }
+
+  .lockSummary {
+    font-size: 0.72rem;
+    white-space: normal;
+  }
+}

@@ -4,29 +4,13 @@ import { CourtActionLog } from './components/CourtActionLog/CourtActionLog';
 import { ChampionshipCard } from './components/ChampionshipCard/ChampionshipCard';
 import { RoundColumn } from './components/RoundColumn/RoundColumn';
 import { TeamStatsMatrix } from './components/TeamStatsMatrix/TeamStatsMatrix';
-import { TournamentOverview } from './components/TournamentOverview/TournamentOverview';
-import { TournamentStageBar } from './components/TournamentStageBar/TournamentStageBar';
 import { mockBracketData, type BracketTeamKey } from './data/mockBracketData';
 import styles from './BracketTree.module.css';
-
-const FACT_ICONS: Record<string, string> = {
-  format: '☷',
-  regulation: '◴',
-  shotClock: '◉',
-  prizePool: '♜',
-};
 
 export default function BracketTree() {
   const { t } = useTranslation();
   const teamName = (key: BracketTeamKey) => t(`bracket_tree.teams.${key}`);
   const data = mockBracketData;
-
-  const facts = data.overview.facts.map((fact) => ({
-    id: fact.id,
-    label: t(fact.labelKey),
-    value: t(fact.valueKey),
-    icon: FACT_ICONS[fact.id] ?? '',
-  }));
 
   const rounds = data.rounds.map((round) => ({
     id: round.id,
@@ -70,18 +54,6 @@ export default function BracketTree() {
   return (
     <AppShell activeNavItem="bracketTree" onlineCount={data.onlineTeams} sessionCode={data.sessionCode}>
       <main className={styles.page}>
-        {/* <TournamentOverview
-          sessionCode={data.sessionCode}
-          statusLabel={t(data.overview.statusKey)}
-          title={t(data.overview.titleKey)}
-          description={t(data.overview.descriptionKey)}
-          facts={facts}
-        /> */}
-        {/* <TournamentStageBar
-          label={t(data.stage.labelKey)}
-          currentStage={t(data.stage.currentStageKey)}
-          syncStatus={t(data.stage.syncKey)}
-        /> */}
         <section className={styles.bracketGrid} aria-label={t('bracket_tree.sections.bracket')}>
           {rounds.map((round) => (
             <RoundColumn key={round.id} {...round} />

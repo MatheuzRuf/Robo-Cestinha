@@ -1,0 +1,51 @@
+.panel {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-bg);
+}
+
+.formContent {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.notice,
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.notice span {
+  flex: 0 0 auto;
+  color: var(--color-warning);
+}
+
+.error {
+  color: var(--color-live);
+}
+
+.savedMessage {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-left: 3px solid var(--color-success);
+  background: var(--color-surface);
+}
+
+.savedMessage strong {
+  color: var(--color-success);
+}
+
+.savedMessage span {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}

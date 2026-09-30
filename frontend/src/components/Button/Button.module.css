@@ -16,6 +16,15 @@
   border-color: var(--color-primary-hover);
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.button:disabled:hover {
+  border-color: var(--color-border);
+}
+
 .primary {
   background: var(--color-primary);
   color: var(--color-text-inverse);
