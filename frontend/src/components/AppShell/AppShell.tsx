@@ -6,12 +6,20 @@ import styles from './AppShell.module.css';
 interface AppShellProps {
   activeNavItem: 'home' | 'teamLocker' | 'bracketTree' | 'liveBroadcast';
   onlineCount?: { current: number; total: number };
+  currentUserName?: string;
   sessionCode?: string;
   tickerText?: string;
   children: ReactNode;
 }
 
-export function AppShell({ activeNavItem, onlineCount, sessionCode, tickerText, children }: AppShellProps) {
+export function AppShell({
+  activeNavItem,
+  onlineCount,
+  currentUserName,
+  sessionCode,
+  tickerText,
+  children,
+}: AppShellProps) {
   const { t } = useTranslation();
   const navItems: {
     id: AppShellProps['activeNavItem'];
@@ -46,7 +54,8 @@ export function AppShell({ activeNavItem, onlineCount, sessionCode, tickerText, 
           ))}
         </nav>
         <div className={styles.utilityRow}>
-          {onlineCount ? (
+          {currentUserName ? <span className={styles.pill}>{currentUserName}</span> : null}
+          {!currentUserName && onlineCount ? (
             <span className={styles.pill}>
               ◉ {t('shell.online_teams', { count: onlineCount.current, total: onlineCount.total })}
             </span>

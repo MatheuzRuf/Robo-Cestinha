@@ -5,12 +5,13 @@ interface TextInputProps {
   label?: string;
   hint?: string;
   placeholder?: string;
+  maxLength?: number;
   value: string;
   onChange: (value: string) => void;
   trailingAction?: { icon: ReactNode; label: string; onClick: () => void };
 }
 
-export function TextInput({ label, hint, placeholder, value, onChange, trailingAction }: TextInputProps) {
+export function TextInput({ label, hint, placeholder, maxLength, value, onChange, trailingAction }: TextInputProps) {
   return (
     <label className={styles.root}>
       {(label || hint) && (
@@ -23,6 +24,7 @@ export function TextInput({ label, hint, placeholder, value, onChange, trailingA
         <input
           className={styles.input}
           placeholder={placeholder}
+          maxLength={maxLength}
           value={value}
           onChange={(event) => onChange(event.target.value)}
         />

@@ -19,7 +19,6 @@ export default function TeamLocker() {
   const [isSaving, setIsSaving] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
   const [selectionError, setSelectionError] = useState<string | null>(null);
-  const [copyStatus, setCopyStatus] = useState<'success' | 'failure' | null>(null);
   const [loadAttempt, setLoadAttempt] = useState(0);
 
   useEffect(() => {
@@ -53,10 +52,6 @@ export default function TeamLocker() {
     [locker, selectedTeamId],
   );
 
-  const availableCount = locker?.teams.filter((team) => team.status === 'available').length ?? 0;
-  const totalCount = locker?.teams.length ?? 8;
-  const lockedCount = totalCount - availableCount;
-
   const handleSelectTeam = (teamId: string) => {
     setSelectedTeamId(teamId);
     setSelectionError(null);
@@ -66,17 +61,6 @@ export default function TeamLocker() {
     setIsLoading(true);
     setLoadFailed(false);
     setLoadAttempt((attempt) => attempt + 1);
-  };
-
-  const handleCopyInvite = async () => {
-    if (!locker) return;
-    const inviteUrl = `${window.location.origin}/team-locker?session=${encodeURIComponent(locker.sessionCode)}`;
-    try {
-      await navigator.clipboard.writeText(inviteUrl);
-      setCopyStatus('success');
-    } catch {
-      setCopyStatus('failure');
-    }
   };
 
   const handleLockIn = async () => {

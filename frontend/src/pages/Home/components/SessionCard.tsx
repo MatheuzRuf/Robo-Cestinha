@@ -6,52 +6,40 @@ import styles from './SessionCard.module.css';
 interface SessionCardProps {
   sessionCode: string;
   sessionName: string;
-  status: { tone: 'live' | 'complete' | 'paused'; label: string };
-  detailLine: string;
-  primaryStat: { label: string; value: string };
-  secondaryStat?: { label: string; value: string; highlight?: boolean };
-  footerLeft: string;
-  footerRight: string;
-  cta: { label: string; variant: 'primary' | 'secondary' | 'outline'; onClick: () => void };
+  isActive: boolean;
+  activeLabel: string;
+  currentLabel: string;
+  savedLabel: string;
+  joinedAsLabel: string;
+  lastVisitedLabel: string;
+  resumeLabel: string;
+  onResume: () => void;
 }
 
 export function SessionCard({
   sessionCode,
   sessionName,
-  status,
-  detailLine,
-  primaryStat,
-  secondaryStat,
-  footerLeft,
-  footerRight,
-  cta,
+  isActive,
+  activeLabel,
+  currentLabel,
+  savedLabel,
+  joinedAsLabel,
+  lastVisitedLabel,
+  resumeLabel,
+  onResume,
 }: SessionCardProps) {
   return (
     <Card>
       <div className={styles.root}>
         <div className={styles.topRow}>
-          <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+          <StatusBadge tone={isActive ? 'info' : 'paused'}>{isActive ? activeLabel : savedLabel}</StatusBadge>
           <span className={styles.sessionCode}>{sessionCode}</span>
         </div>
         <div className={styles.sessionName}>{sessionName}</div>
-        <div className={styles.detailLine}>{detailLine}</div>
-        <div className={styles.statRow}>
-          <div>
-            <div className={styles.statLabel}>{primaryStat.label}</div>
-            <div className={styles.statValue}>{primaryStat.value}</div>
-          </div>
-          {secondaryStat ? (
-            <div className={`${styles.secondaryStat} ${secondaryStat.highlight ? styles.highlight : ''}`.trim()}>
-              {secondaryStat.value}
-            </div>
-          ) : null}
-        </div>
-        <div className={styles.footerRow}>
-          <span>{footerLeft}</span>
-          <span>{footerRight}</span>
-        </div>
-        <Button variant={cta.variant} onClick={cta.onClick} fullWidth>
-          {cta.label}
+        <div className={styles.detailLine}>{joinedAsLabel}</div>
+        <div className={styles.footerRow}>{lastVisitedLabel}</div>
+        <Button variant={isActive ? 'secondary' : 'primary'} onClick={onResume} disabled={isActive} fullWidth>
+          {isActive ? currentLabel : resumeLabel}
         </Button>
       </div>
     </Card>

@@ -6,17 +6,26 @@ interface ButtonProps {
   icon?: ReactNode;
   fullWidth?: boolean;
   disabled?: boolean;
-  onClick: () => void;
+  type?: 'button' | 'submit';
+  onClick?: () => void;
   children: ReactNode;
 }
 
-export function Button({ variant, icon, fullWidth, disabled = false, onClick, children }: ButtonProps) {
+export function Button({
+  variant,
+  icon,
+  fullWidth,
+  disabled = false,
+  type = 'button',
+  onClick,
+  children,
+}: ButtonProps) {
   return (
     <button
       className={`${styles.button} ${styles[variant]} ${fullWidth ? styles.fullWidth : ''}`.trim()}
       onClick={onClick}
       disabled={disabled}
-      type="button"
+      type={type}
     >
       {icon ? <span className={styles.icon}>{icon}</span> : null}
       <span>{children}</span>

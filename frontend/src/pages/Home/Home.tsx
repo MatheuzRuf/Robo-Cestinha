@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { AppShell } from '../../components/AppShell';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
@@ -8,101 +9,167 @@ import { Modal } from '../../components/Modal';
 import { SegmentedControl } from '../../components/SegmentedControl';
 import { StatusBadge } from '../../components/StatusBadge';
 import { TextInput } from '../../components/TextInput';
+import { featuredSessionCodes, normalizeSessionCode } from '../../lib/session/sessionService';
+import { useSessionStore } from '../../lib/session/sessionStore';
+import type { SessionDescriptor, SessionSettings } from '../../lib/session/types';
 import { useTranslation } from '../../lib/i18n/i18n';
 import { SessionCard } from './components/SessionCard';
 import styles from './Home.module.css';
 
-const RECENT_SESSIONS = [
-  {
-    sessionCode: '#RC-9104-TEX',
-    sessionName: 'LONESTAR INVITATIONAL',
-    status: { tone: 'live' as const, label: 'LIVE · SEMI-FINALS' },
-    detailLine: 'Court 1: Austin Armadillos vs Dallas Drifters',
-    primaryStat: { label: 'AUSTIN ARMADILLOS', value: 'Your Claimed Club' },
-    secondaryStat: { label: '', value: '74 : 71', highlight: true },
-    footerLeft: 'Q4 01:24',
-    footerRight: '7/8 Teams Claimed',
-    ctaKey: 'resume_broadcast' as const,
-    ctaVariant: 'primary' as const,
-  },
-  {
-    sessionCode: '#RC-4421-CHI',
-    sessionName: 'RUSTBELT CLASSIC',
-    status: { tone: 'complete' as const, label: 'FINAL RESULTS' },
-    detailLine: 'Championship Final Series Complete',
-    primaryStat: { label: 'CHICAGO STEEL', value: 'CHAMPION WINNER' },
-    secondaryStat: { label: '', value: '104 - 98', highlight: false },
-    footerLeft: '7 Games Logged',
-    footerRight: 'Stats Vault Ready',
-    ctaKey: 'view_replay_bracket' as const,
-    ctaVariant: 'outline' as const,
-  },
-  {
-    sessionCode: '#RC-2089-SEA',
-    sessionName: 'EMERALD COAST 8',
-    status: { tone: 'paused' as const, label: 'PAUSED · ROUND OF 8' },
-    detailLine: 'Lobby waiting for Tip-Off command',
-    primaryStat: { label: 'SEATTLE TOTEMS', value: 'Locker Slot #03' },
-    secondaryStat: { label: '', value: '8/8 READY', highlight: false },
-    footerLeft: 'All Rosters Full',
-    footerRight: 'Paused Today',
-    ctaKey: 'continue_lobby' as const,
-    ctaVariant: 'secondary' as const,
-  },
-];
+const MAX_USER_NAME_LENGTH = 24;
 
-function getSavedName() {
-  if (typeof window === 'undefined') return '';
-  return window.localStorage.getItem('robo-cestinha-display-name') ?? '';
+type PendingAction = 'create' | 'join' | null;
+
+function getErrorKey(error: unknown) {
+  if (!(error instanceof Error)) return 'home.errors.action_failed';
+
+  switch (error.message) {
+    case 'session_storage_unavailable':
+      return 'home.errors.storage_unavailable';
+    case 'session_not_found':
+      return 'home.errors.session_not_found';
+    case 'saved_identity_not_found':
+      return 'home.errors.saved_session_not_found';
+    default:
+      return 'home.errors.action_failed';
+  }
+}
+
+function formatLastVisited(value: string, locale: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 }
 
 export default function Home() {
-  const { t } = useTranslation();
-  const [simSpeed, setSimSpeed] = useState<'normal' | 'blitz'>('normal');
-  const [quarterLength, setQuarterLength] = useState<'3' | '5'>('3');
+  const { t, locale } = useTranslation();
+  const [simSpeed, setSimSpeed] = useState<SessionSettings['simSpeed']>('normal');
+  const [quarterLength, setQuarterLength] = useState<SessionSettings['quarterLength']>('3');
   const [autoFill, setAutoFill] = useState(true);
   const [sessionCode, setSessionCode] = useState('');
-  const [displayName, setDisplayName] = useState(getSavedName());
-  const [nameDraft, setNameDraft] = useState(displayName);
+  const [nameDraft, setNameDraft] = useState('');
   const [nameModalOpen, setNameModalOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<null | 'create' | 'join'>(null);
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const [joinTarget, setJoinTarget] = useState<SessionDescriptor | null>(null);
+  const [joinError, setJoinError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
 
-  const featuredSessions = ['#RC-7842-OAK', '#RC-9104-TEX'];
+  const recentSessions = useSessionStore((state) => state.recentSessions);
+  const activeSessionHash = useSessionStore((state) => state.activeSessionHash);
+  const activeSession = recentSessions.find((session) => session.sessionHash === activeSessionHash) ?? null;
 
-  const recentCards = useMemo(() => RECENT_SESSIONS.slice(0, 3), []);
-
-  const requireName = (action: 'create' | 'join') => {
-    const saved = displayName.trim();
-    if (!saved) {
-      setPendingAction(action);
+  const lookupSessionMutation = useMutation({
+    mutationFn: async (code: string) => {
+      const session = await useSessionStore.getState().findSession(code);
+      if (!session) throw new Error('session_not_found');
+      return session;
+    },
+    onSuccess: (session) => {
+      setJoinTarget(session);
+      setPendingAction('join');
       setNameDraft('');
+      setNameError(null);
       setNameModalOpen(true);
-      return false;
-    }
-    return true;
-  };
+    },
+    onError: (error) => setJoinError(getErrorKey(error)),
+  });
 
-  const submitName = () => {
-    const nextName = nameDraft.trim();
-    if (!nextName) return;
-    window.localStorage.setItem('robo-cestinha-display-name', nextName);
-    setDisplayName(nextName);
+  const createSessionMutation = useMutation({
+    mutationFn: ({ userName, settings }: { userName: string; settings: SessionSettings }) =>
+      useSessionStore.getState().createSession(userName, settings),
+    onSuccess: () => closeNameModal(),
+    onError: (error) => setNameError(getErrorKey(error)),
+  });
+
+  const joinSessionMutation = useMutation({
+    mutationFn: ({ session, userName }: { session: SessionDescriptor; userName: string }) =>
+      useSessionStore.getState().joinSession(session, userName),
+    onSuccess: () => closeNameModal(),
+    onError: (error) => setNameError(getErrorKey(error)),
+  });
+
+  const isNameSubmitting = createSessionMutation.isPending || joinSessionMutation.isPending;
+
+  function closeNameModal() {
     setNameModalOpen(false);
-    if (pendingAction) {
-      setPendingAction(null);
-    }
-  };
+    setPendingAction(null);
+    setJoinTarget(null);
+    setNameError(null);
+  }
 
   const handleCreate = () => {
-    if (!requireName('create')) return;
+    setPendingAction('create');
+    setNameDraft('');
+    setNameError(null);
+    setNameModalOpen(true);
   };
 
   const handleJoin = () => {
-    if (!requireName('join')) return;
+    setJoinError(null);
+    const normalizedCode = normalizeSessionCode(sessionCode);
+    if (!normalizedCode) {
+      setJoinError('home.errors.invalid_session_code');
+      return;
+    }
+
+    const savedMembership = useSessionStore.getState().getSavedMembership(normalizedCode);
+    if (savedMembership) {
+      try {
+        useSessionStore.getState().resumeSession(normalizedCode);
+      } catch (error) {
+        setJoinError(getErrorKey(error));
+      }
+      return;
+    }
+
+    lookupSessionMutation.mutate(normalizedCode);
+  };
+
+  const submitName = () => {
+    const userName = nameDraft.trim();
+    if (!userName) {
+      setNameError('home.errors.name_required');
+      return;
+    }
+    if (userName.length > MAX_USER_NAME_LENGTH) {
+      setNameError('home.errors.name_too_long');
+      return;
+    }
+
+    setNameError(null);
+    if (pendingAction === 'create') {
+      createSessionMutation.mutate({
+        userName,
+        settings: { simSpeed, quarterLength, autoFill },
+      });
+      return;
+    }
+
+    if (pendingAction === 'join' && joinTarget) {
+      joinSessionMutation.mutate({ session: joinTarget, userName });
+    }
+  };
+
+  const handleResume = (code: string) => {
+    try {
+      useSessionStore.getState().resumeSession(code);
+    } catch (error) {
+      setJoinError(getErrorKey(error));
+    }
+  };
+
+  const handlePaste = async () => {
+    setJoinError(null);
+    try {
+      setSessionCode(await navigator.clipboard.readText());
+    } catch {
+      setJoinError('home.errors.paste_failed');
+    }
   };
 
   return (
-    <AppShell activeNavItem="home" onlineCount={{ current: 8, total: 8 }} sessionCode="#RC-7842-OAK">
+    <AppShell activeNavItem="home" currentUserName={activeSession?.userName} sessionCode={activeSession?.sessionHash}>
       <div className={styles.page}>
         <section className={styles.heroSection}>
           <h1 className={styles.heroTitle}>
@@ -111,6 +178,21 @@ export default function Home() {
           </h1>
           <p className={styles.heroSubtitle}>{t('home.hero.subtitle')}</p>
         </section>
+
+        {activeSession ? (
+          <section className={styles.activeSessionSection} aria-label={t('home.active_session.title')}>
+            <Card>
+              <div className={styles.activeSessionContent}>
+                <div>
+                  <StatusBadge tone="info">{t('home.active_session.badge')}</StatusBadge>
+                  <h2>{activeSession.sessionName ?? t('home.active_session.unnamed')}</h2>
+                  <p>{t('home.active_session.description', { name: activeSession.userName })}</p>
+                </div>
+                <span className={styles.activeSessionCode}>{activeSession.sessionHash}</span>
+              </div>
+            </Card>
+          </section>
+        ) : null}
 
         <section className={styles.actionsSection}>
           <Card>
@@ -123,20 +205,20 @@ export default function Home() {
               <SegmentedControl
                 label={t('home.host.sim_speed_label')}
                 options={[
-                  { value: 'normal', label: 'NORMAL 1X' },
-                  { value: 'blitz', label: 'BLITZ 2X' },
+                  { value: 'normal', label: t('home.host.normal_speed') },
+                  { value: 'blitz', label: t('home.host.blitz_speed') },
                 ]}
                 value={simSpeed}
-                onChange={(value) => setSimSpeed(value as 'normal' | 'blitz')}
+                onChange={(value) => setSimSpeed(value as SessionSettings['simSpeed'])}
               />
               <SegmentedControl
                 label={t('home.host.quarter_length_label')}
                 options={[
-                  { value: '3', label: '3 MINS' },
-                  { value: '5', label: '5 MINS' },
+                  { value: '3', label: t('home.host.three_minutes') },
+                  { value: '5', label: t('home.host.five_minutes') },
                 ]}
                 value={quarterLength}
-                onChange={(value) => setQuarterLength(value as '3' | '5')}
+                onChange={(value) => setQuarterLength(value as SessionSettings['quarterLength'])}
               />
               <CheckboxRow
                 title={t('home.host.auto_fill_title')}
@@ -162,79 +244,111 @@ export default function Home() {
                 hint={t('home.join.input_hint')}
                 placeholder={t('home.join.input_placeholder')}
                 value={sessionCode}
-                onChange={setSessionCode}
-                trailingAction={{
-                  icon: '📋',
-                  label: t('common.paste'),
-                  onClick: async () => {
-                    const text = await navigator.clipboard.readText();
-                    setSessionCode(text);
-                  },
+                onChange={(value) => {
+                  setSessionCode(value);
+                  setJoinError(null);
                 }}
+                trailingAction={{ icon: '📋', label: t('common.paste'), onClick: () => void handlePaste() }}
               />
+              {joinError ? (
+                <p className={styles.errorMessage} role="alert">
+                  {t(joinError)}
+                </p>
+              ) : null}
               <div className={styles.featuredRow}>
                 <span className={styles.featuredLabel}>{t('home.join.featured_label')}</span>
-                {featuredSessions.map((code) => (
-                  <Chip key={code} label={code} onClick={() => setSessionCode(code)} />
+                {featuredSessionCodes.map((code) => (
+                  <Chip
+                    key={code}
+                    label={code}
+                    onClick={() => {
+                      setSessionCode(code);
+                      setJoinError(null);
+                    }}
+                  />
                 ))}
               </div>
-              <Button variant="secondary" onClick={handleJoin} fullWidth>
-                {t('home.join.cta')}
+              <Button variant="secondary" onClick={handleJoin} disabled={lookupSessionMutation.isPending} fullWidth>
+                {lookupSessionMutation.isPending ? t('home.join.checking') : t('home.join.cta')}
               </Button>
             </div>
           </Card>
         </section>
 
-        {recentCards.length ? (
-          <section className={styles.recentSection}>
-            <div className={styles.recentHeadingRow}>
-              <div>
-                <div className={styles.eyebrow}>{t('home.recent.eyebrow')}</div>
-                <h2>{t('home.recent.heading')}</h2>
-              </div>
-              <div className={styles.savedNote}>{t('home.recent.saved_note')}</div>
+        <section className={styles.recentSection}>
+          <div className={styles.recentHeadingRow}>
+            <div>
+              <div className={styles.eyebrow}>{t('home.recent.eyebrow')}</div>
+              <h2>{t('home.recent.heading')}</h2>
             </div>
+            <div className={styles.savedNote}>{t('home.recent.saved_note')}</div>
+          </div>
+          {recentSessions.length ? (
             <div className={styles.recentGrid}>
-              {recentCards.map((session) => (
+              {recentSessions.map((session) => (
                 <SessionCard
-                  key={session.sessionCode}
-                  sessionCode={session.sessionCode}
-                  sessionName={session.sessionName}
-                  status={session.status}
-                  detailLine={session.detailLine}
-                  primaryStat={session.primaryStat}
-                  secondaryStat={session.secondaryStat}
-                  footerLeft={session.footerLeft}
-                  footerRight={session.footerRight}
-                  cta={{
-                    label: t(`home.session_card.${session.ctaKey}`),
-                    variant: session.ctaVariant,
-                    onClick: () => {},
-                  }}
+                  key={session.sessionHash}
+                  sessionCode={session.sessionHash}
+                  sessionName={session.sessionName ?? t('home.session_card.unnamed')}
+                  isActive={session.sessionHash === activeSessionHash}
+                  activeLabel={t('home.session_card.active')}
+                  currentLabel={t('home.session_card.current')}
+                  savedLabel={t('home.session_card.saved')}
+                  joinedAsLabel={t('home.session_card.joined_as', { name: session.userName })}
+                  lastVisitedLabel={t('home.session_card.last_visited', {
+                    date: formatLastVisited(session.lastVisitedAt, locale),
+                  })}
+                  resumeLabel={t('home.session_card.resume')}
+                  onResume={() => handleResume(session.sessionHash)}
                 />
               ))}
             </div>
-          </section>
-        ) : null}
+          ) : (
+            <Card>
+              <div className={styles.emptyState}>
+                <h3>{t('home.recent.empty_title')}</h3>
+                <p>{t('home.recent.empty_description')}</p>
+              </div>
+            </Card>
+          )}
+        </section>
       </div>
 
       <Modal
-        title={t('home.name_modal.title')}
+        title={t(pendingAction === 'join' ? 'home.name_modal.join_title' : 'home.name_modal.create_title')}
         open={nameModalOpen}
-        onClose={() => setNameModalOpen(false)}
+        onClose={() => {
+          if (!isNameSubmitting) closeNameModal();
+        }}
         closeLabel={t('common.close')}
       >
-        <div className={styles.modalStack}>
+        <form
+          className={styles.modalStack}
+          onSubmit={(event) => {
+            event.preventDefault();
+            submitName();
+          }}
+        >
+          <p className={styles.modalDescription}>{t('home.name_modal.description')}</p>
           <TextInput
             label={t('home.name_modal.label')}
             placeholder={t('home.name_modal.placeholder')}
+            maxLength={MAX_USER_NAME_LENGTH}
             value={nameDraft}
-            onChange={setNameDraft}
+            onChange={(value) => {
+              setNameDraft(value);
+              setNameError(null);
+            }}
           />
-          <Button variant="primary" onClick={submitName} fullWidth>
-            {t('home.name_modal.cta')}
+          {nameError ? (
+            <p className={styles.errorMessage} role="alert">
+              {t(nameError)}
+            </p>
+          ) : null}
+          <Button variant="primary" type="submit" disabled={isNameSubmitting} fullWidth>
+            {isNameSubmitting ? t('home.name_modal.submitting') : t('home.name_modal.cta')}
           </Button>
-        </div>
+        </form>
       </Modal>
     </AppShell>
   );
