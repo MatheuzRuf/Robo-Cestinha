@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { ensureSessionStorageAvailable, sessionStorage } from '../storage/sessionStorage';
-import { sessionService, normalizeSessionCode } from './sessionService';
-import type { SessionDescriptor, SessionIdentity, SessionMembership, SessionSettings } from './types';
+import { ensureSessionStorageAvailable, sessionStorage } from '../lib/storage/sessionStorage';
+import { sessionService, normalizeSessionCode } from '../services/sessionService';
+import type { SessionDescriptor, SessionIdentity, SessionMembership, SessionSettings } from '../types/session';
 
 const RECENT_SESSION_LIMIT = 5;
 
@@ -15,6 +15,7 @@ interface SessionStoreState {
   joinSession: (session: SessionDescriptor, userName: string) => Promise<SessionMembership>;
   resumeSession: (sessionHash: string) => SessionMembership;
   getSavedMembership: (sessionHash: string) => SessionMembership | null;
+  setTeamForSession: (sessionHash: string, teamId: string | null) => void;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -180,6 +181,14 @@ export const useSessionStore = create<SessionStoreState>()(
         const savedSession = get().recentSessions.find((session) => session.sessionHash === sessionHash);
         const identity = get().identitiesBySessionHash[sessionHash];
         return savedSession && identity ? { ...savedSession, ...identity } : null;
+      },
+
+      setTeamForSession(sessionHash, teamId) {
+        set((state) => ({
+          recentSessions: state.recentSessions.map((session) =>
+            session.sessionHash === sessionHash ? { ...session, teamId } : session,
+          ),
+        }));
       },
     }),
     {

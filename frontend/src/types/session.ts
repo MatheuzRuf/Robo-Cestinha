@@ -4,6 +4,8 @@ export interface SessionSettings {
   autoFill: boolean;
 }
 
+export type SessionHash = string;
+
 export interface SessionDescriptor {
   sessionHash: string;
   sessionName?: string;

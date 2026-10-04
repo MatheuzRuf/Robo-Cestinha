@@ -1,137 +1,118 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { AppShell } from '../../components/AppShell';
 import { Button } from '../../components/Button';
 import { useTranslation } from '../../lib/i18n/i18n';
+import { useSessionStore } from '../../stores/sessionStore';
+import { useTeamStore } from '../../stores/teamStore';
 import { ClubList } from './components/ClubList';
-import { StartingFive } from './components/StartingFive';
 import { TeamDetails } from './components/TeamDetails';
+import { TeamRoster } from './components/TeamRoster';
 import { TeamSelectionPanel } from './components/TeamSelectionPanel';
-import { teamService } from './services/teamService';
-import type { TeamLockerData } from './types';
 import styles from './TeamLocker.module.css';
 
 export default function TeamLocker() {
   const { t } = useTranslation();
-  const [locker, setLocker] = useState<TeamLockerData | null>(null);
-  const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
-  const [coachHandle, setCoachHandle] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [loadFailed, setLoadFailed] = useState(false);
-  const [selectionError, setSelectionError] = useState<string | null>(null);
-  const [loadAttempt, setLoadAttempt] = useState(0);
+  const navigate = useNavigate();
+  const activeSession = useSessionStore(
+    (state) => state.recentSessions.find((session) => session.sessionHash === state.activeSessionHash) ?? null,
+  );
+  const sessionHash = activeSession?.sessionHash ?? null;
+  const userId = activeSession?.userId ?? null;
+  const context = useMemo(() => (sessionHash && userId ? { sessionHash, userId } : null), [sessionHash, userId]);
+  const snapshot = useTeamStore((state) => state.snapshot);
+  const selectedTeamId = useTeamStore((state) => state.selectedTeamId);
+  const status = useTeamStore((state) => state.status);
+  const isLocking = useTeamStore((state) => state.isLocking);
+  const errorKey = useTeamStore((state) => state.errorKey);
+  const loadLocker = useTeamStore((state) => state.loadLocker);
+  const selectTeam = useTeamStore((state) => state.selectTeam);
+  const lockSelectedTeam = useTeamStore((state) => state.lockSelectedTeam);
+  const reset = useTeamStore((state) => state.reset);
+  const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
 
   useEffect(() => {
-    let isActive = true;
+    if (context) {
+      void loadLocker(context);
+      return;
+    }
+    reset();
+  }, [context, loadLocker, reset]);
 
-    const load = async () => {
-      try {
-        const data = await teamService.getLockerData();
-        if (data.teams.length !== 8) {
-          throw new Error('Team locker must contain exactly eight clubs.');
-        }
-        if (!isActive) return;
-        setLocker(data);
-        setSelectedTeamId(data.myTeamId ?? data.initialSelectedTeamId ?? data.teams[0]?.id ?? null);
-        setIsLoading(false);
-      } catch {
-        if (!isActive) return;
-        setLoadFailed(true);
-        setIsLoading(false);
+  const selectedTeam = snapshot?.teams.find((team) => team.id === selectedTeamId) ?? null;
+  const myTeam = snapshot?.teams.find((team) => team.id === snapshot.myTeamId) ?? null;
+
+  const lockMutation = useMutation({
+    mutationFn: async () => {
+      if (!context) throw new Error('session_not_active');
+      return lockSelectedTeam(context);
+    },
+    onSuccess: (updatedSnapshot) => {
+      if (context) {
+        useSessionStore.getState().setTeamForSession(context.sessionHash, updatedSnapshot.myTeamId);
       }
-    };
-
-    void load();
-    return () => {
-      isActive = false;
-    };
-  }, [loadAttempt]);
-
-  const selectedTeam = useMemo(
-    () => locker?.teams.find((team) => team.id === selectedTeamId) ?? null,
-    [locker, selectedTeamId],
-  );
+    },
+  });
 
   const handleSelectTeam = (teamId: string) => {
-    setSelectedTeamId(teamId);
-    setSelectionError(null);
-  };
-
-  const handleRetry = () => {
-    setIsLoading(true);
-    setLoadFailed(false);
-    setLoadAttempt((attempt) => attempt + 1);
-  };
-
-  const handleLockIn = async () => {
-    if (!locker || !selectedTeam || !coachHandle.trim() || selectedTeam.status !== 'available') return;
-
-    setIsSaving(true);
-    setSelectionError(null);
-    try {
-      await teamService.selectTeam(locker.sessionCode, selectedTeam.id, coachHandle.trim());
-      setLocker((current) => {
-        if (!current) return current;
-        return {
-          ...current,
-          myTeamId: selectedTeam.id,
-          teams: current.teams.map((team) =>
-            team.id === selectedTeam.id ? { ...team, status: 'locked_by_you', lockedBy: coachHandle.trim() } : team,
-          ),
-        };
-      });
-    } catch {
-      setSelectionError('team_locker.selection.save_failed');
-    } finally {
-      setIsSaving(false);
-    }
+    selectTeam(teamId);
+    setExpandedPlayerId(null);
   };
 
   return (
     <AppShell
       activeNavItem="teamLocker"
-      onlineCount={locker?.onlineCount}
-      sessionCode={locker?.sessionCode}
-      tickerText={t('shell.ticker_text')}
+      currentUserName={activeSession?.userName}
+      sessionCode={activeSession?.sessionHash}
     >
       <main className={styles.page}>
-        {isLoading ? (
+        {!activeSession ? (
+          <div className={styles.emptyState}>
+            <p>{t('team_locker.no_active_session')}</p>
+            <Button variant="primary" onClick={() => navigate('/')}>
+              {t('team_locker.go_to_home')}
+            </Button>
+          </div>
+        ) : status === 'loading' || status === 'idle' ? (
           <p className={styles.statusMessage} role="status">
             {t('team_locker.loading')}
           </p>
-        ) : loadFailed || !locker ? (
+        ) : status === 'error' || !snapshot ? (
           <div className={styles.errorState} role="alert">
             <p>{t('team_locker.load_failed')}</p>
-            <Button variant="outline" onClick={handleRetry}>
+            <Button variant="outline" onClick={() => context && void loadLocker(context)}>
               {t('team_locker.retry')}
             </Button>
           </div>
         ) : (
-          <>
-            <div className={styles.lockerGrid}>
-              <ClubList teams={locker.teams} selectedTeamId={selectedTeamId} onSelect={handleSelectTeam} />
+          <div className={styles.lockerGrid}>
+            <ClubList teams={snapshot.teams} selectedTeamId={selectedTeamId} onSelect={handleSelectTeam} />
 
-              <div className={styles.detailsColumn}>
-                {selectedTeam ? (
-                  <>
-                    <TeamDetails team={selectedTeam} />
-                    <StartingFive team={selectedTeam} />
-                    <TeamSelectionPanel
-                      team={selectedTeam}
-                      coachHandle={coachHandle}
-                      hasSavedSelection={locker.myTeamId !== null}
-                      isSaving={isSaving}
-                      error={selectionError}
-                      onCoachHandleChange={setCoachHandle}
-                      onConfirm={() => void handleLockIn()}
-                    />
-                  </>
-                ) : (
-                  <div className={styles.emptyState}>{t('team_locker.empty_selection')}</div>
-                )}
-              </div>
+            <div className={styles.detailsColumn}>
+              {selectedTeam ? (
+                <>
+                  <TeamDetails team={selectedTeam} />
+                  <TeamRoster
+                    team={selectedTeam}
+                    expandedPlayerId={expandedPlayerId}
+                    onTogglePlayer={(playerId) =>
+                      setExpandedPlayerId((currentId) => (currentId === playerId ? null : playerId))
+                    }
+                  />
+                  <TeamSelectionPanel
+                    team={selectedTeam}
+                    myTeam={myTeam ?? null}
+                    isLocking={isLocking || lockMutation.isPending}
+                    errorKey={errorKey}
+                    onConfirm={() => lockMutation.mutate()}
+                  />
+                </>
+              ) : (
+                <div className={styles.emptyState}>{t('team_locker.empty_selection')}</div>
+              )}
             </div>
-          </>
+          </div>
         )}
       </main>
     </AppShell>

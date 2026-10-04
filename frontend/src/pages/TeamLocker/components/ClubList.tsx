@@ -1,17 +1,17 @@
 import { useTranslation } from '../../../lib/i18n/i18n';
-import type { Club } from '../types';
+import type { LockerTeam } from '../../../types/team';
 import styles from './ClubList.module.css';
 
 interface ClubListProps {
-  teams: Club[];
+  teams: LockerTeam[];
   selectedTeamId: string | null;
   onSelect: (teamId: string) => void;
 }
 
 export function ClubList({ teams, selectedTeamId, onSelect }: ClubListProps) {
   const { t } = useTranslation();
-  const availableTeams = teams.filter((team) => team.status === 'available');
-  const lockedTeams = teams.filter((team) => team.status !== 'available');
+  const availableTeams = teams.filter((team) => team.claimStatus === 'available');
+  const lockedTeams = teams.filter((team) => team.claimStatus !== 'available');
 
   return (
     <div className={styles.listColumn}>
@@ -21,7 +21,7 @@ export function ClubList({ teams, selectedTeamId, onSelect }: ClubListProps) {
             <span className={styles.headingIcon} aria-hidden="true">
               ◈
             </span>
-            {t('team_locker.available_clubs')}
+            {t('team_locker.available_teams')}
           </h2>
           <span className={styles.countBadge}>{t('team_locker.open_slots', { count: availableTeams.length })}</span>
         </div>
@@ -32,33 +32,44 @@ export function ClubList({ teams, selectedTeamId, onSelect }: ClubListProps) {
         </div>
       </section>
 
-      <section className={styles.lockedSection} aria-labelledby="locked-clubs-heading">
+      <section className={styles.lockedSection} aria-labelledby="claimed-teams-heading">
         <div className={styles.lockedHeading}>
-          <h2 id="locked-clubs-heading">
+          <h2 id="claimed-teams-heading">
             <span aria-hidden="true">♙</span>
-            {t('team_locker.locked_clubs')}
+            {t('team_locker.claimed_teams')}
           </h2>
         </div>
-        <div className={styles.lockedList}>
-          {lockedTeams.map((team) => (
-            <ClubRow key={team.id} team={team} selected={selectedTeamId === team.id} onSelect={onSelect} />
-          ))}
-        </div>
+        {lockedTeams.length ? (
+          <div className={styles.lockedList}>
+            {lockedTeams.map((team) => (
+              <ClubRow key={team.id} team={team} selected={selectedTeamId === team.id} onSelect={onSelect} />
+            ))}
+          </div>
+        ) : (
+          <p className={styles.noClaimedTeams}>{t('team_locker.no_claimed_teams')}</p>
+        )}
       </section>
     </div>
   );
 }
 
-function ClubRow({ team, selected, onSelect }: { team: Club; selected: boolean; onSelect: (teamId: string) => void }) {
+function ClubRow({
+  team,
+  selected,
+  onSelect,
+}: {
+  team: LockerTeam;
+  selected: boolean;
+  onSelect: (teamId: string) => void;
+}) {
   const { t } = useTranslation();
-  const locked = team.status !== 'available';
+  const locked = team.claimStatus !== 'available';
   const statusLabel =
-    team.status === 'available'
+    team.claimStatus === 'available'
       ? t('team_locker.status.available')
-      : team.status === 'locked_by_you'
+      : team.claimStatus === 'locked_by_you'
         ? t('team_locker.status.locked_by_you')
-        : t('team_locker.status.locked_by_other', { coach: team.lockedBy ?? '' });
-  const name = t(team.nameKey);
+        : t('team_locker.status.locked_by_other');
 
   return (
     <button
@@ -67,13 +78,12 @@ function ClubRow({ team, selected, onSelect }: { team: Club; selected: boolean; 
       data-selected={selected}
       data-locked={locked}
       aria-pressed={selected}
-      aria-label={t('team_locker.select_club', { seed: team.seed, name, status: statusLabel })}
+      aria-label={t('team_locker.select_team', { name: team.name, status: statusLabel })}
       onClick={() => onSelect(team.id)}
     >
-      <span className={styles.seed}>#{team.seed}</span>
+      <span className={styles.abbreviation}>{team.abbreviation}</span>
       <span className={styles.clubInfo}>
-        <span className={styles.location}>{t(team.locationKey)}</span>
-        <span className={styles.clubName}>{name}</span>
+        <span className={styles.clubName}>{team.name}</span>
         <span className={styles.clubStatus}>{statusLabel}</span>
       </span>
       <span className={styles.rowAction} aria-hidden="true">

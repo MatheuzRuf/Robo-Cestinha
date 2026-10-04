@@ -1,4 +1,4 @@
-import type { SessionDescriptor, SessionMembership, SessionSettings } from './types';
+import type { SessionDescriptor, SessionMembership, SessionSettings } from '../types/session';
 
 export const featuredSessionCodes = ['#RC-7842-OAK', '#RC-9104-TEX'] as const;
 

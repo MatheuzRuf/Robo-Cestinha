@@ -45,6 +45,10 @@
   gap: var(--space-2);
 }
 
+.lockedSection {
+  min-width: 0;
+}
+
 .lockedHeading {
   color: var(--color-text-muted);
   margin-bottom: var(--space-2);
@@ -52,6 +56,13 @@
 
 .lockedHeading span {
   color: var(--color-warning);
+}
+
+.noClaimedTeams {
+  margin: 0;
+  padding: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
 }
 
 .clubRow {
@@ -70,8 +81,7 @@
   cursor: pointer;
   transition:
     border-color 120ms ease,
-    background-color 120ms ease,
-    opacity 120ms ease;
+    background-color 120ms ease;
 }
 
 .clubRow:hover {
@@ -99,41 +109,31 @@
   box-shadow: inset 0 0 0 1px var(--color-warning);
 }
 
-.seed {
+.abbreviation {
   display: grid;
   place-items: center;
   min-height: 3rem;
   border-radius: var(--radius-sm);
   background: var(--color-bg);
   color: var(--color-warning);
-  font-size: 1.2rem;
-  font-weight: 900;
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  font-weight: 850;
 }
 
-.clubRow[data-locked='true'] .seed {
+.clubRow[data-locked='true'] .abbreviation {
   color: var(--color-text-muted);
 }
 
 .clubInfo {
   display: grid;
-  gap: 1px;
+  gap: 2px;
   min-width: 0;
-}
-
-.location {
-  overflow: hidden;
-  color: var(--color-text-muted);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.06em;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-  white-space: nowrap;
 }
 
 .clubName {
   overflow: hidden;
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 850;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -165,8 +165,8 @@
     padding: var(--space-2);
   }
 
-  .seed {
+  .abbreviation {
     min-height: 2.5rem;
-    font-size: 1rem;
+    font-size: 0.75rem;
   }
 }

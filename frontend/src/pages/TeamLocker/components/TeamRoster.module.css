@@ -12,23 +12,16 @@
 }
 
 .heading h2 {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
   margin: 0;
   font-size: 1.15rem;
   font-weight: 850;
-}
-
-.heading h2 span {
-  color: var(--color-warning);
 }
 
 .meta {
   color: var(--color-text-muted);
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.05em;
   text-align: right;
   text-transform: uppercase;
 }
@@ -50,11 +43,14 @@
 }
 
 .table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   background: var(--color-bg);
   color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -62,13 +58,40 @@
   font-weight: 700;
 }
 
-.table tbody tr:nth-child(even) {
+.table tbody tr.playerRow[data-alternate='true'] {
   background: var(--color-surface);
+}
+
+.table tbody tr.playerRow {
+  cursor: pointer;
+}
+
+.table tbody tr.playerRow:hover {
+  background: var(--color-surface);
+}
+
+.table tbody tr.playerRow[data-selected='true'] {
+  background: var(--color-surface);
+  box-shadow: inset 2px 0 0 var(--color-primary);
+}
+
+.expandedRow {
+  background: var(--color-bg);
+}
+
+.profileCell {
+  padding: 0 var(--space-3) !important;
+  white-space: normal !important;
+}
+
+.profilePanel {
+  padding: var(--space-2) 0;
 }
 
 .table tbody th,
 .table tbody td {
   border-bottom: 1px solid var(--color-bg);
+  font-variant-numeric: tabular-nums;
 }
 
 .position {
@@ -77,30 +100,39 @@
   font-size: 0.82rem;
 }
 
-.playerName {
-  font-weight: 850;
-}
-
-.overall {
-  display: inline-block;
-  min-width: 2rem;
-  padding: 1px var(--space-1);
-  background: var(--color-bg);
-  color: var(--color-warning);
-  font-family: var(--font-mono);
+.playerButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
   font-weight: 800;
-  text-align: center;
+  text-align: left;
+  cursor: pointer;
 }
 
-.archetype {
+.playerButton:hover {
+  color: var(--color-primary);
+}
+
+.playerButton:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.role {
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
 }
 
-.badge {
+.role[data-starter='true'] {
   color: var(--color-warning);
-  font-size: 1.15rem;
-  text-align: center;
+}
+
+.hint {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
 }
 
 @media (max-width: 680px) {
