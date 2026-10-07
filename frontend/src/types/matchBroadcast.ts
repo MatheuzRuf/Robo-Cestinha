@@ -53,6 +53,28 @@ export interface MatchSnapshot {
   commentary: CommentaryEntry[];
 }
 
+export interface TimelineNarrationEntry {
+  eventId: string;
+  locale: string;
+  text: string;
+}
+
+export interface TimelineEvent {
+  id: string;
+  sequence: number;
+  occurredAt: string;
+  type: string;
+  gameClock: string;
+  description: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface MatchTimelinePayload extends MatchSnapshot {
+  frames: Frame[];
+  events: TimelineEvent[];
+  narration: TimelineNarrationEntry[];
+}
+
 export type MatchUpdatePayload = Partial<
   Omit<MatchSnapshot, 'matchId' | 'matchMeta' | 'frame' | 'playByPlay' | 'commentary' | 'durationSeconds'>
 >;

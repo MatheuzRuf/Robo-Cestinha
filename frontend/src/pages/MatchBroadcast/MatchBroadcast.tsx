@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AppShell } from '../../components/AppShell';
+import { USE_API_TIMELINE } from '../../config/api';
 import { useMatchBroadcastStore } from '../../stores/matchBroadcastStore';
 import { matchBroadcastService } from '../../services/matchBroadcastService';
 import { useTranslation } from '../../lib/i18n/i18n';
+import type { MatchTimelinePayload } from '../../types/matchBroadcast';
 import { useGameFrames } from './hooks/useGameFrames';
 import { BroadcastHeader } from './components/BroadcastHeader/BroadcastHeader';
 import { CommentaryColumn } from './components/CommentaryColumn/CommentaryColumn';
@@ -29,18 +31,55 @@ export default function MatchBroadcast({ matchId: providedMatchId }: MatchBroadc
   const commentary = useMatchBroadcastStore((state) => state.commentary);
   const status = useMatchBroadcastStore((state) => state.status);
   const reset = useMatchBroadcastStore((state) => state.reset);
-  const { frame, transitionDurationMs, speed, setSpeed, isPaused, pause, resume } = useGameFrames(streamFrame);
+  const [apiTimeline, setApiTimeline] = useState<MatchTimelinePayload | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const { frame, transitionDurationMs, speed, setSpeed, isPaused, pause, resume } = useGameFrames(
+    streamFrame,
+    apiTimeline?.frames ?? [],
+  );
 
   useEffect(() => {
+    let disconnect: (() => void) | undefined;
     reset(matchId);
-    const disconnect = matchBroadcastService.connect(
+    setApiTimeline(null);
+    setApiError(null);
+
+    if (USE_API_TIMELINE) {
+      void matchBroadcastService
+        .fetchTimeline(matchId)
+        .then((timeline) => {
+          setApiTimeline(timeline);
+          useMatchBroadcastStore.getState().receiveEvent({
+            sequence: 1,
+            occurredAt: new Date().toISOString(),
+            type: 'snapshot',
+            payload: timeline,
+          });
+          useMatchBroadcastStore.getState().setStatus('connected');
+        })
+        .catch(() => {
+          setApiError('Timeline API unavailable. Falling back to the mock broadcast stream.');
+          disconnect = matchBroadcastService.connect(
+            matchId,
+            (event) => useMatchBroadcastStore.getState().receiveEvent(event),
+            (nextStatus) => useMatchBroadcastStore.getState().setStatus(nextStatus),
+          );
+        });
+
+      return () => {
+        disconnect?.();
+        useMatchBroadcastStore.getState().setStatus('idle');
+      };
+    }
+
+    disconnect = matchBroadcastService.connect(
       matchId,
       (event) => useMatchBroadcastStore.getState().receiveEvent(event),
       (nextStatus) => useMatchBroadcastStore.getState().setStatus(nextStatus),
     );
 
     return () => {
-      disconnect();
+      disconnect?.();
       useMatchBroadcastStore.getState().setStatus('idle');
     };
   }, [matchId, reset]);
@@ -58,6 +97,7 @@ export default function MatchBroadcast({ matchId: providedMatchId }: MatchBroadc
     <AppShell activeNavItem="liveBroadcast" tickerText={snapshot?.ticker}>
       <main className={styles.page}>
         <BroadcastHeader matchMeta={snapshot?.matchMeta} status={status} />
+        {apiError ? <div className={styles.streamStatus}>{apiError}</div> : null}
         {snapshot ? (
           <>
             <Scoreboard

@@ -1,5 +1,9 @@
 import { API_BASE_URL } from '../config/api';
-import type { BroadcastEvent, MatchStreamStatus } from '../types/matchBroadcast';
+import type {
+  BroadcastEvent,
+  MatchStreamStatus,
+  MatchTimelinePayload,
+} from '../types/matchBroadcast';
 
 type EventHandler = (event: BroadcastEvent) => void;
 type StatusHandler = (status: MatchStreamStatus) => void;
@@ -21,6 +25,17 @@ function isBroadcastEvent(value: unknown): value is BroadcastEvent {
 }
 
 export const matchBroadcastService = {
+  async fetchTimeline(matchId: string): Promise<MatchTimelinePayload> {
+    const response = await fetch(`${API_BASE_URL}/matches/${encodeURIComponent(matchId)}/timeline`);
+
+    if (!response.ok) {
+      throw new Error(`Timeline request failed with status ${response.status}`);
+    }
+
+    const payload = (await response.json()) as MatchTimelinePayload;
+    return payload;
+  },
+
   connect(matchId: string, onEvent: EventHandler, onStatus: StatusHandler) {
     const url = new URL(`${API_BASE_URL}/matches/stream`);
     url.searchParams.set('match_id', matchId);

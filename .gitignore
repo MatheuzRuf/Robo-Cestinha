@@ -8,4 +8,14 @@ __pycache__/
 .ruff_cache/
 data/raw/
 .ipynb_checkpoints/
+# Local secrets and env files (all folders)
 .env
+.env.*
+**/.env
+**/.env.*
+
+# Keep the example templates tracked
+!.env.example
+!**/.env.example
+!backend/.env.example
+!frontend/.env.example

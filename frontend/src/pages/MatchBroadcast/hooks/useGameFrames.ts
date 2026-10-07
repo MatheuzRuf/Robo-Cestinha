@@ -11,7 +11,7 @@ interface PlaybackState {
   timeoutId?: number;
 }
 
-export function useGameFrames(incomingFrame: Frame | null) {
+export function useGameFrames(incomingFrame: Frame | null, apiFrames: Frame[] = []) {
   const [frame, setFrame] = useState<Frame | null>(null);
   const [speed, setSpeed] = useState<1 | 1.5 | 2>(1);
   const [isPaused, setIsPaused] = useState(false);
@@ -48,6 +48,17 @@ export function useGameFrames(incomingFrame: Frame | null) {
   }, []);
 
   useEffect(() => {
+    if (apiFrames.length > 0) {
+      const playback = playbackRef.current;
+      queueRef.current = [...apiFrames];
+      if (playback.timeoutId) window.clearTimeout(playback.timeoutId);
+      playback.timeoutId = undefined;
+      playback.playing = false;
+      setFrame(apiFrames[0]);
+      playNextRef.current();
+      return;
+    }
+
     if (!incomingFrame) {
       queueRef.current = [];
       const playback = playbackRef.current;
@@ -60,7 +71,7 @@ export function useGameFrames(incomingFrame: Frame | null) {
     queueRef.current.push(incomingFrame);
     while (queueRef.current.length > MAX_QUEUE_SIZE) queueRef.current.shift();
     playNextRef.current();
-  }, [incomingFrame]);
+  }, [apiFrames, incomingFrame]);
 
   useEffect(() => {
     const playback = playbackRef.current;

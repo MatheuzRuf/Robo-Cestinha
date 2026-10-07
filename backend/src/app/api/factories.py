@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.base import get_db
 from app.domain.bracket.repository import BracketRepository
 from app.domain.bracket.service import BracketService
+from app.domain.matches.service import MockTimelineService
 from app.domain.sessions.repository import SessionRepository
 from app.domain.sessions.service import SessionService
 
@@ -42,3 +43,12 @@ class ServiceFactory:
             repository=SessionRepository(self._db),
             bracket_service=self.bracket_service(),
         )
+
+    def mock_timeline_service(self) -> MockTimelineService:
+        """Build the temporary mock timeline service used by the frontend API.
+
+        Returns:
+            A deterministic mock service that returns the broadcast timeline.
+        """
+
+        return MockTimelineService()

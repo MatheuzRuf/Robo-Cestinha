@@ -5,8 +5,11 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
+
+from app.api.factories import ServiceFactory
+from app.api.schemas.match_timeline import MatchTimelineResponse
 
 router = APIRouter()
 
@@ -384,6 +387,28 @@ async def _generate_events(match_id: str) -> AsyncIterator[str]:
             yield _format_event(sequence, "play_by_play", play_entry)
             sequence += 1
             yield _format_event(sequence, "commentary", commentary_entry)
+
+
+@router.get("/{match_id}/timeline", response_model=MatchTimelineResponse)
+async def get_match_timeline(
+    match_id: str,
+    locale: str = Query(default="en-US", min_length=2, max_length=10),
+    factory: ServiceFactory = Depends(),
+) -> MatchTimelineResponse:
+    """Return a complete mock match timeline payload for the frontend.
+
+    Args:
+        match_id: Match identifier to resolve.
+        locale: Preferred locale for the narration bundle.
+        factory: Request-scoped service factory.
+
+    Returns:
+        The complete timeline, frames, and event metadata used by the broadcast.
+    """
+
+    service = factory.mock_timeline_service()
+    payload = service.get_timeline(match_id=match_id, locale=locale)
+    return MatchTimelineResponse(**payload)
 
 
 @router.get("/stream")
