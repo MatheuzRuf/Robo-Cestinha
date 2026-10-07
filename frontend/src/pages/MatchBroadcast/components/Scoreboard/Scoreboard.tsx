@@ -1,10 +1,10 @@
 import { Button } from '../../../../components/Button';
 import { SegmentedControl } from '../../../../components/SegmentedControl';
 import { useTranslation } from '../../../../lib/i18n/i18n';
-import { mockMatchData, type Speed, type TeamSummary as TeamSummaryData } from '../../data/mockMatchData';
+import type { MatchSnapshot, Speed, TeamSummary } from '../../../../types/matchBroadcast';
 import styles from '../../MatchBroadcast.module.css';
 
-function TeamSummary({ side, team }: { side: 'home' | 'away'; team: TeamSummaryData }) {
+function TeamSummaryBlock({ side, team }: { side: 'home' | 'away'; team: TeamSummary }) {
   const { t } = useTranslation();
 
   return (
@@ -33,23 +33,24 @@ function TeamSummary({ side, team }: { side: 'home' | 'away'; team: TeamSummaryD
 }
 
 type ScoreboardProps = {
+  snapshot: MatchSnapshot;
   speed: Speed;
   setSpeed: (speed: Speed) => void;
   isPaused: boolean;
   onTogglePause: () => void;
 };
 
-export function Scoreboard({ speed, setSpeed, isPaused, onTogglePause }: ScoreboardProps) {
+export function Scoreboard({ snapshot, speed, setSpeed, isPaused, onTogglePause }: ScoreboardProps) {
   const { t } = useTranslation();
 
   return (
     <section className={styles.scoreboard}>
-      <TeamSummary side="home" team={mockMatchData.home} />
+      <TeamSummaryBlock side="home" team={snapshot.home} />
       <div className={styles.clockPanel}>
-        <span className={styles.quarter}>{mockMatchData.quarter}</span>
-        <strong className={styles.gameClock}>{mockMatchData.gameClock}</strong>
+        <span className={styles.quarter}>{t(`match_broadcast.clock.quarters.${snapshot.quarter}`)}</span>
+        <strong className={styles.gameClock}>{snapshot.gameClock}</strong>
         <span className={styles.shotClock}>
-          {t('match_broadcast.clock.shot_clock')} <b>{mockMatchData.shotClock}</b>
+          {t('match_broadcast.clock.shot_clock')} <b>{snapshot.shotClock}</b>
         </span>
         <SegmentedControl
           label={t('match_broadcast.clock.speed_label')}
@@ -65,7 +66,7 @@ export function Scoreboard({ speed, setSpeed, isPaused, onTogglePause }: Scorebo
           {isPaused ? t('match_broadcast.clock.resume') : t('match_broadcast.clock.pause')}
         </Button>
       </div>
-      <TeamSummary side="away" team={mockMatchData.away} />
+      <TeamSummaryBlock side="away" team={snapshot.away} />
     </section>
   );
 }

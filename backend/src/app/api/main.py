@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import health, sessions
+from app.api.routers import health, matches, sessions
 from app.core.config import settings
 
 
@@ -17,3 +17,4 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(sessions.router, prefix="/sessions", tags=["sessions"])
+app.include_router(matches.router, prefix="/matches", tags=["matches"])

@@ -33,6 +33,28 @@ paths:
                 $ref: '#/components/schemas/CreateSessionResponse'
         '422':
           description: Validation error.
+  /matches/stream:
+    get:
+      summary: Stream live match events
+      description: Streams a randomized demo match using Server-Sent Events.
+      parameters:
+        - name: match_id
+          in: query
+          required: false
+          schema:
+            type: string
+            default: demo
+          description: Match identifier included in the stream snapshot.
+      responses:
+        '200':
+          description: Server-Sent Events stream.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: Newline-delimited SSE messages with a JSON event envelope.
+        '422':
+          description: Invalid match identifier.
 components:
   schemas:
     HealthCheckResponse:

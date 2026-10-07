@@ -1,6 +1,6 @@
 import { LogPanel } from '../../../../components/LogPanel';
 import { useTranslation } from '../../../../lib/i18n/i18n';
-import type { PlayByPlayLogEntry } from '../../data/mockMatchData';
+import type { PlayByPlayLogEntry } from '../../../../types/matchBroadcast';
 import styles from '../../MatchBroadcast.module.css';
 
 export function PlayByPlayColumn({ entries }: { entries: PlayByPlayLogEntry[] }) {

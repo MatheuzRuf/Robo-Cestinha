@@ -12,6 +12,7 @@ export default function App() {
         <Route path="/team-locker" element={<TeamLocker />} />
         <Route path="/bracket-tree" element={<BracketTree />} />
         <Route path="/match-demo" element={<MatchBroadcast />} />
+        <Route path="/matches/:matchId" element={<MatchBroadcast />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

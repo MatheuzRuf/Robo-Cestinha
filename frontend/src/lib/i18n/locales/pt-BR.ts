@@ -165,11 +165,13 @@ export const ptBR = {
   },
   match_broadcast: {
     header: {
-      live_label: 'TRANSMISSÃO AO VIVO // QUADRA 01',
-      game_meta: 'SÉRIE DO CAMPEONATO DIVISÃO A · JOGO 7',
       mode_live: 'SIM AO VIVO',
       mode_replay: 'REPLAY-BOX',
-      latency_label: 'LATÊNCIA: {value}ms',
+      connecting: 'CONECTANDO',
+      connected: 'TRANSMISSÃO AO VIVO',
+      reconnecting: 'RECONECTANDO',
+      error: 'TRANSMISSÃO INDISPONÍVEL',
+      waiting_for_match: 'Aguardando dados da partida',
     },
     scoreboard: { fouls_label: 'FALTAS', timeouts_label: 'TEMPOS' },
     clock: {
@@ -177,10 +179,12 @@ export const ptBR = {
       shot_clock: 'RELÓGIO DE ATAQUE',
       pause: 'PAUSAR SIM',
       resume: 'RETOMAR SIM',
+      paused_status: 'PAUSADO',
+      quarters: { 1: '1º QUARTO', 2: '2º QUARTO', 3: '3º QUARTO', 4: '4º QUARTO' },
     },
     play_call: { label: 'JOGADA', probability_label: 'PROBABILIDADE DE ARREMESSO', defense_label: 'DEFESA' },
     timeline: {
-      label: 'LINHA DO TEMPO Q4',
+      label: 'LINHA DO TEMPO Q{quarter}',
       previous: 'Jogada anterior',
       play: 'Reproduzir linha do tempo',
       next: 'Próxima jogada',

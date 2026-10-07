@@ -185,11 +185,34 @@
   overflow: hidden;
 }
 
-.timelineTrack span {
+.timelineProgress {
+  appearance: none;
   display: block;
-  width: 87%;
+  width: 100%;
   height: 100%;
+  border: 0;
+  background: var(--color-border);
+}
+
+.timelineProgress::-webkit-progress-bar {
+  background: var(--color-border);
+}
+
+.timelineProgress::-webkit-progress-value {
   background: var(--color-primary);
+}
+
+.timelineProgress::-moz-progress-bar {
+  background: var(--color-primary);
+}
+
+.streamStatus {
+  align-self: center;
+  justify-self: center;
+  color: var(--color-text-muted);
+  font: 700 0.9rem var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .timelineButtons button {

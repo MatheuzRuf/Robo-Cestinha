@@ -1,6 +1,6 @@
 import { LogPanel } from '../../../../components/LogPanel';
 import { useTranslation } from '../../../../lib/i18n/i18n';
-import type { CommentaryEntry } from '../../data/mockMatchData';
+import type { CommentaryEntry } from '../../../../types/matchBroadcast';
 import styles from '../../MatchBroadcast.module.css';
 
 export function CommentaryColumn({ entries, isPaused }: { entries: CommentaryEntry[]; isPaused: boolean }) {
@@ -10,7 +10,7 @@ export function CommentaryColumn({ entries, isPaused }: { entries: CommentaryEnt
     <LogPanel
       title={t('match_broadcast.commentary.title')}
       entriesKey={entries.at(-1)?.id ?? ''}
-      footer={<span className={styles.voice}>{isPaused ? ' · PAUSED' : ''}</span>}
+      footer={<span className={styles.voice}>{isPaused ? ` · ${t('match_broadcast.clock.paused_status')}` : ''}</span>}
     >
       {entries.map((entry) => (
         <article className={styles.commentaryEntry} key={entry.id}>
