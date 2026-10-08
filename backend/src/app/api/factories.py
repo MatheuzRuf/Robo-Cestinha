@@ -1,10 +1,11 @@
+from typing import Annotated
+
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.base import get_db
 from app.domain.bracket.repository import BracketRepository
 from app.domain.bracket.service import BracketService
-from app.domain.matches.service import MockTimelineService
 from app.domain.sessions.repository import SessionRepository
 from app.domain.sessions.service import SessionService
 
@@ -12,7 +13,7 @@ from app.domain.sessions.service import SessionService
 class ServiceFactory:
     """Build request-scoped application services."""
 
-    def __init__(self, db: AsyncSession = Depends(get_db)) -> None:
+    def __init__(self, db: Annotated[AsyncSession, Depends(get_db)]) -> None:
         """Initialize the factory with a request-scoped database session.
 
         Args:

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { AppShell } from '../../components/AppShell';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
@@ -9,7 +9,7 @@ import { Modal } from '../../components/Modal';
 import { SegmentedControl } from '../../components/SegmentedControl';
 import { StatusBadge } from '../../components/StatusBadge';
 import { TextInput } from '../../components/TextInput';
-import { featuredSessionCodes, normalizeSessionCode } from '../../services/sessionService';
+import { normalizeSessionCode, sessionService } from '../../services/sessionService';
 import { useSessionStore } from '../../stores/sessionStore';
 import type { SessionDescriptor, SessionSettings } from '../../types/session';
 import { useTranslation } from '../../lib/i18n/i18n';
@@ -58,6 +58,10 @@ export default function Home() {
   const recentSessions = useSessionStore((state) => state.recentSessions);
   const activeSessionHash = useSessionStore((state) => state.activeSessionHash);
   const activeSession = recentSessions.find((session) => session.sessionHash === activeSessionHash) ?? null;
+  const { data: featuredSessionCodes = [] } = useQuery({
+    queryKey: ['featured-sessions'],
+    queryFn: sessionService.getFeaturedSessionCodes,
+  });
 
   const lookupSessionMutation = useMutation({
     mutationFn: async (code: string) => {

@@ -81,7 +81,7 @@ export const enUS = {
     errors: {
       action_failed: 'Could not complete the request. Try again.',
       invalid_session_code: 'Enter a valid session code or invite URL.',
-      session_not_found: 'No mock session was found for that code.',
+      session_not_found: 'No session was found for that code.',
       saved_session_not_found: 'This saved session is no longer available on this device.',
       storage_unavailable: 'Could not save this session in this browser.',
       name_required: 'Enter your name to continue.',
@@ -159,7 +159,6 @@ export const enUS = {
       team_unavailable: 'This team is no longer available. Reload the locker and choose another team.',
       already_claimed: 'You have already locked a team in this session.',
       team_not_found: 'The selected team could not be found in this session.',
-      storage_unavailable: 'The team choice could not be saved in this browser.',
       save_failed: 'Could not save your team choice. Try again.',
     },
   },

@@ -59,7 +59,7 @@ export interface TeamLockerSnapshot {
   totalTeamCount: number;
 }
 
-export type TeamServiceErrorCode = 'team_unavailable' | 'already_claimed' | 'team_not_found' | 'storage_unavailable';
+export type TeamServiceErrorCode = 'team_unavailable' | 'already_claimed' | 'team_not_found' | 'request_failed';
 
 export class TeamServiceError extends Error {
   constructor(code: TeamServiceErrorCode) {

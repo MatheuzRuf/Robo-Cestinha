@@ -81,7 +81,7 @@ export const ptBR = {
     errors: {
       action_failed: 'Não foi possível concluir. Tente novamente.',
       invalid_session_code: 'Digite um código de sessão ou link de convite válido.',
-      session_not_found: 'Nenhuma sessão de demonstração foi encontrada para esse código.',
+      session_not_found: 'Nenhuma sessão foi encontrada para esse código.',
       saved_session_not_found: 'Esta sessão salva não está mais disponível neste dispositivo.',
       storage_unavailable: 'Não foi possível salvar esta sessão neste navegador.',
       name_required: 'Digite seu nome para continuar.',
@@ -159,7 +159,6 @@ export const ptBR = {
       team_unavailable: 'Esta equipe não está mais disponível. Atualize o vestiário e escolha outra.',
       already_claimed: 'Você já confirmou uma equipe nesta sessão.',
       team_not_found: 'Não foi possível encontrar a equipe selecionada nesta sessão.',
-      storage_unavailable: 'Não foi possível salvar a escolha neste navegador.',
       save_failed: 'Não foi possível salvar sua escolha. Tente novamente.',
     },
   },

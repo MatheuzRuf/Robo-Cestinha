@@ -31,8 +31,6 @@ function errorKey(error: unknown) {
       return 'team_locker.errors.already_claimed';
     case 'team_not_found':
       return 'team_locker.errors.team_not_found';
-    case 'storage_unavailable':
-      return 'team_locker.errors.storage_unavailable';
     default:
       return 'team_locker.errors.save_failed';
   }
