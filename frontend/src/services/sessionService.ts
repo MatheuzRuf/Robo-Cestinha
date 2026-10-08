@@ -1,11 +1,5 @@
 import { API_BASE_URL } from '../config/api';
-import type { SessionDescriptor, SessionMembership, SessionSettings } from '../types/session';
-
-interface SessionSettingsResponse {
-  sim_speed: SessionSettings['simSpeed'];
-  quarter_length: SessionSettings['quarterLength'];
-  auto_fill: boolean;
-}
+import type { SessionDescriptor, SessionMembership } from '../types/session';
 
 interface SessionMembershipResponse {
   session_hash: string;
@@ -15,25 +9,11 @@ interface SessionMembershipResponse {
   user_name?: string;
   team_id: string | null;
   last_visited_at: string;
-  settings?: SessionSettingsResponse | null;
 }
 
 interface SessionDescriptorResponse {
   session_hash: string;
   session_name?: string | null;
-}
-
-interface FeaturedSessionsResponse {
-  session_hashes: string[];
-}
-
-function mapSettings(settings?: SessionSettingsResponse | null): SessionSettings | undefined {
-  if (!settings) return undefined;
-  return {
-    simSpeed: settings.sim_speed,
-    quarterLength: settings.quarter_length,
-    autoFill: settings.auto_fill,
-  };
 }
 
 async function readResponse<T>(response: Response): Promise<T> {
@@ -60,24 +40,11 @@ export function normalizeSessionCode(input: string): string | null {
 }
 
 export const sessionService = {
-  async getFeaturedSessionCodes(): Promise<string[]> {
-    const response = await fetch(`${API_BASE_URL}/sessions/featured`);
-    const payload = await readResponse<FeaturedSessionsResponse>(response);
-    return payload.session_hashes;
-  },
-
-  async createSession(userName: string, settings: SessionSettings): Promise<SessionMembership> {
+  async createSession(userName: string): Promise<SessionMembership> {
     const response = await fetch(`${API_BASE_URL}/sessions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        owner_name: userName,
-        settings: {
-          sim_speed: settings.simSpeed,
-          quarter_length: settings.quarterLength,
-          auto_fill: settings.autoFill,
-        },
-      }),
+      body: JSON.stringify({ owner_name: userName }),
     });
     const payload = await readResponse<SessionMembershipResponse>(response);
     const userId = payload.owner_user_id ?? payload.user_id;
@@ -89,7 +56,6 @@ export const sessionService = {
       userName: payload.owner_name ?? payload.user_name ?? userName,
       teamId: payload.team_id,
       lastVisitedAt: payload.last_visited_at,
-      settings: mapSettings(payload.settings) ?? settings,
     };
   },
 
@@ -128,7 +94,6 @@ export const sessionService = {
       userName: payload.user_name ?? userName,
       teamId: payload.team_id,
       lastVisitedAt: payload.last_visited_at,
-      settings: mapSettings(payload.settings),
     };
   },
 };

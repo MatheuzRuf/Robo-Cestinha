@@ -1,11 +1,15 @@
-from secrets import token_hex
+from secrets import choice, randbelow
+
+SESSION_CODE_SUFFIXES = ("OAK", "TEX", "CHI", "SEA", "BKN", "MIA")
 
 
 def generate_session_hash() -> str:
     """Generate a short public session hash.
 
-    The identifier is intended to be unique in practice, but it is not
-    collision-proof; callers still rely on the database unique constraint.
+    The code may collide; the database unique constraint remains the final guard.
+
+    Returns:
+        A code compatible with the frontend session-code format.
     """
 
-    return f"RC-{token_hex(2).upper()}-{token_hex(2).upper()}"
+    return f"#RC-{randbelow(9000) + 1000}-{choice(SESSION_CODE_SUFFIXES)}"

@@ -4,13 +4,9 @@ from types import SimpleNamespace
 
 import pytest
 from app.api.routers import sessions
-from app.api.schemas.session import (
-    CreateSessionRequest,
-    JoinSessionRequest,
-    SessionSettingsPayload,
-    TeamClaimRequest,
-)
+from app.api.schemas.session import CreateSessionRequest, JoinSessionRequest
 from app.core.ids import generate_session_hash
+from app.domain.sessions.service import SessionNotFoundError
 from fastapi import HTTPException
 
 
@@ -32,76 +28,72 @@ async def test_create_session_returns_frontend_membership_contract():
         def session_service(self):
             return MockSessionService()
 
-    settings = SessionSettingsPayload(
-        sim_speed="blitz", quarter_length="5", auto_fill=False
+    response = await sessions.create_session(
+        CreateSessionRequest(owner_name="Alex"), MockFactory()
     )
-    try:
-        response = await sessions.create_session(
-            CreateSessionRequest(owner_name="Alex", settings=settings), MockFactory()
-        )
 
-        assert response.session_hash == session_hash
-        assert response.owner_user_id == owner.id
-        assert response.owner_name == "Alex"
-        assert response.settings == settings
-    finally:
-        sessions.MOCK_SESSION_DESCRIPTORS.pop(session_hash, None)
-        sessions.MOCK_SESSION_SETTINGS.pop(session_hash, None)
+    assert response.session_hash == session_hash
+    assert response.owner_user_id == owner.id
+    assert response.owner_name == "Alex"
+    assert response.team_id is None
+    assert response.last_visited_at
 
 
 @pytest.mark.asyncio
-async def test_featured_session_codes_are_returned():
-    response = await sessions.get_featured_sessions()
+async def test_persisted_session_can_be_found_and_joined():
+    session_hash = generate_session_hash()
+    user = SimpleNamespace(id=uuid.uuid4(), name="Alex")
 
-    assert response.session_hashes == ["#RC-7842-OAK", "#RC-9104-TEX"]
+    class MockSessionService:
+        async def get_session(self, code: str):
+            assert code == session_hash
+            return SimpleNamespace(hash=session_hash)
 
+        async def join_session(self, code: str, user_name: str):
+            assert code == session_hash
+            assert user_name == "Alex"
+            return SimpleNamespace(hash=session_hash), user
 
-@pytest.mark.asyncio
-async def test_featured_session_can_be_found_and_joined():
-    descriptor = await sessions.get_session("#RC-7842-OAK")
+    class MockFactory:
+        def session_service(self):
+            return MockSessionService()
+
+    descriptor = await sessions.get_session(session_hash, MockFactory())
     membership = await sessions.join_session(
-        "#RC-7842-OAK", JoinSessionRequest(user_name="Alex")
+        session_hash, JoinSessionRequest(user_name="Alex"), MockFactory()
     )
 
-    assert descriptor.session_hash == "#RC-7842-OAK"
-    assert membership.session_hash == "#RC-7842-OAK"
+    assert descriptor.session_hash == session_hash
+    assert membership.session_hash == session_hash
+    assert membership.user_id == user.id
     assert membership.user_name == "Alex"
     assert membership.team_id is None
+    assert membership.last_visited_at
 
 
 @pytest.mark.asyncio
 async def test_unknown_session_returns_not_found():
+    class MockSessionService:
+        async def get_session(self, _session_hash: str):
+            raise SessionNotFoundError
+
+        async def join_session(self, _session_hash: str, _user_name: str):
+            raise SessionNotFoundError
+
+    class MockFactory:
+        def session_service(self):
+            return MockSessionService()
+
     with pytest.raises(HTTPException) as error:
-        await sessions.get_session("#RC-1234-XYZ")
+        await sessions.get_session("#RC-1234-XYZ", MockFactory())
 
     assert error.value.status_code == 404
+    assert error.value.detail == "session_not_found"
 
-
-@pytest.mark.asyncio
-async def test_team_locker_claim_rejects_duplicate_claims():
-    session_hash = "#RC-TEST-CLAIM"
-    sessions.MOCK_SESSION_TEAM_CLAIMS.pop(session_hash, None)
-
-    try:
-        snapshot = await sessions.get_team_locker(session_hash, user_id="user-one")
-        assert snapshot["totalTeamCount"] == 8
-        assert snapshot["openTeamCount"] == 8
-
-        updated = await sessions.claim_team(
-            session_hash,
-            TeamClaimRequest(user_id="user-one", team_id=snapshot["teams"][0]["id"]),
+    with pytest.raises(HTTPException) as error:
+        await sessions.join_session(
+            "#RC-1234-XYZ", JoinSessionRequest(user_name="Alex"), MockFactory()
         )
-        assert updated["myTeamId"] == snapshot["teams"][0]["id"]
 
-        with pytest.raises(HTTPException) as error:
-            await sessions.claim_team(
-                session_hash,
-                TeamClaimRequest(
-                    user_id="user-two", team_id=snapshot["teams"][0]["id"]
-                ),
-            )
-
-        assert error.value.status_code == 409
-        assert error.value.detail == "team_unavailable"
-    finally:
-        sessions.MOCK_SESSION_TEAM_CLAIMS.pop(session_hash, None)
+    assert error.value.status_code == 404
+    assert error.value.detail == "session_not_found"

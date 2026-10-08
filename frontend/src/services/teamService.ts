@@ -33,20 +33,17 @@ export const teamService: TeamService = {
   async getLocker(context) {
     const query = new URLSearchParams({ user_id: context.userId });
     const response = await fetch(
-      `${API_BASE_URL}/sessions/${encodeURIComponent(context.sessionHash)}/team-locker?${query}`,
+      `${API_BASE_URL}/team/${encodeURIComponent(context.sessionHash)}/team-locker?${query}`,
     );
     return readSnapshot(response);
   },
 
   async lockTeam(input) {
-    const response = await fetch(
-      `${API_BASE_URL}/sessions/${encodeURIComponent(input.sessionHash)}/team-locker/claim`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: input.userId, team_id: input.teamId }),
-      },
-    );
+    const response = await fetch(`${API_BASE_URL}/team/${encodeURIComponent(input.sessionHash)}/team-locker/claim`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: input.userId, team_id: input.teamId }),
+    });
     return readSnapshot(response);
   },
 };
