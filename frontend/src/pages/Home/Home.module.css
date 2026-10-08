@@ -93,17 +93,6 @@
   color: var(--color-text-muted);
 }
 
-.featuredRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.featuredLabel {
-  color: var(--color-text-muted);
-}
-
 .recentSection {
   display: flex;
   flex-direction: column;

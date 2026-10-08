@@ -244,6 +244,7 @@
 .sideColumn {
   min-width: 0;
   min-height: 0;
+  height: min(60svh, 42rem);
   display: flex;
 }
 
@@ -422,10 +423,11 @@
     grid-template-columns: 1fr;
   }
   .sideColumn {
-    min-height: 320px;
+    height: 360px;
+    min-height: 0;
   }
   .sideColumn > :global(.card) {
-    height: 360px;
+    height: 100%;
   }
   .centerColumn {
     overflow: visible;

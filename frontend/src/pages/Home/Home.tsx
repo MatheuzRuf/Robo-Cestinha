@@ -3,15 +3,12 @@ import { useMutation } from '@tanstack/react-query';
 import { AppShell } from '../../components/AppShell';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
-import { CheckboxRow } from '../../components/CheckboxRow';
-import { Chip } from '../../components/Chip';
 import { Modal } from '../../components/Modal';
-import { SegmentedControl } from '../../components/SegmentedControl';
 import { StatusBadge } from '../../components/StatusBadge';
 import { TextInput } from '../../components/TextInput';
-import { featuredSessionCodes, normalizeSessionCode } from '../../services/sessionService';
+import { normalizeSessionCode } from '../../services/sessionService';
 import { useSessionStore } from '../../stores/sessionStore';
-import type { SessionDescriptor, SessionSettings } from '../../types/session';
+import type { SessionDescriptor } from '../../types/session';
 import { useTranslation } from '../../lib/i18n/i18n';
 import { SessionCard } from './components/SessionCard';
 import styles from './Home.module.css';
@@ -44,9 +41,6 @@ function formatLastVisited(value: string, locale: string) {
 
 export default function Home() {
   const { t, locale } = useTranslation();
-  const [simSpeed, setSimSpeed] = useState<SessionSettings['simSpeed']>('normal');
-  const [quarterLength, setQuarterLength] = useState<SessionSettings['quarterLength']>('3');
-  const [autoFill, setAutoFill] = useState(true);
   const [sessionCode, setSessionCode] = useState('');
   const [nameDraft, setNameDraft] = useState('');
   const [nameModalOpen, setNameModalOpen] = useState(false);
@@ -76,8 +70,7 @@ export default function Home() {
   });
 
   const createSessionMutation = useMutation({
-    mutationFn: ({ userName, settings }: { userName: string; settings: SessionSettings }) =>
-      useSessionStore.getState().createSession(userName, settings),
+    mutationFn: (userName: string) => useSessionStore.getState().createSession(userName),
     onSuccess: () => closeNameModal(),
     onError: (error) => setNameError(getErrorKey(error)),
   });
@@ -139,10 +132,7 @@ export default function Home() {
 
     setNameError(null);
     if (pendingAction === 'create') {
-      createSessionMutation.mutate({
-        userName,
-        settings: { simSpeed, quarterLength, autoFill },
-      });
+      createSessionMutation.mutate(userName);
       return;
     }
 
@@ -202,30 +192,6 @@ export default function Home() {
                 <h2>{t('home.host.title')}</h2>
               </div>
               <p className={styles.cardDescription}>{t('home.host.description')}</p>
-              <SegmentedControl
-                label={t('home.host.sim_speed_label')}
-                options={[
-                  { value: 'normal', label: t('home.host.normal_speed') },
-                  { value: 'blitz', label: t('home.host.blitz_speed') },
-                ]}
-                value={simSpeed}
-                onChange={(value) => setSimSpeed(value as SessionSettings['simSpeed'])}
-              />
-              <SegmentedControl
-                label={t('home.host.quarter_length_label')}
-                options={[
-                  { value: '3', label: t('home.host.three_minutes') },
-                  { value: '5', label: t('home.host.five_minutes') },
-                ]}
-                value={quarterLength}
-                onChange={(value) => setQuarterLength(value as SessionSettings['quarterLength'])}
-              />
-              <CheckboxRow
-                title={t('home.host.auto_fill_title')}
-                description={t('home.host.auto_fill_description')}
-                checked={autoFill}
-                onChange={setAutoFill}
-              />
               <Button variant="primary" onClick={handleCreate} fullWidth>
                 {t('home.host.cta')}
               </Button>
@@ -255,19 +221,6 @@ export default function Home() {
                   {t(joinError)}
                 </p>
               ) : null}
-              <div className={styles.featuredRow}>
-                <span className={styles.featuredLabel}>{t('home.join.featured_label')}</span>
-                {featuredSessionCodes.map((code) => (
-                  <Chip
-                    key={code}
-                    label={code}
-                    onClick={() => {
-                      setSessionCode(code);
-                      setJoinError(null);
-                    }}
-                  />
-                ))}
-              </div>
               <Button variant="secondary" onClick={handleJoin} disabled={lookupSessionMutation.isPending} fullWidth>
                 {lookupSessionMutation.isPending ? t('home.join.checking') : t('home.join.cta')}
               </Button>

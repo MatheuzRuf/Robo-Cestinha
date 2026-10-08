@@ -1,6 +1,6 @@
 # Spec 01 — Home Page
 
-Route: `/`. Depends on Spec 00 (design tokens + base components) — do not introduce new one-off styles here; compose from `AppShell`, `Card`, `Button`, `SegmentedControl`, `CheckboxRow`, `TextInput`, `Chip`, `StatusBadge`.
+Route: `/`. Depends on Spec 00 (design tokens + base components) — do not introduce new one-off styles here; compose from `AppShell`, `Card`, `Button`, `TextInput`, `StatusBadge`.
 
 Location: `src/pages/Home/Home.tsx` + `src/pages/Home/components/*`.
 
@@ -42,32 +42,19 @@ Two `Card`s in a row (stack vertically below a breakpoint, e.g. `768px`), equal 
 ### 3.1 Host New Session Card
 ```
 [icon] HOST NEW SESSION
-Configure quarter length and launch an 8-team single-elimination bracket.
-
-<SegmentedControl label="SIMULATION SPEED" options={[NORMAL 1X, BLITZ 2X]} />
-<SegmentedControl label="QUARTER LENGTH" options={[3 MINS, 5 MINS]} />
-
-<CheckboxRow title="AUTO-FILL REGIONAL AI CLUBS"
-             description="Empty seeds filled with classic metro teams" />
+Create an 8-team session.
 
 <Button variant="primary" icon={<BasketballIcon/>} fullWidth>
   CREATE TOURNAMENT
 </Button>
 ```
 
-**State owned by this component:**
-```ts
-const [simSpeed, setSimSpeed] = useState<'normal' | 'blitz'>('normal');
-const [quarterLength, setQuarterLength] = useState<'3' | '5'>('3');
-const [autoFill, setAutoFill] = useState(true);
-```
-
 **On "Create Tournament" click:**
 - If no display name is saved on this device, open the name modal (Spec 02) first; on submit, proceed.
 - If a name is already saved, proceed directly.
-- "Proceed" = call the create-session action with `{ name, simSpeed, quarterLength, autoFill }` (endpoint/contract TBD separately — out of scope for this spec, stub as a passed-in `onCreateSession` prop for now).
+- "Proceed" = call the create-session action with `{ name }` (stub as a passed-in `onCreateSession` prop for now).
 
-i18n keys (snake_case): `home.host.title`, `home.host.description`, `home.host.sim_speed_label`, `home.host.quarter_length_label`, `home.host.auto_fill_title`, `home.host.auto_fill_description`, `home.host.cta`.
+i18n keys (snake_case): `home.host.title`, `home.host.description`, `home.host.cta`.
 
 ### 3.2 Join Arena Card
 ```
@@ -79,8 +66,6 @@ regional franchise or spectate hardwood live action.
            placeholder="E.G. #RC-8812-BKN"
            trailingAction={{ icon: <PasteIcon/>, label: "PASTE", onClick: pasteFromClipboard }} />
 
-Featured: <Chip label="#RC-7842-OAK" /> <Chip label="#RC-9104-TEX" />
-
 <Button variant="secondary" icon={<ArrowIcon/>} fullWidth>
   JOIN SESSION
 </Button>
@@ -91,12 +76,10 @@ Featured: <Chip label="#RC-7842-OAK" /> <Chip label="#RC-9104-TEX" />
 const [sessionCode, setSessionCode] = useState('');
 ```
 - `PASTE` reads from clipboard via the Clipboard API and sets `sessionCode`.
-- Clicking a featured `Chip` sets `sessionCode` to that chip's value (does not auto-submit).
-- Featured chips are a static/sample list for now — do not treat as real data unless a source is specified elsewhere.
 
 **On "Join Session" click:** same name-modal gate as Host card, then call `onJoinSession({ name, sessionCode })` (stubbed prop).
 
-i18n keys (snake_case): `home.join.title`, `home.join.description`, `home.join.input_label`, `home.join.input_hint`, `home.join.input_placeholder`, `home.join.featured_label`, `home.join.cta`.
+i18n keys (snake_case): `home.join.title`, `home.join.description`, `home.join.input_label`, `home.join.input_hint`, `home.join.input_placeholder`, `home.join.cta`.
 
 ---
 
@@ -161,5 +144,5 @@ Example instantiation (live state, from reference):
 
 ## 5. Non-goals for this spec
 - The display-name modal itself (see Spec 02).
-- Real data fetching for recent sessions, featured session codes, or session creation/join API calls — this spec covers structure, props, and local UI state only; wire to real handlers/hooks separately.
+- Real data fetching for recent sessions or session creation/join API calls — this spec covers structure, props, and local UI state only; wire to real handlers/hooks separately.
 - Responsive behavior below mobile breakpoints beyond the single stacking rule noted above.

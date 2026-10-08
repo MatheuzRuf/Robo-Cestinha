@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { ensureSessionStorageAvailable, sessionStorage } from '../lib/storage/sessionStorage';
 import { sessionService, normalizeSessionCode } from '../services/sessionService';
-import type { SessionDescriptor, SessionIdentity, SessionMembership, SessionSettings } from '../types/session';
+import type { SessionDescriptor, SessionIdentity, SessionMembership } from '../types/session';
 
 const RECENT_SESSION_LIMIT = 5;
 
@@ -10,7 +10,7 @@ interface SessionStoreState {
   activeSessionHash: string | null;
   identitiesBySessionHash: Record<string, SessionIdentity>;
   recentSessions: SessionMembership[];
-  createSession: (userName: string, settings: SessionSettings) => Promise<SessionMembership>;
+  createSession: (userName: string) => Promise<SessionMembership>;
   findSession: (codeOrInviteUrl: string) => Promise<SessionDescriptor | null>;
   joinSession: (session: SessionDescriptor, userName: string) => Promise<SessionMembership>;
   resumeSession: (sessionHash: string) => SessionMembership;
@@ -33,19 +33,6 @@ function sanitizeMembership(value: unknown): SessionMembership | null {
     return null;
   }
 
-  const settings = isRecord(value.settings) ? value.settings : null;
-  const sanitizedSettings =
-    settings &&
-    (settings.simSpeed === 'normal' || settings.simSpeed === 'blitz') &&
-    (settings.quarterLength === '3' || settings.quarterLength === '5') &&
-    typeof settings.autoFill === 'boolean'
-      ? {
-          simSpeed: settings.simSpeed as SessionSettings['simSpeed'],
-          quarterLength: settings.quarterLength as SessionSettings['quarterLength'],
-          autoFill: settings.autoFill,
-        }
-      : undefined;
-
   return {
     sessionHash: value.sessionHash,
     ...(typeof value.sessionName === 'string' ? { sessionName: value.sessionName } : {}),
@@ -53,7 +40,6 @@ function sanitizeMembership(value: unknown): SessionMembership | null {
     userName: value.userName,
     teamId: typeof value.teamId === 'string' ? value.teamId : null,
     lastVisitedAt: value.lastVisitedAt,
-    ...(sanitizedSettings ? { settings: sanitizedSettings } : {}),
   };
 }
 
@@ -114,9 +100,9 @@ export const useSessionStore = create<SessionStoreState>()(
       identitiesBySessionHash: {},
       recentSessions: [],
 
-      async createSession(userName, settings) {
+      async createSession(userName) {
         ensureSessionStorageAvailable();
-        const membership = await sessionService.createSession(userName, settings);
+        const membership = await sessionService.createSession(userName);
         set((state) => ({
           activeSessionHash: membership.sessionHash,
           identitiesBySessionHash: pruneIdentities(

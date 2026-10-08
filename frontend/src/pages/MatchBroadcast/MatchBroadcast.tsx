@@ -96,7 +96,6 @@ export default function MatchBroadcast({ matchId: providedMatchId }: MatchBroadc
   return (
     <AppShell activeNavItem="liveBroadcast" tickerText={snapshot?.ticker}>
       <main className={styles.page}>
-        <BroadcastHeader matchMeta={snapshot?.matchMeta} status={status} />
         {apiError ? <div className={styles.streamStatus}>{apiError}</div> : null}
         {snapshot ? (
           <>

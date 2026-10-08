@@ -1,9 +1,3 @@
-export interface SessionSettings {
-  simSpeed: 'normal' | 'blitz';
-  quarterLength: '3' | '5';
-  autoFill: boolean;
-}
-
 export type SessionHash = string;
 
 export interface SessionDescriptor {
@@ -16,7 +10,6 @@ export interface SessionMembership extends SessionDescriptor {
   userName: string;
   teamId: string | null;
   lastVisitedAt: string;
-  settings?: SessionSettings;
 }
 
 export interface SessionIdentity {
