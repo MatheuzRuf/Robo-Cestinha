@@ -8,6 +8,7 @@ from app.domain.bracket.repository import BracketRepository
 from app.domain.bracket.service import BracketService
 from app.domain.sessions.repository import SessionRepository
 from app.domain.sessions.service import SessionService
+from app.domain.matches.service import MockTimelineService
 
 
 class ServiceFactory:
