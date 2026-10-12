@@ -1,3 +1,4 @@
+import { Trophy } from 'lucide-react';
 import { Card } from '../../../../components/Card';
 import styles from './ChampionshipCard.module.css';
 
@@ -21,7 +22,7 @@ export function ChampionshipCard({
   return (
     <Card className={styles.card}>
       <div className={styles.trophy} aria-hidden="true">
-        🏆
+        <Trophy size={28} />
       </div>
       <span className={styles.eyebrow}>{eyebrow}</span>
       <h2>{title}</h2>

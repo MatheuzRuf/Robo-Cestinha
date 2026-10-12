@@ -1,3 +1,4 @@
+import { CircleDot } from 'lucide-react';
 import { Button } from '../../../../components/Button';
 import { SegmentedControl } from '../../../../components/SegmentedControl';
 import { useTranslation } from '../../../../lib/i18n/i18n';
@@ -13,7 +14,7 @@ function TeamSummaryBlock({ side, team }: { side: 'home' | 'away'; team: TeamSum
         <span className={styles.seed}>{team.seed}</span>
         <strong>{team.name}</strong>
         <span className={styles.teamMeta}>
-          {team.possession ? '◀ ' : ''}
+          {team.possession ? <CircleDot className={styles.possessionIcon} size={12} aria-hidden="true" /> : null}
           {team.abbreviation}
         </span>
       </div>

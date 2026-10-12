@@ -14,7 +14,7 @@
   place-items: center;
   background: var(--color-bg);
   border-radius: var(--radius-md);
-  font-size: 1.6rem;
+  color: var(--color-warning);
 }
 
 .eyebrow {

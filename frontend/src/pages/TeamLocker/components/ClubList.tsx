@@ -1,3 +1,4 @@
+import { Check, ChevronRight, ShieldCheck, UsersRound } from 'lucide-react';
 import { useTranslation } from '../../../lib/i18n/i18n';
 import type { LockerTeam } from '../../../types/team';
 import styles from './ClubList.module.css';
@@ -19,7 +20,7 @@ export function ClubList({ teams, selectedTeamId, onSelect }: ClubListProps) {
         <div className={styles.sectionHeading}>
           <h2 id="available-clubs-heading">
             <span className={styles.headingIcon} aria-hidden="true">
-              ◈
+              <UsersRound size={16} />
             </span>
             {t('team_locker.available_teams')}
           </h2>
@@ -35,7 +36,9 @@ export function ClubList({ teams, selectedTeamId, onSelect }: ClubListProps) {
       <section className={styles.lockedSection} aria-labelledby="claimed-teams-heading">
         <div className={styles.lockedHeading}>
           <h2 id="claimed-teams-heading">
-            <span aria-hidden="true">♙</span>
+            <span aria-hidden="true">
+              <ShieldCheck size={16} />
+            </span>
             {t('team_locker.claimed_teams')}
           </h2>
         </div>
@@ -87,7 +90,7 @@ function ClubRow({
         <span className={styles.clubStatus}>{statusLabel}</span>
       </span>
       <span className={styles.rowAction} aria-hidden="true">
-        {selected ? '✓' : '›'}
+        {selected ? <Check size={17} /> : <ChevronRight size={17} />}
       </span>
     </button>
   );
