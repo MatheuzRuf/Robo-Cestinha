@@ -17,9 +17,6 @@ export const enUS = {
     default_session_name: 'Tournament',
     hello_user: 'Hello, {name}',
     leave_session: 'Leave session',
-    ticker_label: 'BROADCAST TICKER',
-    ticker_text:
-      'COURT 1: BROOKLYN BREAKERS LEAD AUSTIN ARMADILLOS 74-71 (Q4 01:24) // COURT 2: CHICAGO STEEL HOLD 104-98',
   },
   home: {
     hero: {

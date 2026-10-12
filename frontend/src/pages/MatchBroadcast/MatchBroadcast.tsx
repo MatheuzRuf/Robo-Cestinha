@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { AppShell } from '../../components/AppShell';
 import { USE_API_TIMELINE } from '../../config/api';
 import { useMatchBroadcastStore } from '../../stores/matchBroadcastStore';
 import { matchBroadcastService } from '../../services/matchBroadcastService';
@@ -93,51 +92,49 @@ export default function MatchBroadcast({ matchId: providedMatchId }: MatchBroadc
           : 'connecting';
 
   return (
-    <AppShell activeNavItem="liveBroadcast" tickerText={snapshot?.ticker}>
-      <main className={styles.page}>
-        {apiError ? <div className={styles.streamStatus}>{apiError}</div> : null}
-        {snapshot ? (
-          <>
-            <Scoreboard
-              snapshot={snapshot}
-              speed={speed}
-              setSpeed={setSpeed}
-              isPaused={isPaused}
-              onTogglePause={isPaused ? resume : pause}
-            />
-            <section className={styles.broadcastMainGrid}>
-              <section className={styles.sideColumn}>
-                <PlayByPlayColumn entries={playByPlay} />
-              </section>
-              <section className={styles.centerColumn}>
-                <CourtStage frame={frame} transitionDurationMs={transitionDurationMs} />
-                <PlayCallStrip
-                  playCall={snapshot.playCall}
-                  shotProbability={snapshot.shotProbability}
-                  defensiveScheme={snapshot.defensiveScheme}
-                />
-                <TimelineScrubber
-                  quarter={snapshot.quarter}
-                  elapsedSeconds={snapshot.elapsedSeconds}
-                  durationSeconds={snapshot.durationSeconds}
-                />
-                <MomentumShiftEngine
-                  momentum={snapshot.momentum}
-                  homeName={snapshot.home.name}
-                  awayName={snapshot.away.name}
-                />
-              </section>
-              <section className={styles.sideColumn}>
-                <CommentaryColumn entries={commentary} isPaused={isPaused} />
-              </section>
+    <main className={styles.page}>
+      {apiError ? <div className={styles.streamStatus}>{apiError}</div> : null}
+      {snapshot ? (
+        <>
+          <Scoreboard
+            snapshot={snapshot}
+            speed={speed}
+            setSpeed={setSpeed}
+            isPaused={isPaused}
+            onTogglePause={isPaused ? resume : pause}
+          />
+          <section className={styles.broadcastMainGrid}>
+            <section className={styles.sideColumn}>
+              <PlayByPlayColumn entries={playByPlay} />
             </section>
-          </>
-        ) : (
-          <div className={styles.streamStatus} role="status">
-            {t(`match_broadcast.header.${statusKey}`)}
-          </div>
-        )}
-      </main>
-    </AppShell>
+            <section className={styles.centerColumn}>
+              <CourtStage frame={frame} transitionDurationMs={transitionDurationMs} />
+              <PlayCallStrip
+                playCall={snapshot.playCall}
+                shotProbability={snapshot.shotProbability}
+                defensiveScheme={snapshot.defensiveScheme}
+              />
+              <TimelineScrubber
+                quarter={snapshot.quarter}
+                elapsedSeconds={snapshot.elapsedSeconds}
+                durationSeconds={snapshot.durationSeconds}
+              />
+              <MomentumShiftEngine
+                momentum={snapshot.momentum}
+                homeName={snapshot.home.name}
+                awayName={snapshot.away.name}
+              />
+            </section>
+            <section className={styles.sideColumn}>
+              <CommentaryColumn entries={commentary} isPaused={isPaused} />
+            </section>
+          </section>
+        </>
+      ) : (
+        <div className={styles.streamStatus} role="status">
+          {t(`match_broadcast.header.${statusKey}`)}
+        </div>
+      )}
+    </main>
   );
 }

@@ -11,7 +11,6 @@ interface AppShellProps {
   sessionName?: string;
   sessionCode?: string;
   onLeaveSession?: () => void;
-  tickerText?: string;
   children: ReactNode;
 }
 
@@ -22,7 +21,6 @@ export function AppShell({
   sessionName,
   sessionCode,
   onLeaveSession,
-  tickerText,
   children,
 }: AppShellProps) {
   const { t } = useTranslation();
@@ -130,12 +128,6 @@ export function AppShell({
         </div>
       </header>
       {children}
-      {tickerText ? (
-        <footer className={styles.ticker} aria-label={t('shell.ticker_label')}>
-          <strong>{t('shell.ticker_label')}</strong>
-          <span>{tickerText}</span>
-        </footer>
-      ) : null}
     </div>
   );
 }

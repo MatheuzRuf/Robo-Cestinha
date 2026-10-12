@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { AppShell } from '../../components/AppShell';
 import { Button } from '../../components/Button';
 import { useTranslation } from '../../lib/i18n/i18n';
 import { useSessionStore } from '../../stores/sessionStore';
@@ -61,62 +60,54 @@ export default function TeamLocker() {
   };
 
   return (
-    <AppShell
-      activeNavItem="teamLocker"
-      currentUserName={activeSession?.userName}
-      sessionName={activeSession?.sessionName}
-      sessionCode={activeSession?.sessionHash}
-      onLeaveSession={() => useSessionStore.getState().leaveSession()}
-    >
-      <main className={styles.page}>
-        {!activeSession ? (
-          <div className={styles.emptyState}>
-            <p>{t('team_locker.no_active_session')}</p>
-            <Button variant="primary" onClick={() => navigate('/')}>
-              {t('team_locker.go_to_home')}
-            </Button>
-          </div>
-        ) : status === 'loading' || status === 'idle' ? (
-          <p className={styles.statusMessage} role="status">
-            {t('team_locker.loading')}
-          </p>
-        ) : status === 'error' || !snapshot ? (
-          <div className={styles.errorState} role="alert">
-            <p>{t('team_locker.load_failed')}</p>
-            <Button variant="outline" onClick={() => context && void loadLocker(context)}>
-              {t('team_locker.retry')}
-            </Button>
-          </div>
-        ) : (
-          <div className={styles.lockerGrid}>
-            <ClubList teams={snapshot.teams} selectedTeamId={selectedTeamId} onSelect={handleSelectTeam} />
+    <main className={styles.page}>
+      {!activeSession ? (
+        <div className={styles.emptyState}>
+          <p>{t('team_locker.no_active_session')}</p>
+          <Button variant="primary" onClick={() => navigate('/')}>
+            {t('team_locker.go_to_home')}
+          </Button>
+        </div>
+      ) : status === 'loading' || status === 'idle' ? (
+        <p className={styles.statusMessage} role="status">
+          {t('team_locker.loading')}
+        </p>
+      ) : status === 'error' || !snapshot ? (
+        <div className={styles.errorState} role="alert">
+          <p>{t('team_locker.load_failed')}</p>
+          <Button variant="outline" onClick={() => context && void loadLocker(context)}>
+            {t('team_locker.retry')}
+          </Button>
+        </div>
+      ) : (
+        <div className={styles.lockerGrid}>
+          <ClubList teams={snapshot.teams} selectedTeamId={selectedTeamId} onSelect={handleSelectTeam} />
 
-            <div className={styles.detailsColumn}>
-              {selectedTeam ? (
-                <>
-                  <TeamDetails team={selectedTeam} />
-                  <TeamRoster
-                    team={selectedTeam}
-                    expandedPlayerId={expandedPlayerId}
-                    onTogglePlayer={(playerId) =>
-                      setExpandedPlayerId((currentId) => (currentId === playerId ? null : playerId))
-                    }
-                  />
-                  <TeamSelectionPanel
-                    team={selectedTeam}
-                    myTeam={myTeam ?? null}
-                    isLocking={isLocking || lockMutation.isPending}
-                    errorKey={errorKey}
-                    onConfirm={() => lockMutation.mutate()}
-                  />
-                </>
-              ) : (
-                <div className={styles.emptyState}>{t('team_locker.empty_selection')}</div>
-              )}
-            </div>
+          <div className={styles.detailsColumn}>
+            {selectedTeam ? (
+              <>
+                <TeamDetails team={selectedTeam} />
+                <TeamRoster
+                  team={selectedTeam}
+                  expandedPlayerId={expandedPlayerId}
+                  onTogglePlayer={(playerId) =>
+                    setExpandedPlayerId((currentId) => (currentId === playerId ? null : playerId))
+                  }
+                />
+                <TeamSelectionPanel
+                  team={selectedTeam}
+                  myTeam={myTeam ?? null}
+                  isLocking={isLocking || lockMutation.isPending}
+                  errorKey={errorKey}
+                  onConfirm={() => lockMutation.mutate()}
+                />
+              </>
+            ) : (
+              <div className={styles.emptyState}>{t('team_locker.empty_selection')}</div>
+            )}
           </div>
-        )}
-      </main>
-    </AppShell>
+        </div>
+      )}
+    </main>
   );
 }

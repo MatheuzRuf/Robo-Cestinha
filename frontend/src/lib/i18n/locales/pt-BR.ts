@@ -17,9 +17,6 @@ export const ptBR = {
     default_session_name: 'Torneio',
     hello_user: 'Olá, {name}',
     leave_session: 'Sair da sessão',
-    ticker_label: 'TICKER DA TRANSMISSÃO',
-    ticker_text:
-      'QUADRA 1: BROOKLYN BREAKERS NA FRENTE DOS AUSTIN ARMADILLOS 74-71 (Q4 01:24) // QUADRA 2: CHICAGO STEEL 104-98',
   },
   home: {
     hero: {

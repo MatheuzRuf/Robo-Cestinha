@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Clipboard, Home as HomeIcon, LogIn, UsersRound } from 'lucide-react';
-import { AppShell } from '../../components/AppShell';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Modal } from '../../components/Modal';
@@ -165,13 +164,7 @@ export default function Home() {
   };
 
   return (
-    <AppShell
-      activeNavItem="home"
-      currentUserName={activeSession?.userName}
-      sessionName={activeSession?.sessionName}
-      sessionCode={activeSession?.sessionHash}
-      onLeaveSession={() => useSessionStore.getState().leaveSession()}
-    >
+    <>
       <div className={styles.page}>
         <section className={styles.heroSection}>
           <h1 className={styles.heroTitle}>
@@ -351,6 +344,6 @@ export default function Home() {
           </Button>
         </form>
       </Modal>
-    </AppShell>
+    </>
   );
 }

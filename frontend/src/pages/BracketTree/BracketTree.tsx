@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { AppShell } from '../../components/AppShell';
 import { Button } from '../../components/Button';
 import { useTranslation } from '../../lib/i18n/i18n';
 import { useBracketStore } from '../../stores/bracketStore';
@@ -41,57 +40,49 @@ export default function BracketTree() {
   }));
 
   return (
-    <AppShell
-      activeNavItem="bracketTree"
-      currentUserName={activeSession?.userName}
-      sessionName={activeSession?.sessionName}
-      sessionCode={activeSession?.sessionHash}
-      onLeaveSession={() => useSessionStore.getState().leaveSession()}
-    >
-      <main className={styles.page}>
-        <h1 className={styles.title}>{t('bracket_tree.title')}</h1>
-        {!activeSession ? (
-          <p className={styles.message}>{t('bracket_tree.no_session')}</p>
-        ) : status === 'loading' || status === 'idle' ? (
-          <p className={styles.message}>{t('bracket_tree.loading')}</p>
-        ) : status === 'error' || !bracket ? (
-          <p className={styles.message} role="alert">
-            {t(errorKey ?? 'bracket_tree.errors.load_failed')}
-          </p>
-        ) : (
-          <>
-            {!bracket.generated && bracket.can_generate ? (
-              <div className={styles.action}>
-                <Button
-                  variant="primary"
-                  onClick={() =>
-                    void generateBracket({
-                      sessionHash: activeSession.sessionHash,
-                      userId: activeSession.userId,
-                    })
-                  }
-                  disabled={isGenerating}
-                >
-                  {t(isGenerating ? 'bracket_tree.generating' : 'bracket_tree.generate')}
-                </Button>
-              </div>
-            ) : null}
-            {!bracket.generated && !bracket.can_generate ? (
-              <p className={styles.message}>{t('bracket_tree.owner_generates')}</p>
-            ) : null}
-            {errorKey ? (
-              <p className={styles.error} role="alert">
-                {t(errorKey)}
-              </p>
-            ) : null}
-            <section className={styles.bracketGrid} aria-label={t('bracket_tree.sections.bracket')}>
-              {rounds?.map((round, index) => (
-                <RoundColumn key={index} {...round} tbdLabel={t('bracket_tree.tbd')} />
-              ))}
-            </section>
-          </>
-        )}
-      </main>
-    </AppShell>
+    <main className={styles.page}>
+      <h1 className={styles.title}>{t('bracket_tree.title')}</h1>
+      {!activeSession ? (
+        <p className={styles.message}>{t('bracket_tree.no_session')}</p>
+      ) : status === 'loading' || status === 'idle' ? (
+        <p className={styles.message}>{t('bracket_tree.loading')}</p>
+      ) : status === 'error' || !bracket ? (
+        <p className={styles.message} role="alert">
+          {t(errorKey ?? 'bracket_tree.errors.load_failed')}
+        </p>
+      ) : (
+        <>
+          {!bracket.generated && bracket.can_generate ? (
+            <div className={styles.action}>
+              <Button
+                variant="primary"
+                onClick={() =>
+                  void generateBracket({
+                    sessionHash: activeSession.sessionHash,
+                    userId: activeSession.userId,
+                  })
+                }
+                disabled={isGenerating}
+              >
+                {t(isGenerating ? 'bracket_tree.generating' : 'bracket_tree.generate')}
+              </Button>
+            </div>
+          ) : null}
+          {!bracket.generated && !bracket.can_generate ? (
+            <p className={styles.message}>{t('bracket_tree.owner_generates')}</p>
+          ) : null}
+          {errorKey ? (
+            <p className={styles.error} role="alert">
+              {t(errorKey)}
+            </p>
+          ) : null}
+          <section className={styles.bracketGrid} aria-label={t('bracket_tree.sections.bracket')}>
+            {rounds?.map((round, index) => (
+              <RoundColumn key={index} {...round} tbdLabel={t('bracket_tree.tbd')} />
+            ))}
+          </section>
+        </>
+      )}
+    </main>
   );
 }
