@@ -7,17 +7,30 @@
   padding: var(--space-6) var(--space-4) var(--space-8);
 }
 
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.message,
+.error {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.error {
+  color: var(--color-live);
+}
+
 .bracketGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: center;
-  gap: var(--space-6);
-}
-
-.insightsGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(18rem, 1fr);
-  align-items: stretch;
+  align-items: start;
   gap: var(--space-6);
 }
 
@@ -25,10 +38,6 @@
   .bracketGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
-  }
-
-  .insightsGrid {
-    grid-template-columns: 1fr;
   }
 }
 

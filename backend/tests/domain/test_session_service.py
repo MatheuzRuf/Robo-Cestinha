@@ -1,5 +1,4 @@
 import uuid
-from types import SimpleNamespace
 
 import pytest
 from app.db.models import Session, User
@@ -49,7 +48,7 @@ class FakeSessionRepository:
 @pytest.mark.asyncio
 async def test_create_and_join_persist_users_with_scoped_join_sequences():
     repository = FakeSessionRepository()
-    service = SessionService(repository, SimpleNamespace())
+    service = SessionService(repository)
 
     session, owner = await service.create_session("Alex")
     joined_session, participant = await service.join_session(
@@ -68,7 +67,7 @@ async def test_create_and_join_persist_users_with_scoped_join_sequences():
 
 @pytest.mark.asyncio
 async def test_joining_unknown_session_raises_domain_error():
-    service = SessionService(FakeSessionRepository(), SimpleNamespace())
+    service = SessionService(FakeSessionRepository())
 
     with pytest.raises(SessionNotFoundError):
         await service.join_session("#RC-1234-XYZ", "Alex")

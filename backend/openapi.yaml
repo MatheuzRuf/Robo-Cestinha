@@ -33,6 +33,59 @@ paths:
                 $ref: '#/components/schemas/CreateSessionResponse'
         '422':
           description: Validation error.
+  /bracket/{session_hash}:
+    get:
+      summary: Get a session bracket or its empty skeleton
+      parameters:
+        - name: session_hash
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Bracket rounds, assigned teams, and generation permission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BracketResponse'
+        '404':
+          description: Session not found.
+    post:
+      summary: Generate a session bracket
+      parameters:
+        - name: session_hash
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateBracketRequest'
+      responses:
+        '200':
+          description: Bracket generated and saved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BracketResponse'
+        '403':
+          description: Requester is not the session owner.
+        '404':
+          description: Session not found.
+        '409':
+          description: Bracket already generated.
+        '422':
+          description: Not enough teams are available.
   /matches/stream:
     get:
       summary: Stream live match events
@@ -88,3 +141,71 @@ components:
           type: string
           format: uuid
           description: Database ID of the owner user.
+    GenerateBracketRequest:
+      type: object
+      required:
+        - user_id
+      properties:
+        user_id:
+          type: string
+          format: uuid
+    BracketResponse:
+      type: object
+      required:
+        - generated
+        - can_generate
+        - rounds
+      properties:
+        generated:
+          type: boolean
+        can_generate:
+          type: boolean
+        rounds:
+          type: array
+          items:
+            $ref: '#/components/schemas/BracketRound'
+    BracketRound:
+      type: object
+      required:
+        - round_number
+        - matches
+      properties:
+        round_number:
+          type: integer
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/BracketMatch'
+    BracketMatch:
+      type: object
+      required:
+        - match_id
+        - slot
+        - home_team
+        - away_team
+      properties:
+        match_id:
+          type: string
+          format: uuid
+          nullable: true
+        slot:
+          type: integer
+        home_team:
+          allOf:
+            - $ref: '#/components/schemas/BracketTeam'
+          nullable: true
+        away_team:
+          allOf:
+            - $ref: '#/components/schemas/BracketTeam'
+          nullable: true
+    BracketTeam:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string

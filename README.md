@@ -100,21 +100,27 @@ make dev          # ensures Postgres is up, migrates, uvicorn --reload on :8000
 - `curl http://localhost:8000/health` → `{"status":"ok"}`
 - Interactive API docs: <http://localhost:8000/docs> (OpenAPI at `/openapi.json`)
 
-**Seed the team/player catalog** (only needed once — required before creating
-sessions, which pick from the catalog teams):
+**Seed the team/player catalog** (only needed once — required before bracket
+generation):
 
 ```bash
 cd backend && uv run python -m app.db.seed
 ```
 
-This loads `data/processed/teams.json` + `players.json` into Postgres. It skips
-if the catalog already has teams; to re-seed, `make reset-db` (wipes the volume)
-and run it again. Try the one live endpoint:
+This validates `data/processed/teams.json` and `players.json`, then loads the
+eight teams currently used by the Team Locker (`bkn`, `nyk`, `bos`, `gsw`,
+`okc`, `lal`, `den`, `phi`) and the players in their rosters. It stores team
+statistics and player attributes. The seed skips if the database already has
+teams. To replace an existing catalog, `make reset-db` (this deletes the local
+Postgres volume) and run the seed command again.
+
+Creating a session only creates the session and its owner. The owner can
+generate its bracket from the Bracket Tree page. For example, create a session:
 
 ```bash
 curl -X POST localhost:8000/sessions -H 'content-type: application/json' \
      -d '{"owner_name": "Luigi"}'
-# → creates a Session + owner User + an 8-team bracket (Match rows)
+# → creates a Session and owner User; bracket generation is a separate action
 ```
 
 ### 2. Frontend (React app)
