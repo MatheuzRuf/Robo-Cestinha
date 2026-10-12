@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { Clipboard, Home as HomeIcon, LogIn } from 'lucide-react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Clipboard, Home as HomeIcon, LogIn, UsersRound } from 'lucide-react';
 import { AppShell } from '../../components/AppShell';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Modal } from '../../components/Modal';
-import { StatusBadge } from '../../components/StatusBadge';
 import { TextInput } from '../../components/TextInput';
-import { normalizeSessionCode } from '../../services/sessionService';
+import { normalizeSessionCode, sessionService } from '../../services/sessionService';
 import { useSessionStore } from '../../stores/sessionStore';
 import type { SessionDescriptor } from '../../types/session';
 import { useTranslation } from '../../lib/i18n/i18n';
@@ -53,6 +52,12 @@ export default function Home() {
   const recentSessions = useSessionStore((state) => state.recentSessions);
   const activeSessionHash = useSessionStore((state) => state.activeSessionHash);
   const activeSession = recentSessions.find((session) => session.sessionHash === activeSessionHash) ?? null;
+  const participantsQuery = useQuery({
+    queryKey: ['sessionParticipants', activeSession?.sessionHash],
+    queryFn: () =>
+      activeSession ? sessionService.getSessionParticipants(activeSession.sessionHash) : Promise.resolve([]),
+    enabled: Boolean(activeSession),
+  });
 
   const lookupSessionMutation = useMutation({
     mutationFn: async (code: string) => {
@@ -160,7 +165,13 @@ export default function Home() {
   };
 
   return (
-    <AppShell activeNavItem="home" currentUserName={activeSession?.userName} sessionCode={activeSession?.sessionHash}>
+    <AppShell
+      activeNavItem="home"
+      currentUserName={activeSession?.userName}
+      sessionName={activeSession?.sessionName}
+      sessionCode={activeSession?.sessionHash}
+      onLeaveSession={() => useSessionStore.getState().leaveSession()}
+    >
       <div className={styles.page}>
         <section className={styles.heroSection}>
           <h1 className={styles.heroTitle}>
@@ -171,15 +182,43 @@ export default function Home() {
         </section>
 
         {activeSession ? (
-          <section className={styles.activeSessionSection} aria-label={t('home.active_session.title')}>
+          <section className={styles.playersSection} aria-labelledby="session-players-heading">
             <Card>
-              <div className={styles.activeSessionContent}>
-                <div>
-                  <StatusBadge tone="info">{t('home.active_session.badge')}</StatusBadge>
-                  <h2>{activeSession.sessionName ?? t('home.active_session.unnamed')}</h2>
-                  <p>{t('home.active_session.description', { name: activeSession.userName })}</p>
+              <div className={styles.playersCard}>
+                <div className={styles.cardTitleRow}>
+                  <span className={styles.cardIcon} aria-hidden="true">
+                    <UsersRound size={16} />
+                  </span>
+                  <h2 id="session-players-heading">{t('home.players.title')}</h2>
                 </div>
-                <span className={styles.activeSessionCode}>{activeSession.sessionHash}</span>
+                {participantsQuery.isPending ? (
+                  <p className={styles.playerMessage} role="status">
+                    {t('home.players.loading')}
+                  </p>
+                ) : participantsQuery.isError ? (
+                  <div className={styles.playerError}>
+                    <p className={styles.errorMessage} role="alert">
+                      {t('home.players.load_failed')}
+                    </p>
+                    <Button variant="outline" onClick={() => void participantsQuery.refetch()}>
+                      {t('home.players.retry')}
+                    </Button>
+                  </div>
+                ) : participantsQuery.data?.length ? (
+                  <ol className={styles.playerList}>
+                    {participantsQuery.data.map((participant) => (
+                      <li className={styles.playerRow} key={participant.userId}>
+                        <span className={styles.playerSequence}>#{participant.joinSequence}</span>
+                        <span className={styles.playerName}>{participant.userName}</span>
+                        {participant.isOwner ? (
+                          <span className={styles.ownerLabel}>{t('home.players.owner')}</span>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p className={styles.playerMessage}>{t('home.players.empty')}</p>
+                )}
               </div>
             </Card>
           </section>

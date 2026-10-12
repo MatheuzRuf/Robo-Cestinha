@@ -10,10 +10,32 @@ from app.api.schemas.session import (
     JoinSessionRequest,
     SessionDescriptorResponse,
     SessionMembershipResponse,
+    SessionParticipantResponse,
 )
 from app.domain.sessions.service import SessionNotFoundError
 
 router = APIRouter()
+
+MOCK_SESSION_PARTICIPANTS = [
+    SessionParticipantResponse(
+        user_id="mock-owner",
+        user_name="Alex Morgan",
+        join_sequence=1,
+        is_owner=True,
+    ),
+    SessionParticipantResponse(
+        user_id="mock-player-2",
+        user_name="Jordan Lee",
+        join_sequence=2,
+        is_owner=False,
+    ),
+    SessionParticipantResponse(
+        user_id="mock-player-3",
+        user_name="Sofia Chen",
+        join_sequence=3,
+        is_owner=False,
+    ),
+]
 
 
 @router.post("", response_model=CreateSessionResponse)
@@ -101,3 +123,22 @@ async def join_session(
         team_id=None,
         last_visited_at=datetime.now(UTC).isoformat(),
     )
+
+
+@router.get(
+    "/{session_hash}/participants",
+    response_model=list[SessionParticipantResponse],
+)
+async def get_session_participants(
+    session_hash: str,
+) -> list[SessionParticipantResponse]:
+    """Return mocked participants for a session roster.
+
+    Args:
+        session_hash: Public code for the requested session.
+
+    Returns:
+        A stable list of mocked participants ordered by join sequence.
+    """
+
+    return [participant.model_copy() for participant in MOCK_SESSION_PARTICIPANTS]

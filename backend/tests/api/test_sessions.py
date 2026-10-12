@@ -97,3 +97,16 @@ async def test_unknown_session_returns_not_found():
 
     assert error.value.status_code == 404
     assert error.value.detail == "session_not_found"
+
+
+@pytest.mark.asyncio
+async def test_session_participants_returns_mocked_ordered_roster():
+    participants = await sessions.get_session_participants("#RC-1234-OAK")
+
+    assert [participant.join_sequence for participant in participants] == [1, 2, 3]
+    assert [participant.is_owner for participant in participants] == [
+        True,
+        False,
+        False,
+    ]
+    assert participants[0].user_name == "Alex Morgan"

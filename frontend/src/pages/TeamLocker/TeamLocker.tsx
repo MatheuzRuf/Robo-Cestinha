@@ -64,7 +64,9 @@ export default function TeamLocker() {
     <AppShell
       activeNavItem="teamLocker"
       currentUserName={activeSession?.userName}
+      sessionName={activeSession?.sessionName}
       sessionCode={activeSession?.sessionHash}
+      onLeaveSession={() => useSessionStore.getState().leaveSession()}
     >
       <main className={styles.page}>
         {!activeSession ? (

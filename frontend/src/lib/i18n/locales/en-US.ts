@@ -14,6 +14,9 @@ export const enUS = {
     nav_live_broadcast: 'LIVE BROADCAST',
     online_teams: '{count}/{total} TEAMS ONLINE',
     session_code: '{code}',
+    default_session_name: 'Tournament',
+    hello_user: 'Hello, {name}',
+    leave_session: 'Leave session',
     ticker_label: 'BROADCAST TICKER',
     ticker_text:
       'COURT 1: BROOKLYN BREAKERS LEAD AUSTIN ARMADILLOS 74-71 (Q4 01:24) // COURT 2: CHICAGO STEEL HOLD 104-98',
@@ -53,6 +56,14 @@ export const enUS = {
       joined_as: 'You joined as {name}',
       last_visited: 'Last visited {date}',
       resume: 'RESUME TOURNAMENT',
+    },
+    players: {
+      title: 'CURRENT PLAYERS',
+      loading: 'Loading players…',
+      load_failed: 'Could not load the session players.',
+      retry: 'RETRY',
+      empty: 'No players are listed in this session.',
+      owner: 'owner',
     },
     name_modal: {
       create_title: 'Choose your name for this tournament',

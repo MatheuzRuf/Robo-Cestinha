@@ -40,3 +40,12 @@ class SessionMembershipResponse(BaseModel):
     user_name: str
     team_id: str | None = None
     last_visited_at: str
+
+
+class SessionParticipantResponse(BaseModel):
+    """A participant returned by the mocked session roster endpoint."""
+
+    user_id: str
+    user_name: str
+    join_sequence: int
+    is_owner: bool

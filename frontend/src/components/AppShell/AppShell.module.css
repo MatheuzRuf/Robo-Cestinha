@@ -8,7 +8,7 @@
 
 .header {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: var(--space-4);
   align-items: center;
   padding: var(--space-3) var(--space-4);
@@ -37,15 +37,25 @@
   letter-spacing: 0.14em;
 }
 
-.nav {
-  display: grid;
-  grid-template-columns: repeat(4, max-content);
-  justify-content: center;
-  gap: var(--space-2);
+.navBar {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-2);
+}
+
+.nav {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  flex: 1;
 }
 
 .navItem {
@@ -71,6 +81,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  flex: 0 0 auto;
 }
 
 .pill,
@@ -88,6 +99,86 @@
   padding: var(--space-2) var(--space-3);
   font-size: 0.85rem;
   font-weight: 800;
+}
+
+.sessionDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 0;
+  padding: 0 var(--space-2);
+}
+
+.sessionName {
+  max-width: 180px;
+  overflow: hidden;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sessionCode {
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.userMenu {
+  position: relative;
+}
+
+.userMenuTrigger,
+.userMenuPopover {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.userMenuTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.userMenuTrigger:hover,
+.userMenuItem:hover {
+  background: var(--color-border);
+}
+
+.userMenuTrigger:focus-visible,
+.userMenuItem:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.userMenuPopover {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 20;
+  min-width: 160px;
+  padding: var(--space-1);
+}
+
+.userMenuItem {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .iconButton {
@@ -124,8 +215,25 @@
     grid-template-columns: 1fr;
     justify-items: start;
   }
+
+  .navBar {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .nav {
-    grid-template-columns: repeat(2, max-content);
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .utilityRow {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .sessionDetails {
+    align-items: flex-start;
   }
 
   .ticker {

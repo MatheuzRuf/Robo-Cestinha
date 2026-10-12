@@ -16,3 +16,10 @@ export interface SessionIdentity {
   userId: string;
   userName: string;
 }
+
+export interface SessionParticipant {
+  userId: string;
+  userName: string;
+  joinSequence: number;
+  isOwner: boolean;
+}

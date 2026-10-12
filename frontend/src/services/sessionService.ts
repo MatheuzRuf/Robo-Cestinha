@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../config/api';
-import type { SessionDescriptor, SessionMembership } from '../types/session';
+import type { SessionDescriptor, SessionMembership, SessionParticipant } from '../types/session';
 
 interface SessionMembershipResponse {
   session_hash: string;
@@ -14,6 +14,13 @@ interface SessionMembershipResponse {
 interface SessionDescriptorResponse {
   session_hash: string;
   session_name?: string | null;
+}
+
+interface SessionParticipantResponse {
+  user_id: string;
+  user_name: string;
+  join_sequence: number;
+  is_owner: boolean;
 }
 
 async function readResponse<T>(response: Response): Promise<T> {
@@ -95,5 +102,16 @@ export const sessionService = {
       teamId: payload.team_id,
       lastVisitedAt: payload.last_visited_at,
     };
+  },
+
+  async getSessionParticipants(sessionHash: string): Promise<SessionParticipant[]> {
+    const response = await fetch(`${API_BASE_URL}/sessions/${encodeURIComponent(sessionHash)}/participants`);
+    const participants = await readResponse<SessionParticipantResponse[]>(response);
+    return participants.map((participant) => ({
+      userId: participant.user_id,
+      userName: participant.user_name,
+      joinSequence: participant.join_sequence,
+      isOwner: participant.is_owner,
+    }));
   },
 };

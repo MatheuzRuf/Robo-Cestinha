@@ -14,6 +14,7 @@ interface SessionStoreState {
   findSession: (codeOrInviteUrl: string) => Promise<SessionDescriptor | null>;
   joinSession: (session: SessionDescriptor, userName: string) => Promise<SessionMembership>;
   resumeSession: (sessionHash: string) => SessionMembership;
+  leaveSession: () => void;
   getSavedMembership: (sessionHash: string) => SessionMembership | null;
   setTeamForSession: (sessionHash: string, teamId: string | null) => void;
 }
@@ -161,6 +162,10 @@ export const useSessionStore = create<SessionStoreState>()(
           recentSessions: upsertRecentSession(state.recentSessions, membership),
         }));
         return membership;
+      },
+
+      leaveSession() {
+        set({ activeSessionHash: null });
       },
 
       getSavedMembership(sessionHash) {

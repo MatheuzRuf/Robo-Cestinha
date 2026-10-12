@@ -14,6 +14,9 @@ export const ptBR = {
     nav_live_broadcast: 'TRANSMISSÃO AO VIVO',
     online_teams: '{count}/{total} TIMES ONLINE',
     session_code: '{code}',
+    default_session_name: 'Torneio',
+    hello_user: 'Olá, {name}',
+    leave_session: 'Sair da sessão',
     ticker_label: 'TICKER DA TRANSMISSÃO',
     ticker_text:
       'QUADRA 1: BROOKLYN BREAKERS NA FRENTE DOS AUSTIN ARMADILLOS 74-71 (Q4 01:24) // QUADRA 2: CHICAGO STEEL 104-98',
@@ -53,6 +56,14 @@ export const ptBR = {
       joined_as: 'Você entrou como {name}',
       last_visited: 'Último acesso: {date}',
       resume: 'RETOMAR TORNEIO',
+    },
+    players: {
+      title: 'JOGADORES ATUAIS',
+      loading: 'Carregando jogadores…',
+      load_failed: 'Não foi possível carregar os jogadores da sessão.',
+      retry: 'TENTAR NOVAMENTE',
+      empty: 'Nenhum jogador está listado nesta sessão.',
+      owner: 'responsável',
     },
     name_modal: {
       create_title: 'Escolha seu nome para este torneio',

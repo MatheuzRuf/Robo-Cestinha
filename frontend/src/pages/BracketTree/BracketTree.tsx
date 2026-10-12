@@ -41,7 +41,13 @@ export default function BracketTree() {
   }));
 
   return (
-    <AppShell activeNavItem="bracketTree" sessionCode={activeSession?.sessionHash}>
+    <AppShell
+      activeNavItem="bracketTree"
+      currentUserName={activeSession?.userName}
+      sessionName={activeSession?.sessionName}
+      sessionCode={activeSession?.sessionHash}
+      onLeaveSession={() => useSessionStore.getState().leaveSession()}
+    >
       <main className={styles.page}>
         <h1 className={styles.title}>{t('bracket_tree.title')}</h1>
         {!activeSession ? (
