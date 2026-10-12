@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Circle } from 'lucide-react';
 import { SegmentedControl } from '../../../../components/SegmentedControl';
 import { StatusBadge } from '../../../../components/StatusBadge';
 import { useTranslation } from '../../../../lib/i18n/i18n';
@@ -26,7 +27,7 @@ export function BroadcastHeader({ matchMeta, status }: BroadcastHeaderProps) {
   return (
     <section className={styles.broadcastHeader}>
       <div className={styles.headerIdentity}>
-        <StatusBadge tone={tone} icon="●">
+        <StatusBadge tone={tone} icon={<Circle size={8} fill="currentColor" aria-hidden="true" />}>
           {t(`match_broadcast.header.${statusKey}`)}
         </StatusBadge>
         <span>{matchMeta ?? t('match_broadcast.header.waiting_for_match')}</span>

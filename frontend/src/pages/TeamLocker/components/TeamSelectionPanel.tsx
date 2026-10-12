@@ -1,3 +1,4 @@
+import { ShieldCheck, TriangleAlert } from 'lucide-react';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { useTranslation } from '../../../lib/i18n/i18n';
@@ -39,12 +40,14 @@ export function TeamSelectionPanel({ team, myTeam, isLocking, errorKey, onConfir
             fullWidth
             disabled={isLocking || team.claimStatus !== 'available'}
             onClick={onConfirm}
-            icon={<span aria-hidden="true">♙</span>}
+            icon={<ShieldCheck size={16} aria-hidden="true" />}
           >
             {isLocking ? t('team_locker.selection.saving') : t('team_locker.selection.lock_in', { team: team.name })}
           </Button>
           <p className={styles.notice}>
-            <span aria-hidden="true">⚠</span>
+            <span aria-hidden="true">
+              <TriangleAlert size={15} />
+            </span>
             {t('team_locker.selection.immutable')}
           </p>
         </>

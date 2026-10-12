@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { Clipboard, Home as HomeIcon, LogIn } from 'lucide-react';
 import { AppShell } from '../../components/AppShell';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
@@ -188,7 +189,9 @@ export default function Home() {
           <Card>
             <div className={styles.cardStack}>
               <div className={styles.cardTitleRow}>
-                <StatusBadge tone="info">⌂</StatusBadge>
+                <span className={styles.cardIcon} aria-hidden="true">
+                  <HomeIcon size={16} />
+                </span>
                 <h2>{t('home.host.title')}</h2>
               </div>
               <p className={styles.cardDescription}>{t('home.host.description')}</p>
@@ -201,7 +204,9 @@ export default function Home() {
           <Card>
             <div className={styles.cardStack}>
               <div className={styles.cardTitleRow}>
-                <StatusBadge tone="info">↪</StatusBadge>
+                <span className={styles.cardIcon} aria-hidden="true">
+                  <LogIn size={16} />
+                </span>
                 <h2>{t('home.join.title')}</h2>
               </div>
               <p className={styles.cardDescription}>{t('home.join.description')}</p>
@@ -214,7 +219,11 @@ export default function Home() {
                   setSessionCode(value);
                   setJoinError(null);
                 }}
-                trailingAction={{ icon: '📋', label: t('common.paste'), onClick: () => void handlePaste() }}
+                trailingAction={{
+                  icon: <Clipboard size={16} aria-hidden="true" />,
+                  label: t('common.paste'),
+                  onClick: () => void handlePaste(),
+                }}
               />
               {joinError ? (
                 <p className={styles.errorMessage} role="alert">

@@ -7,7 +7,6 @@ import { matchBroadcastService } from '../../services/matchBroadcastService';
 import { useTranslation } from '../../lib/i18n/i18n';
 import type { MatchTimelinePayload } from '../../types/matchBroadcast';
 import { useGameFrames } from './hooks/useGameFrames';
-import { BroadcastHeader } from './components/BroadcastHeader/BroadcastHeader';
 import { CommentaryColumn } from './components/CommentaryColumn/CommentaryColumn';
 import { CourtStage } from './components/CourtStage/CourtStage';
 import { MomentumShiftEngine } from './components/MomentumShiftEngine/MomentumShiftEngine';

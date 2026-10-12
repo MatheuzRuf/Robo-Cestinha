@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { UsersRound } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from '../../lib/i18n/i18n';
 import styles from './AppShell.module.css';
@@ -57,7 +58,8 @@ export function AppShell({
           {currentUserName ? <span className={styles.pill}>{currentUserName}</span> : null}
           {!currentUserName && onlineCount ? (
             <span className={styles.pill}>
-              ◉ {t('shell.online_teams', { count: onlineCount.current, total: onlineCount.total })}
+              <UsersRound size={14} aria-hidden="true" />{' '}
+              {t('shell.online_teams', { count: onlineCount.current, total: onlineCount.total })}
             </span>
           ) : null}
           {sessionCode ? <span className={styles.pill}>{t('shell.session_code', { code: sessionCode })}</span> : null}

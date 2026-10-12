@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Card } from '../../../../components/Card';
 import { StatusBadge } from '../../../../components/StatusBadge';
 import styles from './TournamentOverview.module.css';
@@ -6,7 +7,7 @@ export interface TournamentFact {
   id: string;
   label: string;
   value: string;
-  icon: string;
+  icon: ReactNode;
 }
 
 interface TournamentOverviewProps {

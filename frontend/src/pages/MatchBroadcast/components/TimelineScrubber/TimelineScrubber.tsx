@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { useTranslation } from '../../../../lib/i18n/i18n';
 import styles from '../../MatchBroadcast.module.css';
 
@@ -31,13 +32,13 @@ export function TimelineScrubber({ quarter, elapsedSeconds, durationSeconds }: T
       </div>
       <div className={styles.timelineButtons}>
         <button type="button" disabled aria-label={t('match_broadcast.timeline.previous')}>
-          ◀
+          <ChevronLeft size={18} aria-hidden="true" />
         </button>
         <button type="button" disabled aria-label={t('match_broadcast.timeline.play')}>
-          ▶
+          <Play size={16} aria-hidden="true" />
         </button>
         <button type="button" disabled aria-label={t('match_broadcast.timeline.next')}>
-          ▶
+          <ChevronRight size={18} aria-hidden="true" />
         </button>
       </div>
     </section>
