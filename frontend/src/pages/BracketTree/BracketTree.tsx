@@ -1,88 +1,90 @@
+import { useEffect } from 'react';
 import { AppShell } from '../../components/AppShell';
+import { Button } from '../../components/Button';
 import { useTranslation } from '../../lib/i18n/i18n';
-import { CourtActionLog } from './components/CourtActionLog/CourtActionLog';
-import { ChampionshipCard } from './components/ChampionshipCard/ChampionshipCard';
+import { useBracketStore } from '../../stores/bracketStore';
+import { useSessionStore } from '../../stores/sessionStore';
 import { RoundColumn } from './components/RoundColumn/RoundColumn';
-import { TeamStatsMatrix } from './components/TeamStatsMatrix/TeamStatsMatrix';
-import { mockBracketData, type BracketTeamKey } from './data/mockBracketData';
 import styles from './BracketTree.module.css';
+
+const roundTitleKeys = ['quarterfinals', 'semifinals', 'final'] as const;
+const matchLabels = ['QF', 'SF', 'F'] as const;
 
 export default function BracketTree() {
   const { t } = useTranslation();
-  const teamName = (key: BracketTeamKey) => t(`bracket_tree.teams.${key}`);
-  const data = mockBracketData;
+  const activeSession = useSessionStore(
+    (state) => state.recentSessions.find((session) => session.sessionHash === state.activeSessionHash) ?? null,
+  );
+  const bracket = useBracketStore((state) => state.bracket);
+  const status = useBracketStore((state) => state.status);
+  const isGenerating = useBracketStore((state) => state.isGenerating);
+  const errorKey = useBracketStore((state) => state.errorKey);
+  const loadBracket = useBracketStore((state) => state.loadBracket);
+  const generateBracket = useBracketStore((state) => state.generateBracket);
+  const resetBracket = useBracketStore((state) => state.reset);
 
-  const rounds = data.rounds.map((round) => ({
-    id: round.id,
-    title: t(round.titleKey),
-    summary: t(round.summaryKey),
+  useEffect(() => {
+    if (!activeSession) {
+      resetBracket();
+      return;
+    }
+
+    void loadBracket({ sessionHash: activeSession.sessionHash, userId: activeSession.userId });
+  }, [activeSession, loadBracket, resetBracket]);
+
+  const rounds = bracket?.rounds.map((round) => ({
+    title: t(`bracket_tree.rounds.${roundTitleKeys[round.round_number] ?? 'final'}`),
     matches: round.matches.map((match) => ({
-      id: match.id,
-      matchNumber: match.number,
-      venue: match.venue,
-      status: match.status,
-      statusLabel: t(match.statusKey),
-      gameClock: 'gameClock' in match ? match.gameClock : undefined,
-      shotClock: 'shotClock' in match ? match.shotClock : undefined,
-      teams: match.teams.map((team) => ({
-        name: teamName(team.teamKey),
-        seed: team.seed,
-        score: team.score,
-        winner: team.winner,
-      })),
-      detail: t(match.detailKey),
-      actionLabel: t(match.actionKey),
+      matchNumber: `${matchLabels[round.round_number] ?? 'R'}-${match.slot + 1}`,
+      teams: [match.home_team, match.away_team] as const,
     })),
   }));
 
-  const statRows = data.stats.rows.map((row) => ({
-    id: row.teamKey,
-    seed: row.seed,
-    teamName: teamName(row.teamKey),
-    values: [...row.values],
-    status: t(row.statusKey),
-  }));
-
-  const actionEntries = data.actionLog.entries.map((entry) => ({
-    id: entry.id,
-    time: entry.time,
-    team: teamName(entry.teamKey),
-    player: entry.player,
-    description: t(entry.descriptionKey),
-  }));
-
   return (
-    <AppShell activeNavItem="bracketTree" onlineCount={data.onlineTeams} sessionCode={data.sessionCode}>
+    <AppShell activeNavItem="bracketTree" sessionCode={activeSession?.sessionHash}>
       <main className={styles.page}>
-        <section className={styles.bracketGrid} aria-label={t('bracket_tree.sections.bracket')}>
-          {rounds.map((round) => (
-            <RoundColumn key={round.id} {...round} />
-          ))}
-          <ChampionshipCard
-            eyebrow={t(data.championship.eyebrowKey)}
-            title={t(data.championship.titleKey)}
-            description={t(data.championship.descriptionKey)}
-            winnerSlots={data.championship.winnerSlots.map((key) => t(key))}
-            seriesLabel={t(data.championship.seriesKey)}
-            statusLabel={t(data.championship.statusKey)}
-          />
-        </section>
-        <section className={styles.insightsGrid} aria-label={t('bracket_tree.sections.stats_and_log')}>
-          <TeamStatsMatrix
-            title={t(data.stats.titleKey)}
-            meta={t(data.stats.metaKey)}
-            columns={data.stats.columns.map((key) => t(key))}
-            rows={statRows}
-            footnote={t(data.stats.footnoteKey)}
-          />
-          <CourtActionLog
-            title={t(data.actionLog.titleKey)}
-            liveLabel={t(data.actionLog.liveKey)}
-            entries={actionEntries}
-            broadcaster={t(data.actionLog.broadcasterKey)}
-            audioLabel={t(data.actionLog.audioKey)}
-          />
-        </section>
+        <h1 className={styles.title}>{t('bracket_tree.title')}</h1>
+        {!activeSession ? (
+          <p className={styles.message}>{t('bracket_tree.no_session')}</p>
+        ) : status === 'loading' || status === 'idle' ? (
+          <p className={styles.message}>{t('bracket_tree.loading')}</p>
+        ) : status === 'error' || !bracket ? (
+          <p className={styles.message} role="alert">
+            {t(errorKey ?? 'bracket_tree.errors.load_failed')}
+          </p>
+        ) : (
+          <>
+            {!bracket.generated && bracket.can_generate ? (
+              <div className={styles.action}>
+                <Button
+                  variant="primary"
+                  onClick={() =>
+                    void generateBracket({
+                      sessionHash: activeSession.sessionHash,
+                      userId: activeSession.userId,
+                    })
+                  }
+                  disabled={isGenerating}
+                >
+                  {t(isGenerating ? 'bracket_tree.generating' : 'bracket_tree.generate')}
+                </Button>
+              </div>
+            ) : null}
+            {!bracket.generated && !bracket.can_generate ? (
+              <p className={styles.message}>{t('bracket_tree.owner_generates')}</p>
+            ) : null}
+            {errorKey ? (
+              <p className={styles.error} role="alert">
+                {t(errorKey)}
+              </p>
+            ) : null}
+            <section className={styles.bracketGrid} aria-label={t('bracket_tree.sections.bracket')}>
+              {rounds?.map((round, index) => (
+                <RoundColumn key={index} {...round} tbdLabel={t('bracket_tree.tbd')} />
+              ))}
+            </section>
+          </>
+        )}
       </main>
     </AppShell>
   );

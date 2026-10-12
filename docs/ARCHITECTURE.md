@@ -7,10 +7,11 @@ repository and distinguishes it from planned flows. Solid arrows in the
 diagrams represent existing integrations; dashed arrows represent future
 integrations.
 
-**Current status:** data ingestion prepares an offline catalog; the database
-stores the catalog and sessions; the API provides a health check and session
-creation; the engine runs an independent headless simulation; and the frontend
-still uses mock data. These parts do not yet form an integrated broadcast flow.
+**Current status:** data ingestion prepares an offline catalog; the seed script
+loads eight selected teams and their players into the database; the API manages
+sessions and brackets; the bracket page reads and generates brackets through
+the API; the team locker and match broadcast still use mock behavior; and the
+engine runs an independent headless simulation.
 
 ## System overview
 
@@ -22,12 +23,13 @@ flowchart LR
     Seed[Catalog seed]
     DB[(PostgreSQL)]
     Engine[Headless engine<br/>independent execution]
-    API[FastAPI<br/>/health · POST /sessions]
+    API[FastAPI<br/>sessions · bracket · matches]
     Domain[SessionService]
     Repo[SessionRepository]
-    FE[React frontend<br/>pages with mock data]
-    Mock[Mock engine and mock data]
-    Bracket[BracketService<br/>implemented, not connected]
+    FE[React frontend]
+    BracketStore[Zustand bracket store]
+    Mock[Team locker and broadcast mocks]
+    Bracket[BracketService]
     BracketRepo[BracketRepository]
     MatchSvc[MatchService and coordinator<br/>planned]
     Stream[SSE and event persistence<br/>planned]
@@ -36,12 +38,11 @@ flowchart LR
     Files --> Seed --> DB
     Files --> Engine
     API --> Domain --> Repo --> DB
-    API --> DB
     Bracket --> BracketRepo --> DB
+    Bracket --> Domain
+    FE --> BracketStore --> API
     FE --> Mock
 
-    FE -. "future integration" .-> API
-    Domain -. "invoke bracket creation" .-> Bracket
     API -.-> MatchSvc -.-> Engine
     MatchSvc -.-> Stream -.-> FE
 ```
@@ -54,35 +55,38 @@ script are operational tasks outside request traffic.
 
 ```mermaid
 flowchart TB
-    App[App.tsx<br/>selects page by pathname]
+    App[App.tsx<br/>React Router]
     Home[Home]
+    BracketTree[BracketTree]
     Broadcast[MatchBroadcast]
+    Locker[TeamLocker]
     Shared[Shared components]
     Hook[useGameFrames]
-    Mock[mockEngine and mockMatchData]
-    Storage[(localStorage<br/>local state)]
-    API[FastAPI<br/>not connected]
+    Mock[Mock team locker and match data]
+    Store[Zustand bracket store]
+    API[FastAPI]
 
     App --> Home
+    App --> BracketTree
     App --> Broadcast
+    App --> Locker
     Home --> Shared
     Broadcast --> Shared
     Broadcast --> Hook --> Mock
-    Home -.-> Storage
-    Home -. "future integration" .-> API
-    Broadcast -. "future integration" .-> API
+    BracketTree --> Store --> API
+    Locker --> API --> Mock
+    Home --> API
 ```
 
-- The frontend uses React, TypeScript, and Vite. `App.tsx` chooses between
-  pages by checking `window.location.pathname`; there is no routing library
-  yet.
-- `Home` and `MatchBroadcast` render the interface, but their operations do not
-  consume the API. The broadcast uses the mock engine and static match data.
+- The frontend uses React, TypeScript, Vite, and React Router.
+- `Home` uses the session endpoints. `BracketTree` reads bracket state and
+  generation actions from a Zustand store, which calls the bracket API.
+- The Team Locker endpoint still builds its response from processed JSON and
+  keeps claims in memory. Match broadcast still uses mock match data.
 - `useGameFrames` queues locally generated frames to animate the court. It
   does not consume SSE or replay persisted frames.
-- Shared components handle presentation. The display name and other local data
-  may use `localStorage`; this is not session state synchronized with the
-  backend.
+- Shared components handle presentation. Session memberships and identities
+  are stored locally by the frontend.
 
 ## Backend and persistence
 
@@ -99,34 +103,36 @@ flowchart TB
 
     subgraph HTTP[Implemented FastAPI endpoints]
         Health[GET /health]
-        CreateSession[POST /sessions]
+        Sessions[Session endpoints]
+        GetBracket[GET /bracket/{session_hash}]
+        GenerateBracket[POST /bracket/{session_hash}]
     end
 
-    Service[SessionService]
+    SessionService[SessionService]
     SessionRepo[SessionRepository]
-    BracketService[BracketService<br/>existing code, not called by session flow]
+    BracketService[BracketService]
     BracketRepo[BracketRepository]
     Database[(PostgreSQL)]
 
-    Factory --> CreateSession
-    CreateSession --> Service --> SessionRepo --> Database
+    Factory --> Sessions --> SessionService --> SessionRepo --> Database
+    Factory --> GetBracket --> BracketService
+    Factory --> GenerateBracket --> BracketService
+    BracketService --> SessionService
+    BracketService --> BracketRepo --> Database
     Health --> DBSession --> Database
-    Factory -. "also constructs" .-> BracketService --> BracketRepo --> Database
 ```
 
-- The current endpoints are `GET /health` and `POST /sessions`. The latter
-  creates and persists a session and its owner user.
+- `POST /sessions` creates a session and its owner. Bracket generation is a
+  separate owner action through `POST /bracket/{session_hash}`.
+- `GET /bracket/{session_hash}` returns either an empty eight-team bracket
+  skeleton or the saved bracket. The bracket service looks sessions up through
+  `SessionService`; the session service does not depend on bracket creation.
 - `api/factories.py` is the composition point: `ServiceFactory` creates
   services and repositories using a request-scoped asynchronous SQLAlchemy
   session.
 - Services coordinate domain operations; repositories encapsulate queries and
   persistence. `BaseRepository` centralizes shared session and transaction
   operations.
-- `BracketService.seed_bracket_for_session()` and its repository are
-  implemented, but `SessionService.create_session()` does not call that
-  method. Therefore, the session-creation endpoint **does not create bracket
-  matches** today. Describe this integration as future work until it is wired
-  into the code.
 - `core/` centralizes configuration and secrets. The intended backend
   dependency direction is API → domain → repositories → database; the engine
   and ingestion do not depend on session or HTTP concepts.
@@ -146,12 +152,19 @@ erDiagram
 
     TEAM {
         uuid id PK
+        string catalog_id UK
         string name
+        string abbreviation
+        json team_stats
     }
     PLAYER {
         uuid id PK
+        string catalog_id UK
         uuid team_id FK
         string name
+        string position
+        string position5
+        bool is_starter
         json attributes
     }
     SESSION {
@@ -236,10 +249,14 @@ flowchart LR
     Files --> Demo[engine.demo]
 ```
 
-The pipeline separates network fetching from offline derivation, validates the
-results before writing processed files, and produces the catalog consumed by
-the seed script and the engine's independent demo. It does not participate in
-each API request.
+The pipeline separates network fetching from offline derivation and validates
+the results before writing processed files. The database seed validates those
+files again, selects `bkn`, `nyk`, `bos`, `gsw`, `okc`, `lal`, `den`, and `phi`,
+then creates player rows from those teams' rosters. Team statistics and player
+attributes remain typed by the processed-data Pydantic schemas and are stored
+as JSON columns. The team roster is represented in the database by
+`Player.team_id`, rather than by a duplicate roster JSON column. The seed script
+and engine demo are operational tasks; neither runs during API requests.
 
 ## Future direction
 
