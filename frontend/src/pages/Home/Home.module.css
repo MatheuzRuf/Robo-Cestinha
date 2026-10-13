@@ -194,6 +194,13 @@
   color: var(--color-text-muted);
 }
 
+.modalActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
 .errorMessage {
   margin: 0;
   color: var(--color-live);

@@ -5,9 +5,10 @@ import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Modal } from '../../components/Modal';
 import { TextInput } from '../../components/TextInput';
+import { useToast } from '../../components/Toast/useToast';
 import { normalizeSessionCode, sessionService } from '../../services/sessionService';
 import { useSessionStore } from '../../stores/sessionStore';
-import type { SessionDescriptor } from '../../types/session';
+import type { SessionDescriptor, SessionMembership } from '../../types/session';
 import { useTranslation } from '../../lib/i18n/i18n';
 import { SessionCard } from './components/SessionCard';
 import styles from './Home.module.css';
@@ -40,11 +41,13 @@ function formatLastVisited(value: string, locale: string) {
 
 export default function Home() {
   const { t, locale } = useTranslation();
+  const { showToast } = useToast();
   const [sessionCode, setSessionCode] = useState('');
   const [nameDraft, setNameDraft] = useState('');
   const [nameModalOpen, setNameModalOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [joinTarget, setJoinTarget] = useState<SessionDescriptor | null>(null);
+  const [resumeTarget, setResumeTarget] = useState<SessionMembership | null>(null);
   const [joinError, setJoinError] = useState<string | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
 
@@ -75,15 +78,28 @@ export default function Home() {
   });
 
   const createSessionMutation = useMutation({
-    mutationFn: (userName: string) => useSessionStore.getState().createSession(userName),
-    onSuccess: () => closeNameModal(),
+    mutationFn: async (userName: string) => {
+      const previousSessionHash = useSessionStore.getState().activeSessionHash;
+      const membership = await useSessionStore.getState().createSession(userName);
+      return { membership, previousSessionHash };
+    },
+    onSuccess: ({ membership, previousSessionHash }) => {
+      closeNameModal();
+      notifySessionCreated(previousSessionHash, membership);
+    },
     onError: (error) => setNameError(getErrorKey(error)),
   });
 
   const joinSessionMutation = useMutation({
-    mutationFn: ({ session, userName }: { session: SessionDescriptor; userName: string }) =>
-      useSessionStore.getState().joinSession(session, userName),
-    onSuccess: () => closeNameModal(),
+    mutationFn: async ({ session, userName }: { session: SessionDescriptor; userName: string }) => {
+      const previousSessionHash = useSessionStore.getState().activeSessionHash;
+      const membership = await useSessionStore.getState().joinSession(session, userName);
+      return { membership, previousSessionHash };
+    },
+    onSuccess: ({ membership, previousSessionHash }) => {
+      closeNameModal();
+      notifySessionChanged(previousSessionHash, membership);
+    },
     onError: (error) => setNameError(getErrorKey(error)),
   });
 
@@ -94,6 +110,16 @@ export default function Home() {
     setPendingAction(null);
     setJoinTarget(null);
     setNameError(null);
+  }
+
+  function notifySessionChanged(previousSessionHash: string | null, membership: SessionMembership) {
+    if (previousSessionHash === membership.sessionHash) return;
+    showToast(t('home.toast.session_changed', { session_hash: membership.sessionHash }), 'success');
+  }
+
+  function notifySessionCreated(previousSessionHash: string | null, membership: SessionMembership) {
+    if (previousSessionHash === membership.sessionHash) return;
+    showToast(t('home.toast.session_created', { session_hash: membership.sessionHash }), 'success');
   }
 
   const handleCreate = () => {
@@ -114,7 +140,10 @@ export default function Home() {
     const savedMembership = useSessionStore.getState().getSavedMembership(normalizedCode);
     if (savedMembership) {
       try {
-        useSessionStore.getState().resumeSession(normalizedCode);
+        const store = useSessionStore.getState();
+        const previousSessionHash = store.activeSessionHash;
+        const membership = store.resumeSession(normalizedCode);
+        notifySessionChanged(previousSessionHash, membership);
       } catch (error) {
         setJoinError(getErrorKey(error));
       }
@@ -146,10 +175,17 @@ export default function Home() {
     }
   };
 
-  const handleResume = (code: string) => {
+  const handleConfirmResume = () => {
+    if (!resumeTarget) return;
+
+    const store = useSessionStore.getState();
+    const previousSessionHash = store.activeSessionHash;
     try {
-      useSessionStore.getState().resumeSession(code);
+      const membership = store.resumeSession(resumeTarget.sessionHash);
+      setResumeTarget(null);
+      notifySessionChanged(previousSessionHash, membership);
     } catch (error) {
+      setResumeTarget(null);
       setJoinError(getErrorKey(error));
     }
   };
@@ -293,7 +329,10 @@ export default function Home() {
                     date: formatLastVisited(session.lastVisitedAt, locale),
                   })}
                   resumeLabel={t('home.session_card.resume')}
-                  onResume={() => handleResume(session.sessionHash)}
+                  onResume={() => {
+                    setJoinError(null);
+                    setResumeTarget(session);
+                  }}
                 />
               ))}
             </div>
@@ -343,6 +382,25 @@ export default function Home() {
             {isNameSubmitting ? t('home.name_modal.submitting') : t('home.name_modal.cta')}
           </Button>
         </form>
+      </Modal>
+
+      <Modal
+        title={t('home.resume_modal.title')}
+        open={Boolean(resumeTarget)}
+        onClose={() => setResumeTarget(null)}
+        closeLabel={t('common.close')}
+      >
+        <div className={styles.modalStack}>
+          <p className={styles.modalDescription}>{t('home.resume_modal.description')}</p>
+          <div className={styles.modalActions}>
+            <Button variant="outline" onClick={() => setResumeTarget(null)}>
+              {t('home.resume_modal.cancel')}
+            </Button>
+            <Button variant="primary" onClick={handleConfirmResume}>
+              {t('home.session_card.resume')}
+            </Button>
+          </div>
+        </div>
       </Modal>
     </>
   );

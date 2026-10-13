@@ -1,6 +1,7 @@
 export const enUS = {
   common: {
     close: 'Close',
+    dismiss: 'Dismiss notification',
     paste: 'Paste',
     sound: 'Sound',
     profile: 'Profile',
@@ -53,6 +54,15 @@ export const enUS = {
       joined_as: 'You joined as {name}',
       last_visited: 'Last visited {date}',
       resume: 'RESUME TOURNAMENT',
+    },
+    resume_modal: {
+      title: 'Resume this tournament?',
+      description: 'This will switch to the saved tournament.',
+      cancel: 'CANCEL',
+    },
+    toast: {
+      session_changed: 'Switched to Tournament {session_hash}',
+      session_created: 'New Tournament {session_hash} Created',
     },
     players: {
       title: 'CURRENT PLAYERS',

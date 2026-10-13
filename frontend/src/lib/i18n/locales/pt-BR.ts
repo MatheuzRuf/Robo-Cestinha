@@ -1,6 +1,7 @@
 export const ptBR = {
   common: {
     close: 'Fechar',
+    dismiss: 'Dispensar notificação',
     paste: 'Colar',
     sound: 'Som',
     profile: 'Perfil',
@@ -53,6 +54,15 @@ export const ptBR = {
       joined_as: 'Você entrou como {name}',
       last_visited: 'Último acesso: {date}',
       resume: 'RETOMAR TORNEIO',
+    },
+    resume_modal: {
+      title: 'Retomar este torneio?',
+      description: 'Você mudará para o torneio salvo.',
+      cancel: 'CANCELAR',
+    },
+    toast: {
+      session_changed: 'Mudou para o torneio {session_hash}',
+      session_created: 'Novo torneio {session_hash} criado',
     },
     players: {
       title: 'JOGADORES ATUAIS',
