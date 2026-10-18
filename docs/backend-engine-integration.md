@@ -396,7 +396,7 @@ sequenceDiagram
     DB-->>Repo: Match context and player attributes
     Repo-->>Service: Match context
     Service->>Repo: reserve_simulation(matchId, iterations)
-    Repo->>DB: Check ready status; create unique running simulation
+    Repo->>DB: Check ready status and create unique running simulation
     DB-->>Repo: Simulation reservation
     Repo-->>Service: Simulation record
     Service->>Adapter: run(context, iterations)
