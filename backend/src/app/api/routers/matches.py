@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Body, Depends, Query
 from fastapi.responses import StreamingResponse
 
 from app.api.factories import ServiceFactory
@@ -409,6 +409,217 @@ async def get_match_timeline(
     service = factory.mock_timeline_service()
     payload = service.get_timeline(match_id=match_id, locale=locale)
     return MatchTimelineResponse(**payload)
+
+
+@router.post("/{match_id}/simulation")
+async def simulate_match(
+    match_id: str,
+    session_hash: str = Body(..., alias="sessionHash", min_length=1),
+    iterations: int = Body(..., gt=0),
+) -> dict[str, Any]:
+    """Return a hardcoded simulation result for the requested match.
+
+    Args:
+        match_id: Match identifier from the route.
+        session_hash: Session identifier sent in the request body.
+        iterations: Maximum number of normal-play transitions requested.
+
+    Returns:
+        A hardcoded simulation result with frames, events, and a final score.
+    """
+
+    return {
+        "match": {
+            "matchId": match_id,
+            "sessionHash": session_hash,
+            "status": "finished",
+        },
+        "simulation": {
+            "status": "completed",
+            "iterationsLimit": iterations,
+            "iterationsCompleted": 1,
+            "overtimeIterations": 0,
+            "terminationReason": "game_finished",
+        },
+        "teams": {
+            "home": {
+                "teamId": "home-team-demo",
+                "name": "Harbor Hawks",
+                "abbreviation": "HH",
+            },
+            "away": {
+                "teamId": "away-team-demo",
+                "name": "Mountain Bears",
+                "abbreviation": "MB",
+            },
+        },
+        "players": [
+            {
+                "playerId": "home-pg",
+                "teamId": "home-team-demo",
+                "side": "home",
+                "name": "Alex Reed",
+                "position": "PG",
+            },
+            {
+                "playerId": "home-sg",
+                "teamId": "home-team-demo",
+                "side": "home",
+                "name": "Jamie Cole",
+                "position": "SG",
+            },
+            {
+                "playerId": "home-sf",
+                "teamId": "home-team-demo",
+                "side": "home",
+                "name": "Morgan Lee",
+                "position": "SF",
+            },
+            {
+                "playerId": "home-pf",
+                "teamId": "home-team-demo",
+                "side": "home",
+                "name": "Riley Gray",
+                "position": "PF",
+            },
+            {
+                "playerId": "home-c",
+                "teamId": "home-team-demo",
+                "side": "home",
+                "name": "Casey Park",
+                "position": "C",
+            },
+            {
+                "playerId": "away-pg",
+                "teamId": "away-team-demo",
+                "side": "away",
+                "name": "Taylor Fox",
+                "position": "PG",
+            },
+            {
+                "playerId": "away-sg",
+                "teamId": "away-team-demo",
+                "side": "away",
+                "name": "Jordan Bell",
+                "position": "SG",
+            },
+            {
+                "playerId": "away-sf",
+                "teamId": "away-team-demo",
+                "side": "away",
+                "name": "Cameron West",
+                "position": "SF",
+            },
+            {
+                "playerId": "away-pf",
+                "teamId": "away-team-demo",
+                "side": "away",
+                "name": "Drew North",
+                "position": "PF",
+            },
+            {
+                "playerId": "away-c",
+                "teamId": "away-team-demo",
+                "side": "away",
+                "name": "Avery Stone",
+                "position": "C",
+            },
+        ],
+        "frames": [
+            {
+                "iteration": 0,
+                "playerWithBallId": "home-pg",
+                "players": [
+                    {"playerId": "home-pg", "x": 24, "y": 25},
+                    {"playerId": "home-sg", "x": 30, "y": 15},
+                    {"playerId": "home-sf", "x": 30, "y": 35},
+                    {"playerId": "home-pf", "x": 36, "y": 20},
+                    {"playerId": "home-c", "x": 36, "y": 30},
+                    {"playerId": "away-pg", "x": 70, "y": 25},
+                    {"playerId": "away-sg", "x": 66, "y": 15},
+                    {"playerId": "away-sf", "x": 66, "y": 35},
+                    {"playerId": "away-pf", "x": 60, "y": 20},
+                    {"playerId": "away-c", "x": 60, "y": 30},
+                ],
+                "ball": {"x": 24, "y": 25, "trajectory": None},
+                "score": {"home": 0, "away": 0},
+                "possessionTeamId": "home-team-demo",
+            },
+            {
+                "iteration": 1,
+                "playerWithBallId": None,
+                "players": [
+                    {"playerId": "home-pg", "x": 25, "y": 25},
+                    {"playerId": "home-sg", "x": 31, "y": 15},
+                    {"playerId": "home-sf", "x": 31, "y": 35},
+                    {"playerId": "home-pf", "x": 37, "y": 20},
+                    {"playerId": "home-c", "x": 37, "y": 30},
+                    {"playerId": "away-pg", "x": 69, "y": 25},
+                    {"playerId": "away-sg", "x": 65, "y": 15},
+                    {"playerId": "away-sf", "x": 65, "y": 35},
+                    {"playerId": "away-pf", "x": 59, "y": 20},
+                    {"playerId": "away-c", "x": 59, "y": 30},
+                ],
+                "ball": {
+                    "x": 94,
+                    "y": 25,
+                    "trajectory": {
+                        "type": "shot",
+                        "fromPosition": {"x": 25, "y": 25},
+                        "toPosition": {"x": 94, "y": 25},
+                    },
+                },
+                "score": {"home": 2, "away": 0},
+                "possessionTeamId": None,
+            },
+        ],
+        "events": [
+            {
+                "sequence": 1,
+                "iteration": 0,
+                "type": "game_started",
+                "teamId": "home-team-demo",
+                "playerId": "home-pg",
+                "targetPlayerId": None,
+                "data": {},
+            },
+            {
+                "sequence": 2,
+                "iteration": 1,
+                "type": "shot_attempted",
+                "teamId": "home-team-demo",
+                "playerId": "home-pg",
+                "targetPlayerId": None,
+                "data": {"shotValue": 2},
+            },
+            {
+                "sequence": 3,
+                "iteration": 1,
+                "type": "shot_made",
+                "teamId": "home-team-demo",
+                "playerId": "home-pg",
+                "targetPlayerId": None,
+                "data": {
+                    "pointsScored": 2,
+                    "scoreAfter": {"home": 2, "away": 0},
+                },
+            },
+            {
+                "sequence": 4,
+                "iteration": 1,
+                "type": "game_finished",
+                "teamId": "home-team-demo",
+                "playerId": None,
+                "targetPlayerId": None,
+                "data": {"winnerTeamId": "home-team-demo"},
+            },
+        ],
+        "summary": {
+            "homeScore": 2,
+            "awayScore": 0,
+            "winnerTeamId": "home-team-demo",
+        },
+    }
 
 
 @router.get("/stream")
