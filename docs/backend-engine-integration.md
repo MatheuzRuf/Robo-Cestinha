@@ -16,7 +16,6 @@ The implementation must:
 - Move the winner into the correct slot in the next match.
 - Reject a second simulation of the same match.
 - Return a recorded simulation from a GET endpoint.
-- Provide a separate endpoint with a fixed mock response.
 
 The engine must not know about FastAPI, SQLAlchemy, sessions, or HTTP. The
 domain service connects the engine to the repositories. The API router calls
@@ -125,8 +124,11 @@ Request:
 The match ID is in the path. The session hash and iteration limit are in the
 request body. The service must confirm that the match belongs to the session.
 
-The route returns `201 Created` with the complete simulation result after the
-engine and database work finish.
+At first, the route returns a fixed hardcoded result. This lets the API
+response contract be checked before the engine integration is complete. Later,
+replace the hardcoded result with the engine and database workflow. Keep the
+request and response contract unchanged. The engine-backed route returns
+`201 Created` after the engine and database work finish.
 
 ### 4.2 Read a recorded simulation
 
@@ -139,21 +141,6 @@ Return the stored result. Do not call the engine from this route. Return
 
 The repository must read frame chunks by `chunk_index` and events by `sequence`.
 The response schema must be the same schema used by the POST response.
-
-### 4.3 Read a fixed mock result
-
-```http
-GET /matches/{match_id}/simulation/mock
-```
-
-This route returns a hardcoded result. It does not call the engine and does not
-read or write the database. Set the response `matchId` to the ID in the path.
-Use fixed team IDs, player IDs, positions, events, scores, and winner so the
-result is stable between calls.
-
-Keep `/mock` in the route name. Do not use this route to start or record a real
-match. Do not connect any other module to this route in this plan. Its purpose
-is to provide a stable API example and a simple route test.
 
 ## 5. Response shape
 
@@ -413,8 +400,9 @@ sequenceDiagram
     API-->>API: Validate API response schema
 ```
 
-The mock endpoint uses a shorter path. It calls `MockSimulationService` and
-returns its fixed result. It does not call the repository or engine.
+The first implementation of the POST route returns a fixed result directly.
+After the engine and repository work is ready, the route calls `MatchService`
+and returns its result instead.
 
 ## 7. Backend class and method stubs
 
@@ -476,14 +464,6 @@ async def simulate_match(match_id, request, factory) -> MatchSimulationResponse:
 @router.get("/{match_id}/timeline", response_model=MatchSimulationResponse)
 async def get_recorded_match(match_id, factory) -> MatchSimulationResponse:
     ...
-
-
-@router.get(
-    "/{match_id}/simulation/mock",
-    response_model=MatchSimulationResponse,
-)
-async def get_mock_simulation(match_id, factory) -> MatchSimulationResponse:
-    ...
 ```
 
 ```python
@@ -491,9 +471,6 @@ async def get_mock_simulation(match_id, factory) -> MatchSimulationResponse:
 
 class ServiceFactory:
     def match_service(self) -> MatchService:
-        ...
-
-    def mock_simulation_service(self) -> MockSimulationService:
         ...
 ```
 
@@ -686,23 +663,7 @@ machine must expose one transition at a time. The current
 `resolve_possession()` call can process several actions before it returns. That
 does not provide enough states for this contract.
 
-### 7.6 Mock service
-
-```python
-# backend/src/app/domain/matches/mock_service.py
-
-class MockSimulationService:
-    def get_mock_simulation(self, match_id: UUID) -> MatchSimulationResult:
-        ...
-```
-
-Store a fixed fixture in this service or in a small fixture module. Include an
-initial frame, at least three transitions, a pass, a missed or made shot, a
-scoring event, a possession change, and a finished result. Include
-`playerWithBallId` in every frame. Return the same result on every call, except
-that `matchId` matches the path value.
-
-### 7.7 Database models
+### 7.6 Database models
 
 ```python
 # backend/src/app/db/models/match_simulation.py
@@ -767,10 +728,10 @@ simulation status on `MatchSimulation`.
 3. Add schema validation for positive iteration limits, coordinate bounds,
    ordered frame iterations, unique player IDs per frame, and one
    `playerWithBallId` value per frame.
-4. Add `GET /matches/{match_id}/simulation/mock`.
-5. Add `MockSimulationService` with a fixed result.
-6. Test that the mock route returns the response schema and does not call the
-   engine or database.
+4. Add `POST /matches/{match_id}/simulation` with a fixed hardcoded result.
+   Keep the result in the route for this first step only.
+5. Test the request fields and response shape. Do not add a separate mock route
+   or mock service.
 
 ### Step 2: Add persistence
 
@@ -828,9 +789,9 @@ must own all SQLAlchemy queries and writes.
    - `422 invalid_iterations`
    - `500 simulation_failed`
 3. Return the completed result with `201 Created`.
-4. Replace the mock implementation of `GET /matches/{match_id}/timeline` with
-   a repository read. Do not call the engine from GET.
-5. Keep the separate `/simulation/mock` route fixed and clearly named.
+4. Replace the hardcoded POST response with a `MatchService` call.
+5. Replace the current mock implementation of `GET /matches/{match_id}/timeline`
+   with a repository read. Do not call the engine from GET.
 
 ### Step 6: Verify bracket completion
 
@@ -851,15 +812,14 @@ match without its bracket update.
 
 | File | Action | Purpose |
 |---|---|---|
-| `backend/src/app/api/routers/matches.py` | Change | Add mock, start, and recorded-result routes. Keep routes thin. |
+| `backend/src/app/api/routers/matches.py` | Change | Add the start and recorded-result routes. The POST returns hardcoded data first, then calls the service. Keep routes thin. |
 | `backend/src/app/api/schemas/match_simulation.py` | Add | Define request and response contracts. |
 | `backend/src/app/api/schemas/__init__.py` | Change | Export the new API schemas if this package uses exports. |
-| `backend/src/app/api/factories.py` | Change | Build request-scoped match and mock services. |
+| `backend/src/app/api/factories.py` | Change | Build the request-scoped match service. |
 | `backend/src/app/domain/matches/service.py` | Change | Add the real match workflow. Replace or separate the current mock timeline service. |
 | `backend/src/app/domain/matches/repository.py` | Add | Read match context and persist/retrieve simulation data. |
 | `backend/src/app/domain/matches/engine_adapter.py` | Add | Map database records and IDs to and from engine types. |
 | `backend/src/app/domain/matches/types.py` | Add | Define domain result and match-context data types without FastAPI or Pydantic. |
-| `backend/src/app/domain/matches/mock_service.py` | Add | Return the fixed mock result for the mock route. |
 | `backend/src/app/db/models/match_simulation.py` | Add | Store one simulation record per match. |
 | `backend/src/app/db/models/match_event.py` | Add | Store ordered semantic events. |
 | `backend/src/app/db/models/match_frame_chunk.py` | Add | Store batches of ordered frames. |
@@ -869,7 +829,7 @@ match without its bracket update.
 | `backend/src/app/engine/schemas.py` | Change | Add transition, frame, event, and simulation-result types. |
 | `backend/src/app/engine/state_machine.py` | Change | Expose one resolved transition at a time. |
 | `backend/src/app/engine/match_runner.py` | Change | Accept the iteration limit and capture frames/events. Add tie resolution. |
-| `backend/tests/api/test_matches.py` | Change | Test mock, start, read, status codes, and duplicate requests. |
+| `backend/tests/api/test_matches.py` | Change | Test the initial hardcoded POST response, start, read, status codes, and duplicate requests. |
 | `backend/tests/domain/test_match_service.py` | Add | Test orchestration, engine input, ID mapping, and errors. |
 | `backend/tests/domain/test_match_repository.py` | Add | Test queries, constraints, persistence, and bracket transaction. |
 | `backend/tests/engine/test_match_runner.py` | Add | Test transitions, frames, events, score, iteration limit, and overtime. |
@@ -881,7 +841,7 @@ simulation route as part of this work.
 
 The implementation is complete when all checks below pass:
 
-- The mock endpoint returns a stable response with no database or engine call.
+- The initial POST returns a hardcoded response that follows the API schema.
 - The real POST checks session ownership and match readiness.
 - The engine receives both teams and all related players with their attributes.
 - A result has one initial frame and one frame per completed transition.
