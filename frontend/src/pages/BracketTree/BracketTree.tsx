@@ -35,6 +35,11 @@ export default function BracketTree() {
     title: t(`bracket_tree.rounds.${roundTitleKeys[round.round_number] ?? 'final'}`),
     matches: round.matches.map((match) => ({
       matchNumber: `${matchLabels[round.round_number] ?? 'R'}-${match.slot + 1}`,
+      matchId: match.match_id,
+      userTeamId: activeSession?.teamId ?? null,
+      status: match.status ?? null,
+      homeScore: match.home_score ?? null,
+      awayScore: match.away_score ?? null,
       teams: [match.home_team, match.away_team] as const,
     })),
   }));

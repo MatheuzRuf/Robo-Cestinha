@@ -28,6 +28,7 @@ from app.domain.matches.types import (
     MatchContext,
     MatchSimulationResult,
     SimulationRecord,
+    StoredSimulationView,
 )
 
 
@@ -213,6 +214,77 @@ class MatchRepository(BaseRepository):
         simulation.termination_reason = error_code
         simulation.completed_at = datetime.now(UTC)
         await self.commit()
+
+    async def get_simulation_view(
+        self,
+        session_hash: str,
+        match_id: uuid.UUID,
+    ) -> StoredSimulationView | None:
+        """Load a completed simulation and its match roster for replay.
+
+        Args:
+            session_hash: Public session code that must own the match.
+            match_id: Match whose completed simulation should be loaded.
+
+        Returns:
+            The stored simulation view, or None when the session, match, or a
+            completed simulation cannot be found.
+        """
+
+        session = await self._get_session_by_hash(session_hash)
+        if session is None:
+            return None
+
+        match = await self._get_match(match_id)
+        if match is None or match.session_id != session.id:
+            return None
+
+        simulation = await self._get_simulation_by_match_id(match_id)
+        if simulation is None or simulation.status != "completed":
+            return None
+
+        home_team = await self._get_team(match.home_team_id)
+        away_team = await self._get_team(match.away_team_id)
+        if home_team is None or away_team is None:
+            return None
+
+        chunk_result = await self._db.execute(
+            select(MatchFrameChunk)
+            .where(MatchFrameChunk.simulation_id == simulation.id)
+            .order_by(MatchFrameChunk.chunk_index)
+        )
+        frames = [
+            frame for chunk in chunk_result.scalars().all() for frame in chunk.frames
+        ]
+
+        event_result = await self._db.execute(
+            select(MatchEvent)
+            .where(MatchEvent.simulation_id == simulation.id)
+            .order_by(MatchEvent.sequence)
+        )
+        events = [
+            {
+                "sequence": event.sequence,
+                "iteration": event.iteration,
+                "type": event.type,
+                "teamId": event.team_id,
+                "playerId": event.player_id,
+                "targetPlayerId": event.target_player_id,
+                "data": event.payload,
+            }
+            for event in event_result.scalars().all()
+        ]
+
+        return StoredSimulationView(
+            match=match,
+            home_team=home_team,
+            away_team=away_team,
+            home_players=await self._get_players(home_team.id),
+            away_players=await self._get_players(away_team.id),
+            simulation=simulation,
+            frames=frames,
+            events=events,
+        )
 
     async def _get_session_by_hash(self, session_hash: str) -> Session | None:
         normalized = session_hash.strip().upper()

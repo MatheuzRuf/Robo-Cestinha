@@ -61,6 +61,10 @@ class BracketService:
                     {
                         "match_id": match.id,
                         "slot": match.slot_in_round,
+                        "status": match.status,
+                        "home_score": match.home_score,
+                        "away_score": match.away_score,
+                        "winner_team_id": match.winner_team_id,
                         "home_team": self._team_payload(match.home_team_id, home_name),
                         "away_team": self._team_payload(match.away_team_id, away_name),
                     }

@@ -179,6 +179,8 @@ export const enUS = {
     },
     simulation: {
       no_active_session: 'Create or join a session before viewing a simulation.',
+      no_match: 'No match is ready yet. Generate the bracket to start your first game.',
+      go_to_bracket: 'GO TO BRACKET',
       loading: 'LOADING SIMULATION…',
       error: 'Could not load the simulation.',
       retry: 'RETRY SIMULATION',

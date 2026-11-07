@@ -6,6 +6,8 @@ __pycache__/
 *.pyc
 .venv/
 .ruff_cache/
+# Regenerated semantic-search vector index (pi codebase-index extension)
+/.pi/codebase-index/
 data/raw/
 .ipynb_checkpoints/
 # Local secrets and env files (all folders)

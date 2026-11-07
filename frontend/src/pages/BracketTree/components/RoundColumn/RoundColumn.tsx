@@ -3,6 +3,11 @@ import styles from './RoundColumn.module.css';
 
 export interface RoundMatch {
   matchNumber: string;
+  matchId: string | null;
+  userTeamId: string | null;
+  status: string | null;
+  homeScore: number | null;
+  awayScore: number | null;
   teams: readonly [{ id: string; name: string } | null, { id: string; name: string } | null];
 }
 

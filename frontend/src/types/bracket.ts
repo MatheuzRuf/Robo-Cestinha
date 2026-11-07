@@ -11,6 +11,10 @@ export interface BracketTeam {
 export interface BracketMatch {
   match_id: string | null;
   slot: number;
+  status?: string | null;
+  home_score?: number | null;
+  away_score?: number | null;
+  winner_team_id?: string | null;
   home_team: BracketTeam | null;
   away_team: BracketTeam | null;
 }

@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { simulationService } from '../../services/simulationService';
@@ -22,39 +21,57 @@ export default function MatchBroadcast() {
   const sessionHash = useSessionStore((state) => state.activeSessionHash);
   const { t } = useTranslation();
   const requestController = useRef<AbortController | null>(null);
-  const simulationMutation = useMutation<
-    SimulationResponse,
-    Error,
-    Parameters<typeof simulationService.runSimulation>[0]
-  >({
-    mutationFn: simulationService.runSimulation,
-  });
-  const { data: simulation, error, isPending, mutateAsync, reset } = simulationMutation;
+  const [simulation, setSimulation] = useState<SimulationResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(true);
 
-  const runSimulation = useCallback(() => {
+  const loadSimulation = useCallback(async () => {
     requestController.current?.abort();
     requestController.current = null;
-    reset();
 
-    if (!sessionHash) return;
+    if (!sessionHash) {
+      setSimulation(null);
+      setIsPending(false);
+      return;
+    }
 
     const controller = new AbortController();
     requestController.current = controller;
-    void mutateAsync({
-      matchId,
-      sessionHash,
-      iterations: DEFAULT_ITERATIONS_LIMIT,
-      signal: controller.signal,
-    }).catch(() => undefined);
-  }, [matchId, mutateAsync, reset, sessionHash]);
+    setIsPending(true);
+    setError(null);
+
+    try {
+      const stored = await simulationService.getSimulation({
+        matchId,
+        sessionHash,
+        signal: controller.signal,
+      });
+      const data =
+        stored ??
+        (await simulationService.runSimulation({
+          matchId,
+          sessionHash,
+          iterations: DEFAULT_ITERATIONS_LIMIT,
+          signal: controller.signal,
+        }));
+      if (controller.signal.aborted) return;
+      setSimulation(data);
+    } catch (cause) {
+      if (controller.signal.aborted) return;
+      setSimulation(null);
+      setError(cause instanceof Error ? cause.message : 'Simulation request failed');
+    } finally {
+      if (!controller.signal.aborted) setIsPending(false);
+    }
+  }, [matchId, sessionHash]);
 
   useEffect(() => {
-    runSimulation();
+    void loadSimulation();
     return () => {
       requestController.current?.abort();
       requestController.current = null;
     };
-  }, [runSimulation]);
+  }, [loadSimulation]);
 
   const courtFrames = useMemo(() => {
     if (!simulation) return [];
@@ -128,7 +145,7 @@ export default function MatchBroadcast() {
       ) : error || !simulation || !currentSimulationFrame || !playback.frame ? (
         <div className={styles.errorState} role="alert">
           <p>{t('match_broadcast.simulation.error')}</p>
-          <Button variant="outline" onClick={runSimulation}>
+          <Button variant="outline" onClick={() => void loadSimulation()}>
             {t('match_broadcast.simulation.retry')}
           </Button>
         </div>

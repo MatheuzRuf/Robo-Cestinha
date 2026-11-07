@@ -179,6 +179,8 @@ export const ptBR = {
     },
     simulation: {
       no_active_session: 'Crie ou entre em uma sessão antes de ver uma simulação.',
+      no_match: 'Nenhuma partida pronta ainda. Gere a chave para iniciar o primeiro jogo.',
+      go_to_bracket: 'IR PARA A CHAVE',
       loading: 'CARREGANDO SIMULAÇÃO…',
       error: 'Não foi possível carregar a simulação.',
       retry: 'TENTAR NOVAMENTE',

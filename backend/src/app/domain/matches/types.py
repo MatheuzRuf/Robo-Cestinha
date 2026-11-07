@@ -30,6 +30,20 @@ class SimulationRecord:
 
 
 @dataclass
+class StoredSimulationView:
+    """Everything needed to replay a completed, persisted simulation."""
+
+    match: Any
+    home_team: Any
+    away_team: Any
+    home_players: list[Any]
+    away_players: list[Any]
+    simulation: Any
+    frames: list[dict[str, Any]]
+    events: list[dict[str, Any]]
+
+
+@dataclass
 class MatchSimulationResult:
     """The outcome of a match simulation, API-shaped and ready to return."""
 

@@ -21,6 +21,10 @@ class BracketMatchResponse(BaseModel):
 
     match_id: uuid.UUID | None
     slot: int
+    status: str | None = None
+    home_score: int | None = None
+    away_score: int | None = None
+    winner_team_id: uuid.UUID | None = None
     home_team: BracketTeamResponse | None
     away_team: BracketTeamResponse | None
 

@@ -13,6 +13,10 @@ class MatchAlreadySimulatedError(RuntimeError):
     """Raised when a match already has a simulation run."""
 
 
+class SimulationNotFoundError(LookupError):
+    """Raised when no completed simulation exists for a match."""
+
+
 class InvalidIterationsError(ValueError):
     """Raised when the requested iteration count is out of bounds."""
 
