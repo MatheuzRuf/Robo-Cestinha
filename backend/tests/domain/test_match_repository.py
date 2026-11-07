@@ -17,7 +17,7 @@ from app.domain.matches.errors import (
     MatchNotReadyError,
     MatchOrSessionNotFoundError,
 )
-from app.domain.matches.repository import MatchRepository
+from app.domain.matches.repository import MatchRepository, _json_safe
 from app.domain.matches.types import MatchSimulationResult
 
 
@@ -65,6 +65,9 @@ class FakeDatabase:
 
     async def commit(self):
         self.commits += 1
+
+    async def rollback(self):
+        pass
 
     async def refresh(self, entity):
         pass
@@ -138,18 +141,28 @@ def _context_result(match, home_team, away_team):
         teams={},
         players=[],
         frames=[
-            {"iteration": 0, "players": []},
-            {"iteration": 1, "players": []},
+            {
+                "iteration": 0,
+                "playerWithBallId": uuid.uuid4(),
+                "possessionTeamId": home_team.id,
+                "players": [{"playerId": uuid.uuid4(), "x": 10, "y": 20}],
+            },
+            {
+                "iteration": 1,
+                "playerWithBallId": None,
+                "possessionTeamId": None,
+                "players": [{"playerId": uuid.uuid4(), "x": 30, "y": 40}],
+            },
         ],
         events=[
             {
                 "sequence": 1,
                 "iteration": 0,
-                "type": "game_started",
-                "teamId": None,
+                "type": "game_finished",
+                "teamId": home_team.id,
                 "playerId": None,
                 "targetPlayerId": None,
-                "data": {},
+                "data": {"winnerTeamId": home_team.id},
             },
         ],
         engine_version="1.0.0",
@@ -287,6 +300,12 @@ async def test_complete_simulation_persists_result_and_finishes_match():
     assert any(isinstance(c, MatchFrameChunk) for c in db.added)
     assert db.commits == 1
 
+    # UUIDs must be stringified before hitting the PostgreSQL JSON columns.
+    stored_chunk = next(c for c in db.added if isinstance(c, MatchFrameChunk))
+    assert _json_safe(stored_chunk.frames) == stored_chunk.frames
+    stored_event = next(e for e in db.added_all if isinstance(e, MatchEvent))
+    assert isinstance(stored_event.payload["winnerTeamId"], str)
+
 
 @pytest.mark.asyncio
 async def test_complete_simulation_advances_winner_to_next_match():
@@ -322,3 +341,27 @@ async def test_fail_simulation_marks_failed_without_match_changes():
     assert sim.status == "failed"
     assert sim.termination_reason == "engine_error"
     assert db.commits == 1
+
+
+@pytest.mark.asyncio
+async def test_json_safe_stringifies_nested_uuids():
+    team_id = uuid.uuid4()
+    player_id = uuid.uuid4()
+    value = {
+        "possessionTeamId": team_id,
+        "players": [{"playerId": player_id, "x": 1}],
+        "trajectory": {
+            "fromPlayerId": player_id,
+            "toPlayerId": None,
+            "progress": 1.0,
+        },
+        "count": 3,
+        "flag": True,
+    }
+    safe = _json_safe(value)
+    assert safe["possessionTeamId"] == str(team_id)
+    assert safe["players"][0]["playerId"] == str(player_id)
+    assert safe["trajectory"]["fromPlayerId"] == str(player_id)
+    assert safe["trajectory"]["toPlayerId"] is None
+    assert safe["count"] == 3
+    assert safe["flag"] is True

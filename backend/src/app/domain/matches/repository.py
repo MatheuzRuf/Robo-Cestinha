@@ -158,7 +158,7 @@ class MatchRepository(BaseRepository):
                     team_id=_to_uuid(event.get("teamId")),
                     player_id=_to_uuid(event.get("playerId")),
                     target_player_id=_to_uuid(event.get("targetPlayerId")),
-                    payload=event.get("data") or {},
+                    payload=_json_safe(event.get("data") or {}),
                 )
                 for event in result.events
             ]
@@ -170,7 +170,7 @@ class MatchRepository(BaseRepository):
                     chunk_index=0,
                     first_iteration=0,
                     frame_count=len(result.frames),
-                    frames=result.frames,
+                    frames=_json_safe(result.frames),
                 )
             )
 
@@ -204,6 +204,8 @@ class MatchRepository(BaseRepository):
             error_code: Stable code describing the failure.
         """
 
+        # A prior failed flush leaves the session unusable until rolled back.
+        await self._db.rollback()
         simulation = await self._get_simulation_by_id(simulation_id)
         if simulation is None:
             return
@@ -262,3 +264,20 @@ def _to_uuid(value) -> uuid.UUID | None:
     if isinstance(value, uuid.UUID):
         return value
     return uuid.UUID(str(value))
+
+
+def _json_safe(value):
+    """Convert a nested value into JSON-serializable primitives.
+
+    Frames and event payloads carry database UUIDs that PostgreSQL's JSON
+    serializer cannot encode, so convert them to strings on the way into the
+    JSON columns.
+    """
+
+    if isinstance(value, uuid.UUID):
+        return str(value)
+    if isinstance(value, dict):
+        return {key: _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    return value
