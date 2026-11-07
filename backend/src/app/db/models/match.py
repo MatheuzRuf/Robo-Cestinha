@@ -41,3 +41,6 @@ class Match(Base):
     )
 
     session: Mapped["Session"] = relationship(back_populates="matches")
+    simulation: Mapped["MatchSimulation | None"] = relationship(
+        back_populates="match", cascade="all, delete-orphan"
+    )
