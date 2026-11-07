@@ -3,10 +3,13 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.db.base import get_db
 from app.domain.bracket.repository import BracketRepository
 from app.domain.bracket.service import BracketService
-from app.domain.matches.service import MockSimulationService
+from app.domain.matches.engine_adapter import MatchEngineAdapter
+from app.domain.matches.repository import MatchRepository
+from app.domain.matches.service import MatchService
 from app.domain.sessions.repository import SessionRepository
 from app.domain.sessions.service import SessionService
 
@@ -46,11 +49,15 @@ class ServiceFactory:
             repository=SessionRepository(self._db),
         )
 
-    def mock_simulation_service(self) -> MockSimulationService:
-        """Build the temporary mock simulation service used by the broadcast API.
+    def match_service(self) -> MatchService:
+        """Build a match service for the current request.
 
         Returns:
-            A seeded service that returns simulation frames and events.
+            A match service backed by the current database session.
         """
 
-        return MockSimulationService()
+        return MatchService(
+            repository=MatchRepository(self._db),
+            engine_adapter=MatchEngineAdapter(),
+            max_iterations=settings.max_simulation_iterations,
+        )
