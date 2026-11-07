@@ -91,14 +91,17 @@ frontend is standalone (mock data).
 # first time only: .env from example, uv sync, start Postgres, run migrations
 make bootstrap
 
-# every dev session afterwards
-make dev          # ensures Postgres is up, migrates, uvicorn --reload on :8000
+# every dev session afterwards (starts backend and frontend)
+make dev
 ```
 
-`make dev` blocks in the foreground (uvicorn with auto-reload). Verify:
+`make dev` blocks in the foreground, starting the API with auto-reload on
+`:8000` and the Vite frontend on `:5173`. Install frontend dependencies once
+before running it (`cd frontend && npm install`). Verify:
 
 - `curl http://localhost:8000/health` → `{"status":"ok"}`
 - Interactive API docs: <http://localhost:8000/docs> (OpenAPI at `/openapi.json`)
+- Frontend: <http://localhost:5173>
 
 **Seed the team/player catalog** (only needed once — required before bracket
 generation):
@@ -128,7 +131,7 @@ curl -X POST localhost:8000/sessions -H 'content-type: application/json' \
 ```bash
 cd frontend
 npm install      # first time only (locks to package-lock.json)
-npm run dev      # Vite dev server on :5173
+npm run dev      # optional: run only the Vite server on :5173
 ```
 
 Open <http://localhost:5173>:
@@ -146,7 +149,7 @@ Both pages run entirely on mock data (`src/mock/mockEngine.ts`,
 | Target | What it does |
 |---|---|
 | `make bootstrap` | create `backend/.env` from `.env.example`, `uv sync`, `docker compose up -d db`, alembic migrate |
-| `make dev` | same DB setup as bootstrap, then `uvicorn app.api.main:app --reload` |
+| `make dev` | same DB setup as bootstrap, then runs the API and Vite dev server together |
 | `make migrate` | `alembic upgrade head` |
 | `make reset-db` | `docker compose down -v` (wipes data), re-create + migrate |
 | `make format` / `format-check` | `ruff format` on `backend/` |

@@ -3,8 +3,16 @@
 bootstrap:
 	cd backend && ./scripts/bootstrap.sh
 
+dev: SHELL := /bin/bash
 dev:
-	cd backend && ./scripts/dev.sh
+	@set +e; \
+	(cd backend && ./scripts/dev.sh) & backend_pid=$$!; \
+	(cd frontend && npm run dev) & frontend_pid=$$!; \
+	trap 'kill "$$backend_pid" "$$frontend_pid" 2>/dev/null || true' INT TERM EXIT; \
+	wait -n "$$backend_pid" "$$frontend_pid"; status=$$?; \
+	kill "$$backend_pid" "$$frontend_pid" 2>/dev/null || true; \
+	wait "$$backend_pid" "$$frontend_pid" 2>/dev/null || true; \
+	exit "$$status"
 
 migrate:
 	cd backend && ./scripts/migrate.sh
