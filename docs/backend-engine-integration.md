@@ -23,12 +23,11 @@ the domain service. Repositories own all database queries and writes.
 
 ## 2. Current code
 
-- `backend/src/app/api/routers/matches.py` has a mock timeline route and a mock
-  event stream route.
+- `backend/src/app/api/routers/matches.py` has a mock bulk simulation route.
 - `backend/src/app/domain/matches/service.py` contains
-  `MockTimelineService`. It returns mock timeline data and does not read the
-  database.
-- `backend/src/app/api/factories.py` creates the mock timeline service.
+  `MockSimulationService`. It returns seeded mock frames and events without
+  reading the database.
+- `backend/src/app/api/factories.py` creates the mock simulation service.
 - `backend/src/app/db/models/match.py` stores the match, team IDs, status,
   scores, winner, and next-match link.
 - The database has `Team` and `Player` rows. `Player.attributes` stores the
@@ -130,17 +129,10 @@ replace the hardcoded result with the engine and database workflow. Keep the
 request and response contract unchanged. The engine-backed route returns
 `201 Created` after the engine and database work finish.
 
-### 4.2 Read a recorded simulation
+### 4.2 Recorded simulation retrieval
 
-```http
-GET /matches/{match_id}/timeline
-```
-
-Return the stored result. Do not call the engine from this route. Return
-`404 simulation_not_found` if the match has no completed simulation.
-
-The repository must read frame chunks by `chunk_index` and events by `sequence`.
-The response schema must be the same schema used by the POST response.
+The API does not expose a GET route for recorded simulations. The broadcast UI
+uses the frames and events returned by the simulation POST response.
 
 ## 5. Response shape
 
@@ -459,11 +451,6 @@ stay separate from database models and engine schemas.
 @router.post("/{match_id}/simulation", response_model=MatchSimulationResponse)
 async def simulate_match(match_id, request, factory) -> MatchSimulationResponse:
     ...
-
-
-@router.get("/{match_id}/timeline", response_model=MatchSimulationResponse)
-async def get_recorded_match(match_id, factory) -> MatchSimulationResponse:
-    ...
 ```
 
 ```python
@@ -778,7 +765,7 @@ must pass stored player attributes to the engine unchanged.
 Domain services must not import FastAPI or API Pydantic schemas. Repositories
 must own all SQLAlchemy queries and writes.
 
-### Step 5: Add real start and read routes
+### Step 5: Add the real simulation route
 
 1. Add `POST /matches/{match_id}/simulation` with `sessionHash` and
    `iterations` in the request body.
@@ -790,8 +777,6 @@ must own all SQLAlchemy queries and writes.
    - `500 simulation_failed`
 3. Return the completed result with `201 Created`.
 4. Replace the hardcoded POST response with a `MatchService` call.
-5. Replace the current mock implementation of `GET /matches/{match_id}/timeline`
-   with a repository read. Do not call the engine from GET.
 
 ### Step 6: Verify bracket completion
 
@@ -812,11 +797,11 @@ match without its bracket update.
 
 | File | Action | Purpose |
 |---|---|---|
-| `backend/src/app/api/routers/matches.py` | Change | Add the start and recorded-result routes. The POST returns hardcoded data first, then calls the service. Keep routes thin. |
+| `backend/src/app/api/routers/matches.py` | Change | Add the simulation route. The POST returns hardcoded data first, then calls the service. Keep the route thin. |
 | `backend/src/app/api/schemas/match_simulation.py` | Add | Define request and response contracts. |
 | `backend/src/app/api/schemas/__init__.py` | Change | Export the new API schemas if this package uses exports. |
 | `backend/src/app/api/factories.py` | Change | Build the request-scoped match service. |
-| `backend/src/app/domain/matches/service.py` | Change | Add the real match workflow. Replace or separate the current mock timeline service. |
+| `backend/src/app/domain/matches/service.py` | Change | Add the real match workflow and replace the current mock simulation service. |
 | `backend/src/app/domain/matches/repository.py` | Add | Read match context and persist/retrieve simulation data. |
 | `backend/src/app/domain/matches/engine_adapter.py` | Add | Map database records and IDs to and from engine types. |
 | `backend/src/app/domain/matches/types.py` | Add | Define domain result and match-context data types without FastAPI or Pydantic. |

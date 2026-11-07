@@ -1,33 +1,10 @@
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Body, Depends, Query
+from fastapi import APIRouter, Body, Depends
 
 from app.api.factories import ServiceFactory
-from app.api.schemas.match_timeline import MatchTimelineResponse
 
 router = APIRouter()
-
-
-@router.get("/{match_id}/timeline", response_model=MatchTimelineResponse)
-async def get_match_timeline(
-    match_id: str,
-    factory: Annotated[ServiceFactory, Depends()],
-    locale: str = Query(default="en-US", min_length=2, max_length=10),
-) -> MatchTimelineResponse:
-    """Return a complete mock match timeline payload for the frontend.
-
-    Args:
-        match_id: Match identifier to resolve.
-        locale: Preferred locale for the narration bundle.
-        factory: Request-scoped service factory.
-
-    Returns:
-        The complete timeline, frames, and event metadata used by the broadcast.
-    """
-
-    service = factory.mock_timeline_service()
-    payload = service.get_timeline(match_id=match_id, locale=locale)
-    return MatchTimelineResponse(**payload)
 
 
 @router.post("/{match_id}/simulation")

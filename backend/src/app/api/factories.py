@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.base import get_db
 from app.domain.bracket.repository import BracketRepository
 from app.domain.bracket.service import BracketService
-from app.domain.matches.service import MockSimulationService, MockTimelineService
+from app.domain.matches.service import MockSimulationService
 from app.domain.sessions.repository import SessionRepository
 from app.domain.sessions.service import SessionService
 
@@ -45,15 +45,6 @@ class ServiceFactory:
         return SessionService(
             repository=SessionRepository(self._db),
         )
-
-    def mock_timeline_service(self) -> MockTimelineService:
-        """Build the temporary mock timeline service used by the frontend API.
-
-        Returns:
-            A deterministic mock service that returns the broadcast timeline.
-        """
-
-        return MockTimelineService()
 
     def mock_simulation_service(self) -> MockSimulationService:
         """Build the temporary mock simulation service used by the broadcast API.
