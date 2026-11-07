@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import random
 from app.engine.entities import GameState
+from app.engine.grid import get_target_rim
 from app.engine.heuristics import (
     decide_handler_action,
     resolve_pass_teammate,
@@ -12,7 +13,12 @@ from app.engine.heuristics import (
     resolve_move_outcome,
     resolve_shot,
 )
-from app.engine.schemas import ActionLog, PossessionLog
+from app.engine.schemas import (
+    ActionLog,
+    BallTrajectory,
+    PossessionLog,
+    TransitionResult,
+)
 
 
 class StateMachine:
@@ -127,4 +133,124 @@ class StateMachine:
             outcome=outcome,
             points=points,
             duration_s=sum(a.duration_s for a in actions),
+        )
+
+    def resolve_next_transition(self, state: GameState) -> TransitionResult:
+        """Resolve exactly one atomic action and return its observable result.
+
+        Unlike :meth:`resolve_possession`, this runs a single PASS, MOVE, or
+        SHOOT action and returns, so a caller can capture one frame per
+        transition.
+
+        Args:
+            state: Shared game state to resolve and mutate.
+
+        Returns:
+            The resolved transition, including the effect on the score and
+            possession.
+        """
+
+        if not state.active_handler_id:
+            state.active_handler_id = state.attacking_team.select_ball_handler(self.rng)
+
+        handler = state.attacking_team.get_player(state.active_handler_id)
+        acting_team_id = state.possession_team_id
+        action_type = decide_handler_action(state, self.rng)
+        outcome = "continue"
+        points = 0
+        shot_value = None
+        is_three = False
+        target_player_id = None
+        trajectory = None
+        duration_s = 2.0
+        possession_intact = True
+
+        if action_type == "PASS":
+            receiver = resolve_pass_teammate(
+                state.attacking_team, handler.player_id, self.rng
+            )
+            success, stealer = resolve_pass_outcome(
+                handler, receiver, state.defending_team, self.rng
+            )
+            duration_s = 1.5
+            target_player_id = receiver.player_id
+            trajectory = BallTrajectory(
+                type="pass",
+                from_position=handler.court_pos.to_tuple(),
+                to_position=receiver.court_pos.to_tuple(),
+                from_player_id=handler.player_id,
+                to_player_id=receiver.player_id,
+            )
+            if success:
+                state.active_handler_id = receiver.player_id
+                state.last_passer_id = handler.player_id
+                outcome = "success"
+            else:
+                state.flip_possession(new_handler_id=stealer.player_id)
+                outcome = "turnover"
+                possession_intact = False
+        elif action_type == "MOVE":
+            direction = decide_move_direction(
+                handler.court_pos, state.is_attacking_team_home(), self.rng
+            )
+            outcome_type, intercepter = resolve_move_outcome(
+                handler, state.defending_team, direction, self.rng
+            )
+            duration_s = 2.0
+            if outcome_type == "SUCCESS":
+                handler.court_pos = handler.court_pos.move(direction)
+                outcome = "success"
+            elif outcome_type == "STRIPPED":
+                state.flip_possession(new_handler_id=intercepter.player_id)
+                outcome = "turnover"
+                possession_intact = False
+            elif outcome_type == "FOUL_DRAWN":
+                outcome = "foul"
+            else:
+                outcome = "holds"
+        elif action_type == "SHOOT":
+            is_made, is_three, pts = resolve_shot(
+                handler, state.is_attacking_team_home(), state, self.rng
+            )
+            duration_s = 1.2
+            shot_value = 3 if is_three else 2
+            points = pts
+            outcome = "made" if is_made else "missed"
+            rim = get_target_rim(state.is_attacking_team_home())
+            trajectory = BallTrajectory(
+                type="shot",
+                from_position=handler.court_pos.to_tuple(),
+                to_position=rim,
+                from_player_id=handler.player_id,
+                to_player_id=None,
+            )
+            if is_made:
+                if state.is_attacking_team_home():
+                    state.home_team.score += pts
+                else:
+                    state.away_team.score += pts
+            state.flip_possession(rng=self.rng)
+            possession_intact = False
+
+        elapsed, violation = state.clock.tick(duration_s)
+        if violation and possession_intact:
+            state.flip_possession(rng=self.rng)
+            outcome = "turnover"
+
+        return TransitionResult(
+            action_type=action_type.lower(),
+            outcome=outcome,
+            player_id=handler.player_id,
+            target_player_id=target_player_id,
+            acting_team_id=acting_team_id,
+            possession_team_id=state.possession_team_id,
+            turnover=outcome == "turnover",
+            scored=outcome == "made",
+            points=points,
+            shot_value=shot_value,
+            is_three=is_three,
+            possession_changed=state.possession_team_id != acting_team_id,
+            score_home=state.home_team.score,
+            score_away=state.away_team.score,
+            trajectory=trajectory,
         )
