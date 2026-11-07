@@ -41,6 +41,11 @@ class BaseRepository:
 
         await self._db.commit()
 
+    async def rollback(self) -> None:
+        """Roll back the current transaction."""
+
+        await self._db.rollback()
+
     async def refresh(self, entity: object) -> None:
         """Refresh an entity from the database.
 

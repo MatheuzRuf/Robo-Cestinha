@@ -102,3 +102,93 @@ class MatchLog(BaseModel):
     quarters: List[QuarterLog] = Field(default_factory=list)
     box_score: Dict[str, TeamBoxScore] = Field(default_factory=dict)
     key_moments: List[KeyMoment] = Field(default_factory=list)
+
+
+class BallTrajectory(BaseModel):
+    """Describe a pass or shot path for a single transition."""
+
+    type: str  # "pass" | "shot"
+    from_position: Optional[Tuple[int, int]] = None
+    to_position: Optional[Tuple[int, int]] = None
+    from_player_id: Optional[str] = None
+    to_player_id: Optional[str] = None
+
+
+class PlayerPosition(BaseModel):
+    """One on-court player position inside a simulation frame."""
+
+    player_id: str
+    x: int
+    y: int
+
+
+class BallState(BaseModel):
+    """Ball position and optional trajectory for one frame."""
+
+    x: int
+    y: int
+    trajectory: Optional[BallTrajectory] = None
+
+
+class ScoreSnapshot(BaseModel):
+    """Score of both teams at one point in the simulation."""
+
+    home: int
+    away: int
+
+
+class SimulationFrame(BaseModel):
+    """One dense snapshot of the court after a single transition."""
+
+    iteration: int
+    player_with_ball_id: Optional[str]
+    players: List[PlayerPosition] = Field(default_factory=list)
+    ball: BallState
+    score: ScoreSnapshot
+    possession_team_id: Optional[str]
+
+
+class SimulationEvent(BaseModel):
+    """One ordered semantic event tied to a frame iteration."""
+
+    sequence: int
+    iteration: int
+    type: str
+    team_id: Optional[str] = None
+    player_id: Optional[str] = None
+    target_player_id: Optional[str] = None
+    data: Dict[str, Any] = Field(default_factory=dict)
+
+
+class TransitionResult(BaseModel):
+    """The observable effect of exactly one resolved game action."""
+
+    action_type: str
+    outcome: str
+    player_id: Optional[str] = None
+    target_player_id: Optional[str] = None
+    acting_team_id: Optional[str] = None
+    possession_team_id: Optional[str] = None
+    turnover: bool = False
+    scored: bool = False
+    points: int = 0
+    shot_value: Optional[int] = None
+    is_three: bool = False
+    possession_changed: bool = False
+    score_home: int = 0
+    score_away: int = 0
+    trajectory: Optional[BallTrajectory] = None
+
+
+class EngineSimulationResult(BaseModel):
+    """The bounded, frame-based result of a single match simulation."""
+
+    frames: List[SimulationFrame] = Field(default_factory=list)
+    events: List[SimulationEvent] = Field(default_factory=list)
+    iterations_completed: int = 0
+    overtime_iterations: int = 0
+    home_score: int = 0
+    away_score: int = 0
+    winner_team_id: str = ""
+    termination_reason: str = ""
+    engine_version: str = "1.0.0"
