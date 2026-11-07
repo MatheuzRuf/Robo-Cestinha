@@ -1,139 +1,178 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { USE_API_TIMELINE } from '../../config/api';
-import { useMatchBroadcastStore } from '../../stores/matchBroadcastStore';
-import { matchBroadcastService } from '../../services/matchBroadcastService';
+import { Button } from '../../components/Button';
+import { simulationService } from '../../services/simulationService';
+import { useSessionStore } from '../../stores/sessionStore';
 import { useTranslation } from '../../lib/i18n/i18n';
-import type { MatchTimelinePayload } from '../../types/matchBroadcast';
+import type { PlayerState, Team } from '../../types/game';
+import type { SimulationResponse } from '../../types/matchBroadcast';
 import { useGameFrames } from './hooks/useGameFrames';
-import { CommentaryColumn } from './components/CommentaryColumn/CommentaryColumn';
 import { CourtStage } from './components/CourtStage/CourtStage';
-import { MomentumShiftEngine } from './components/MomentumShiftEngine/MomentumShiftEngine';
-import { PlayByPlayColumn } from './components/PlayByPlayColumn/PlayByPlayColumn';
-import { PlayCallStrip } from './components/PlayCallStrip/PlayCallStrip';
 import { Scoreboard } from './components/Scoreboard/Scoreboard';
-import { TimelineScrubber } from './components/TimelineScrubber/TimelineScrubber';
+import { SimulationEvents } from './components/SimulationEvents/SimulationEvents';
+import { SimulationProgress } from './components/SimulationProgress/SimulationProgress';
 import styles from './MatchBroadcast.module.css';
 
-interface MatchBroadcastProps {
-  matchId?: string;
-}
+const DEFAULT_ITERATIONS_LIMIT = 1000;
 
-export default function MatchBroadcast({ matchId: providedMatchId }: MatchBroadcastProps) {
+export default function MatchBroadcast() {
   const { matchId: routeMatchId } = useParams();
-  const matchId = providedMatchId ?? routeMatchId ?? 'demo';
+  const matchId = routeMatchId ?? 'demo';
+  const sessionHash = useSessionStore((state) => state.activeSessionHash);
   const { t } = useTranslation();
-  const snapshot = useMatchBroadcastStore((state) => state.snapshot);
-  const streamFrame = useMatchBroadcastStore((state) => state.frame);
-  const playByPlay = useMatchBroadcastStore((state) => state.playByPlay);
-  const commentary = useMatchBroadcastStore((state) => state.commentary);
-  const status = useMatchBroadcastStore((state) => state.status);
-  const reset = useMatchBroadcastStore((state) => state.reset);
-  const [apiTimeline, setApiTimeline] = useState<MatchTimelinePayload | null>(null);
-  const [apiError, setApiError] = useState<string | null>(null);
-  const { frame, transitionDurationMs, speed, setSpeed, isPaused, pause, resume } = useGameFrames(
-    streamFrame,
-    apiTimeline?.frames ?? [],
-  );
+  const requestController = useRef<AbortController | null>(null);
+  const simulationMutation = useMutation<
+    SimulationResponse,
+    Error,
+    Parameters<typeof simulationService.runSimulation>[0]
+  >({
+    mutationFn: simulationService.runSimulation,
+  });
+  const { data: simulation, error, isPending, mutateAsync, reset } = simulationMutation;
+
+  const runSimulation = useCallback(() => {
+    requestController.current?.abort();
+    requestController.current = null;
+    reset();
+
+    if (!sessionHash) return;
+
+    const controller = new AbortController();
+    requestController.current = controller;
+    void mutateAsync({
+      matchId,
+      sessionHash,
+      iterations: DEFAULT_ITERATIONS_LIMIT,
+      signal: controller.signal,
+    }).catch(() => undefined);
+  }, [matchId, mutateAsync, reset, sessionHash]);
 
   useEffect(() => {
-    let disconnect: (() => void) | undefined;
-    reset(matchId);
-    setApiTimeline(null);
-    setApiError(null);
-
-    if (USE_API_TIMELINE) {
-      void matchBroadcastService
-        .fetchTimeline(matchId)
-        .then((timeline) => {
-          setApiTimeline(timeline);
-          useMatchBroadcastStore.getState().receiveEvent({
-            sequence: 1,
-            occurredAt: new Date().toISOString(),
-            type: 'snapshot',
-            payload: timeline,
-          });
-          useMatchBroadcastStore.getState().setStatus('connected');
-        })
-        .catch(() => {
-          setApiError('Timeline API unavailable. Falling back to the mock broadcast stream.');
-          disconnect = matchBroadcastService.connect(
-            matchId,
-            (event) => useMatchBroadcastStore.getState().receiveEvent(event),
-            (nextStatus) => useMatchBroadcastStore.getState().setStatus(nextStatus),
-          );
-        });
-
-      return () => {
-        disconnect?.();
-        useMatchBroadcastStore.getState().setStatus('idle');
-      };
-    }
-
-    disconnect = matchBroadcastService.connect(
-      matchId,
-      (event) => useMatchBroadcastStore.getState().receiveEvent(event),
-      (nextStatus) => useMatchBroadcastStore.getState().setStatus(nextStatus),
-    );
-
+    runSimulation();
     return () => {
-      disconnect?.();
-      useMatchBroadcastStore.getState().setStatus('idle');
+      requestController.current?.abort();
+      requestController.current = null;
     };
-  }, [matchId, reset]);
+  }, [runSimulation]);
 
-  const statusKey =
-    status === 'connected'
-      ? 'connected'
-      : status === 'reconnecting'
-        ? 'reconnecting'
-        : status === 'error'
-          ? 'error'
-          : 'connecting';
+  const courtFrames = useMemo(() => {
+    if (!simulation) return [];
+
+    const playersById = new Map(simulation.players.map((player) => [player.playerId, player]));
+    const teamSideFor = (teamId: string): Team => (teamId === simulation.teams.home.teamId ? 'home' : 'away');
+    return simulation.frames.map((simulationFrame) => {
+      const positionsById = new Map(simulationFrame.players.map((position) => [position.playerId, position]));
+      const holderPosition = simulationFrame.playerWithBallId
+        ? positionsById.get(simulationFrame.playerWithBallId)
+        : undefined;
+      const sourceTrajectory = simulationFrame.ball.trajectory;
+
+      return {
+        players: simulationFrame.players.flatMap((position): PlayerState[] => {
+          const player = playersById.get(position.playerId);
+          if (!player) return [];
+
+          return [
+            {
+              id: player.playerId,
+              team: player.side,
+              x: position.x,
+              y: position.y,
+              name: player.name,
+              number: player.number ?? undefined,
+              position: player.position,
+            },
+          ];
+        }),
+        ball: {
+          x: holderPosition?.x ?? simulationFrame.ball.x,
+          y: holderPosition?.y ?? simulationFrame.ball.y,
+          height: simulationFrame.ball.height ?? 0,
+        },
+        trajectory: sourceTrajectory
+          ? {
+              type: sourceTrajectory.type,
+              from: sourceTrajectory.fromPosition,
+              to: sourceTrajectory.toPosition,
+              fromTeam: teamSideFor(sourceTrajectory.fromTeamId),
+              toTeam: teamSideFor(sourceTrajectory.toTeamId),
+              progress: sourceTrajectory.progress,
+            }
+          : undefined,
+      };
+    });
+  }, [simulation]);
+
+  const playback = useGameFrames(courtFrames);
+  const currentSimulationFrame = simulation?.frames[playback.frameIndex] ?? null;
+  const currentBasketEvent = simulation?.events.find(
+    (event) => event.type === 'shot_made' && event.iteration === currentSimulationFrame?.iteration,
+  );
+  const basketSide = currentBasketEvent
+    ? currentBasketEvent.teamId === simulation?.teams.home.teamId
+      ? 'right'
+      : 'left'
+    : undefined;
 
   return (
     <main className={styles.page}>
-      {apiError ? <div className={styles.streamStatus}>{apiError}</div> : null}
-      {snapshot ? (
+      {!sessionHash ? (
+        <div className={styles.statusMessage} role="status">
+          {t('match_broadcast.simulation.no_active_session')}
+        </div>
+      ) : isPending ? (
+        <div className={styles.statusMessage} role="status">
+          {t('match_broadcast.simulation.loading')}
+        </div>
+      ) : error || !simulation || !currentSimulationFrame || !playback.frame ? (
+        <div className={styles.errorState} role="alert">
+          <p>{t('match_broadcast.simulation.error')}</p>
+          <Button variant="outline" onClick={runSimulation}>
+            {t('match_broadcast.simulation.retry')}
+          </Button>
+        </div>
+      ) : (
         <>
           <Scoreboard
-            snapshot={snapshot}
-            speed={speed}
-            setSpeed={setSpeed}
-            isPaused={isPaused}
-            onTogglePause={isPaused ? resume : pause}
+            homeTeam={simulation.teams.home}
+            awayTeam={simulation.teams.away}
+            homeScore={currentSimulationFrame.score.home}
+            awayScore={currentSimulationFrame.score.away}
+            possessionTeamId={currentSimulationFrame.possessionTeamId}
+            frameNumber={playback.frameIndex + 1}
+            totalFrames={simulation.frames.length}
+            speed={playback.speed}
+            setSpeed={playback.setSpeed}
+            isPaused={playback.isPaused}
+            isComplete={playback.isComplete}
+            onTogglePause={playback.isPaused ? playback.resume : playback.pause}
+            onRestart={playback.restart}
           />
           <section className={styles.broadcastMainGrid}>
-            <section className={styles.sideColumn}>
-              <PlayByPlayColumn entries={playByPlay} />
-            </section>
-            <section className={styles.centerColumn}>
-              <CourtStage frame={frame} transitionDurationMs={transitionDurationMs} />
-              <PlayCallStrip
-                playCall={snapshot.playCall}
-                shotProbability={snapshot.shotProbability}
-                defensiveScheme={snapshot.defensiveScheme}
+            <div className={styles.centerColumn}>
+              <CourtStage
+                frame={playback.frame}
+                transitionDurationMs={playback.transitionDurationMs}
+                basketMessage={
+                  currentBasketEvent
+                    ? t('match_broadcast.simulation.basket_made', {
+                        points: Number(currentBasketEvent.data.pointsScored ?? 2),
+                      })
+                    : undefined
+                }
+                basketSequence={currentBasketEvent?.sequence}
+                madeBasketSide={basketSide}
               />
-              <TimelineScrubber
-                quarter={snapshot.quarter}
-                elapsedSeconds={snapshot.elapsedSeconds}
-                durationSeconds={snapshot.durationSeconds}
-              />
-              <MomentumShiftEngine
-                momentum={snapshot.momentum}
-                homeName={snapshot.home.name}
-                awayName={snapshot.away.name}
-              />
-            </section>
-            <section className={styles.sideColumn}>
-              <CommentaryColumn entries={commentary} isPaused={isPaused} />
-            </section>
+              <SimulationProgress currentFrame={playback.frameIndex + 1} totalFrames={simulation.frames.length} />
+            </div>
+            <SimulationEvents
+              events={simulation.events}
+              players={simulation.players}
+              currentIteration={currentSimulationFrame.iteration}
+            />
           </section>
         </>
-      ) : (
-        <div className={styles.streamStatus} role="status">
-          {t(`match_broadcast.header.${statusKey}`)}
-        </div>
       )}
     </main>
   );

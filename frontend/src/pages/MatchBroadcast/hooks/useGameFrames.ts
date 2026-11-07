@@ -1,107 +1,67 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Frame } from '../../../types/game';
 
 export const TRANSITION_DURATION_MS = 800;
-const MAX_QUEUE_SIZE = 5;
 
 interface PlaybackState {
-  paused: boolean;
-  speed: 1 | 1.5 | 2;
-  playing: boolean;
-  timeoutId?: number;
+  frames: Frame[];
+  frameIndex: number;
+  isPaused: boolean;
 }
 
-export function useGameFrames(incomingFrame: Frame | null, apiFrames: Frame[] = []) {
-  const [frame, setFrame] = useState<Frame | null>(null);
+export function useGameFrames(frames: Frame[]) {
+  const [playbackState, setPlaybackState] = useState<PlaybackState>(() => ({
+    frames,
+    frameIndex: 0,
+    isPaused: false,
+  }));
   const [speed, setSpeed] = useState<1 | 1.5 | 2>(1);
-  const [isPaused, setIsPaused] = useState(false);
-  const queueRef = useRef<Frame[]>([]);
-  const playbackRef = useRef<PlaybackState>({ paused: false, speed: 1, playing: false });
-  const playNextRef = useRef<() => void>(() => {});
+  const isCurrentSequence = playbackState.frames === frames;
+  const frameIndex = isCurrentSequence ? playbackState.frameIndex : 0;
+  const isPaused = isCurrentSequence && playbackState.isPaused;
 
   useEffect(() => {
-    const playback = playbackRef.current;
+    if (isPaused || frameIndex >= frames.length - 1) return;
 
-    function playNext() {
-      if (playback.paused || playback.playing || queueRef.current.length === 0) return;
+    const timeoutId = window.setTimeout(() => {
+      setPlaybackState((currentState) => {
+        const currentIndex = currentState.frames === frames ? currentState.frameIndex : 0;
+        const currentPaused = currentState.frames === frames && currentState.isPaused;
+        return {
+          frames,
+          frameIndex: Math.min(currentIndex + 1, frames.length - 1),
+          isPaused: currentPaused,
+        };
+      });
+    }, TRANSITION_DURATION_MS / speed);
 
-      const next = queueRef.current.shift();
-      if (!next) return;
-
-      playback.playing = true;
-      setFrame(next);
-      playback.timeoutId = window.setTimeout(() => {
-        playback.playing = false;
-        playback.timeoutId = undefined;
-        playNextRef.current();
-      }, TRANSITION_DURATION_MS / playback.speed);
-    }
-
-    playNextRef.current = playNext;
-
-    return () => {
-      if (playback.timeoutId) window.clearTimeout(playback.timeoutId);
-      playback.timeoutId = undefined;
-      playback.playing = false;
-      queueRef.current = [];
-    };
-  }, []);
-
-  useEffect(() => {
-    if (apiFrames.length > 0) {
-      const playback = playbackRef.current;
-      queueRef.current = [...apiFrames];
-      if (playback.timeoutId) window.clearTimeout(playback.timeoutId);
-      playback.timeoutId = undefined;
-      playback.playing = false;
-      setFrame(apiFrames[0]);
-      playNextRef.current();
-      return;
-    }
-
-    if (!incomingFrame) {
-      queueRef.current = [];
-      const playback = playbackRef.current;
-      if (playback.timeoutId) window.clearTimeout(playback.timeoutId);
-      playback.timeoutId = undefined;
-      playback.playing = false;
-      return;
-    }
-
-    queueRef.current.push(incomingFrame);
-    while (queueRef.current.length > MAX_QUEUE_SIZE) queueRef.current.shift();
-    playNextRef.current();
-  }, [apiFrames, incomingFrame]);
-
-  useEffect(() => {
-    const playback = playbackRef.current;
-    playback.paused = isPaused;
-    playback.speed = speed;
-
-    if (isPaused && playback.timeoutId) {
-      window.clearTimeout(playback.timeoutId);
-      playback.timeoutId = undefined;
-      playback.playing = false;
-    } else if (!isPaused) {
-      playNextRef.current();
-    }
-  }, [isPaused, speed]);
+    return () => window.clearTimeout(timeoutId);
+  }, [frameIndex, frames, isPaused, speed]);
 
   function pause() {
-    setIsPaused(true);
+    setPlaybackState({ frames, frameIndex, isPaused: true });
   }
 
   function resume() {
-    setIsPaused(false);
+    setPlaybackState({ frames, frameIndex, isPaused: false });
   }
 
+  function restart() {
+    setPlaybackState({ frames, frameIndex: 0, isPaused: false });
+  }
+
+  const currentFrameIndex = Math.min(frameIndex, Math.max(0, frames.length - 1));
+
   return {
-    frame: incomingFrame === null ? null : frame,
+    frame: frames[currentFrameIndex] ?? null,
+    frameIndex: currentFrameIndex,
+    isComplete: frames.length > 0 && currentFrameIndex === frames.length - 1,
     transitionDurationMs: TRANSITION_DURATION_MS / speed,
     speed,
     setSpeed,
     isPaused,
     pause,
     resume,
+    restart,
   };
 }

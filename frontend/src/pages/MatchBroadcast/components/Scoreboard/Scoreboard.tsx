@@ -2,56 +2,80 @@ import { CircleDot } from 'lucide-react';
 import { Button } from '../../../../components/Button';
 import { SegmentedControl } from '../../../../components/SegmentedControl';
 import { useTranslation } from '../../../../lib/i18n/i18n';
-import type { MatchSnapshot, Speed, TeamSummary } from '../../../../types/matchBroadcast';
+import type { SimulationTeam, Speed } from '../../../../types/matchBroadcast';
 import styles from '../../MatchBroadcast.module.css';
 
-function TeamSummaryBlock({ side, team }: { side: 'home' | 'away'; team: TeamSummary }) {
-  const { t } = useTranslation();
-
+function TeamSummaryBlock({
+  side,
+  team,
+  score,
+  hasPossession,
+}: {
+  side: 'home' | 'away';
+  team: SimulationTeam;
+  score: number;
+  hasPossession: boolean;
+}) {
   return (
     <div className={`${styles.teamSummary} ${side === 'away' ? styles.awaySummary : ''}`}>
       <div className={styles.teamCopy}>
-        <span className={styles.seed}>{team.seed}</span>
         <strong>{team.name}</strong>
         <span className={styles.teamMeta}>
-          {team.possession ? <CircleDot className={styles.possessionIcon} size={12} aria-hidden="true" /> : null}
+          {hasPossession ? <CircleDot className={styles.possessionIcon} size={12} aria-hidden="true" /> : null}
           {team.abbreviation}
         </span>
       </div>
-      <strong className={styles.score}>{team.score}</strong>
-      <span className={styles.teamStats}>
-        {t('match_broadcast.scoreboard.fouls_label')}{' '}
-        <b>
-          {team.fouls.current}/{team.fouls.max}
-        </b>{' '}
-        · {t('match_broadcast.scoreboard.timeouts_label')}{' '}
-        <b>
-          {team.timeouts.remaining}/{team.timeouts.total}
-        </b>
-      </span>
+      <strong className={styles.score}>{score}</strong>
     </div>
   );
 }
 
 type ScoreboardProps = {
-  snapshot: MatchSnapshot;
+  homeTeam: SimulationTeam;
+  awayTeam: SimulationTeam;
+  homeScore: number;
+  awayScore: number;
+  possessionTeamId: string | null;
+  frameNumber: number;
+  totalFrames: number;
   speed: Speed;
   setSpeed: (speed: Speed) => void;
   isPaused: boolean;
+  isComplete: boolean;
   onTogglePause: () => void;
+  onRestart: () => void;
 };
 
-export function Scoreboard({ snapshot, speed, setSpeed, isPaused, onTogglePause }: ScoreboardProps) {
+export function Scoreboard({
+  homeTeam,
+  awayTeam,
+  homeScore,
+  awayScore,
+  possessionTeamId,
+  frameNumber,
+  totalFrames,
+  speed,
+  setSpeed,
+  isPaused,
+  isComplete,
+  onTogglePause,
+  onRestart,
+}: ScoreboardProps) {
   const { t } = useTranslation();
 
   return (
     <section className={styles.scoreboard}>
-      <TeamSummaryBlock side="home" team={snapshot.home} />
+      <TeamSummaryBlock
+        side="home"
+        team={homeTeam}
+        score={homeScore}
+        hasPossession={possessionTeamId === homeTeam.teamId}
+      />
       <div className={styles.clockPanel}>
-        <span className={styles.quarter}>{t(`match_broadcast.clock.quarters.${snapshot.quarter}`)}</span>
-        <strong className={styles.gameClock}>{snapshot.gameClock}</strong>
-        <span className={styles.shotClock}>
-          {t('match_broadcast.clock.shot_clock')} <b>{snapshot.shotClock}</b>
+        <span className={styles.frameLabel}>
+          {isComplete
+            ? t('match_broadcast.simulation.completed')
+            : t('match_broadcast.simulation.frame_progress', { current: frameNumber, total: totalFrames })}
         </span>
         <SegmentedControl
           label={t('match_broadcast.clock.speed_label')}
@@ -63,11 +87,22 @@ export function Scoreboard({ snapshot, speed, setSpeed, isPaused, onTogglePause 
           value={String(speed)}
           onChange={(value) => setSpeed(Number(value) as Speed)}
         />
-        <Button variant="outline" onClick={onTogglePause}>
-          {isPaused ? t('match_broadcast.clock.resume') : t('match_broadcast.clock.pause')}
-        </Button>
+        {isComplete ? (
+          <Button variant="outline" onClick={onRestart}>
+            {t('match_broadcast.simulation.replay')}
+          </Button>
+        ) : (
+          <Button variant="outline" onClick={onTogglePause}>
+            {isPaused ? t('match_broadcast.clock.resume') : t('match_broadcast.clock.pause')}
+          </Button>
+        )}
       </div>
-      <TeamSummaryBlock side="away" team={snapshot.away} />
+      <TeamSummaryBlock
+        side="away"
+        team={awayTeam}
+        score={awayScore}
+        hasPossession={possessionTeamId === awayTeam.teamId}
+      />
     </section>
   );
 }

@@ -1,4 +1,5 @@
 .stage {
+  position: relative;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -7,6 +8,48 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.basketMessage {
+  position: absolute;
+  z-index: 1;
+  top: var(--space-4);
+  left: 50%;
+  max-width: calc(100% - var(--space-8));
+  padding: var(--space-2) var(--space-4);
+  transform: translateX(-50%);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: 700 1.1rem var(--font-mono);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  animation: basketMessage 350ms ease-out both;
+}
+
+@keyframes basketMessage {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -8px) scale(0.9);
+  }
+
+  18%,
+  72% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -4px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .basketMessage {
+    animation-duration: 1ms;
+  }
 }
 
 .stage svg {

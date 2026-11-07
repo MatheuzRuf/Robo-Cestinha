@@ -6,13 +6,14 @@ export interface PlayerState {
   x: number; // feet
   y: number; // feet
   name: string;
-  number: number;
+  number?: number;
   position: string;
 }
 
 export interface BallState {
   x: number;
   y: number;
+  height?: number;
 }
 
 export interface BallTrajectory {
@@ -21,6 +22,7 @@ export interface BallTrajectory {
   to: BallState;
   fromTeam: Team;
   toTeam: Team;
+  progress?: number;
 }
 
 export interface Frame {

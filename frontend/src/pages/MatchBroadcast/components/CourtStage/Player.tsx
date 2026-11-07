@@ -30,7 +30,7 @@ export function Player({ player, transitionDuration }: { player: PlayerState; tr
         animate={{ x: cx, y: cy + 4 }}
         transition={{ duration: transitionDuration, ease: 'linear' }}
       >
-        {player.number}
+        {player.number ?? player.position}
       </motion.text>
       <motion.rect
         className={styles.labelBackground}
@@ -46,7 +46,8 @@ export function Player({ player, transitionDuration }: { player: PlayerState; tr
         animate={{ x: cx, y: cy + PLAYER_RADIUS + 18 }}
         transition={{ duration: transitionDuration, ease: 'linear' }}
       >
-        {player.name.toUpperCase()} #{player.number}
+        {player.name.toUpperCase()}
+        {player.number === undefined ? ` · ${player.position}` : ` #${player.number}`}
       </motion.text>
     </>
   );

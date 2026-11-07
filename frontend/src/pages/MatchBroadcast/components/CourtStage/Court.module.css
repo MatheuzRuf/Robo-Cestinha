@@ -24,6 +24,33 @@
   stroke-width: 1;
 }
 
+.basketPulse {
+  fill: none;
+  stroke: var(--color-warning);
+  stroke-width: 3;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: basketPulse 350ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .basketPulse {
+    animation-duration: 1ms;
+  }
+}
+
+@keyframes basketPulse {
+  from {
+    opacity: 1;
+    transform: scale(0.7);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
 .backboard {
   stroke: #f7ead8;
   stroke-width: 3;

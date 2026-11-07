@@ -5,12 +5,19 @@
 }
 
 .trajectory {
-  stroke: var(--trajectory-color);
   stroke-width: 2.25;
   stroke-dasharray: 7 6;
   stroke-linecap: round;
   opacity: 0.9;
   animation: trajectory 700ms linear infinite;
+}
+
+.sameTeamTrajectory {
+  stroke: var(--color-warning);
+}
+
+.opponentTrajectory {
+  stroke: var(--color-trajectory-opponent);
 }
 
 @keyframes trajectory {

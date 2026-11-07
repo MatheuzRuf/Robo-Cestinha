@@ -14,7 +14,7 @@ import {
   ft,
 } from '../../../../config/court';
 
-export function Court() {
+export function Court({ madeBasketSide }: { madeBasketSide?: 'left' | 'right' }) {
   const w = ft(COURT_WIDTH_FT);
   const h = ft(COURT_HEIGHT_FT);
   const midY = h / 2;
@@ -66,6 +66,14 @@ export function Court() {
       />
       <circle cx={hoopX} cy={midY} r={hoopR} className={styles.hoop} />
       <circle cx={hoopXRight} cy={midY} r={hoopR} className={styles.hoop} />
+      {madeBasketSide ? (
+        <circle
+          cx={madeBasketSide === 'left' ? hoopX : hoopXRight}
+          cy={midY}
+          r={hoopR + 1.2}
+          className={styles.basketPulse}
+        />
+      ) : null}
       <line x1={hoopX - 8} y1={midY - 8} x2={hoopX - 8} y2={midY + 8} className={styles.backboard} />
       <line x1={hoopXRight + 8} y1={midY - 8} x2={hoopXRight + 8} y2={midY + 8} className={styles.backboard} />
     </g>

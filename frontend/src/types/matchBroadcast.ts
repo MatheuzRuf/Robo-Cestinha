@@ -1,94 +1,84 @@
-import type { Frame } from './game';
-
 export type Speed = 1 | 1.5 | 2;
 
-export interface TeamSummary {
-  abbreviation: string;
+export interface SimulationTeam {
+  teamId: string;
   name: string;
-  score: number;
-  seed: string;
-  possession: boolean;
-  fouls: { current: number; max: number };
-  timeouts: { remaining: number; total: number };
+  abbreviation: string;
 }
 
-export interface PlayByPlayLogEntry {
-  id: string;
-  gameClock: string;
-  type: string;
-  description: string;
+export interface SimulationPlayer {
+  playerId: string;
+  teamId: string;
+  side: 'home' | 'away';
+  name: string;
+  position: string;
+  number?: number | null;
 }
 
-export interface CommentaryEntry {
-  id: string;
-  gameClock: string;
-  text: string;
+export interface SimulationFramePosition {
+  playerId: string;
+  x: number;
+  y: number;
 }
 
-export interface MomentumSnapshot {
-  runLabel: string;
-  runDelta: string;
-  homePoints: number;
-  awayPoints: number;
-  stats: [string, string][];
+export interface SimulationFrame {
+  iteration: number;
+  playerWithBallId: string | null;
+  players: SimulationFramePosition[];
+  ball: {
+    x: number;
+    y: number;
+    height?: number;
+    trajectory?: SimulationTrajectory | null;
+  };
+  score: { home: number; away: number };
+  possessionTeamId: string | null;
 }
 
-export interface MatchSnapshot {
-  matchId: string;
-  matchMeta: string;
-  ticker: string;
-  home: TeamSummary;
-  away: TeamSummary;
-  playCall: string;
-  shotProbability: number;
-  defensiveScheme: string;
-  quarter: number;
-  gameClock: string;
-  shotClock: string;
-  elapsedSeconds: number;
-  durationSeconds: number;
-  momentum: MomentumSnapshot;
-  frame: Frame;
-  playByPlay: PlayByPlayLogEntry[];
-  commentary: CommentaryEntry[];
+export interface SimulationTrajectory {
+  type: 'pass' | 'shot';
+  fromPosition: { x: number; y: number };
+  toPosition: { x: number; y: number };
+  fromPlayerId: string | null;
+  toPlayerId: string | null;
+  fromTeamId: string;
+  toTeamId: string;
+  progress: number;
 }
 
-export interface TimelineNarrationEntry {
-  eventId: string;
-  locale: string;
-  text: string;
-}
-
-export interface TimelineEvent {
-  id: string;
+export interface SimulationEvent {
   sequence: number;
-  occurredAt: string;
+  iteration: number;
   type: string;
-  gameClock: string;
-  description: string;
-  metadata: Record<string, unknown>;
+  teamId: string | null;
+  playerId: string | null;
+  targetPlayerId: string | null;
+  data: Record<string, unknown>;
 }
 
-export interface MatchTimelinePayload extends MatchSnapshot {
-  frames: Frame[];
-  events: TimelineEvent[];
-  narration: TimelineNarrationEntry[];
+export interface SimulationResponse {
+  match: {
+    matchId: string;
+    sessionHash: string;
+    status: string;
+  };
+  simulation: {
+    status: string;
+    iterationsLimit: number;
+    iterationsCompleted: number;
+    overtimeIterations: number;
+    terminationReason: string;
+  };
+  teams: {
+    home: SimulationTeam;
+    away: SimulationTeam;
+  };
+  players: SimulationPlayer[];
+  frames: SimulationFrame[];
+  events: SimulationEvent[];
+  summary: {
+    homeScore: number;
+    awayScore: number;
+    winnerTeamId: string | null;
+  };
 }
-
-export type MatchUpdatePayload = Partial<
-  Omit<MatchSnapshot, 'matchId' | 'matchMeta' | 'frame' | 'playByPlay' | 'commentary' | 'durationSeconds'>
->;
-
-interface BroadcastEventBase {
-  sequence: number;
-  occurredAt: string;
-}
-
-export type BroadcastEvent =
-  | (BroadcastEventBase & { type: 'snapshot'; payload: MatchSnapshot })
-  | (BroadcastEventBase & { type: 'frame'; payload: Frame })
-  | (BroadcastEventBase & { type: 'match_update'; payload: MatchUpdatePayload })
-  | (BroadcastEventBase & { type: 'play_by_play'; payload: PlayByPlayLogEntry })
-  | (BroadcastEventBase & { type: 'commentary'; payload: CommentaryEntry });
-
-export type MatchStreamStatus = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'error';
