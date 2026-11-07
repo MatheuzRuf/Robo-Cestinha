@@ -122,9 +122,7 @@ async def test_service_rejects_out_of_bounds_iterations():
 
 @pytest.mark.asyncio
 async def test_service_marks_failed_when_engine_raises():
-    service, repo, adapter = _service(
-        adapter=FakeAdapter(run_error=RuntimeError("boom"))
-    )
+    service, repo, _ = _service(adapter=FakeAdapter(run_error=RuntimeError("boom")))
     with pytest.raises(SimulationFailedError):
         await service.simulate_match("RC-X", uuid.uuid4(), iterations=30)
     assert repo.completed == []
@@ -133,7 +131,7 @@ async def test_service_marks_failed_when_engine_raises():
 
 @pytest.mark.asyncio
 async def test_service_marks_failed_when_completion_raises():
-    service, repo, adapter = _service()
+    service, repo, _ = _service()
     repo.complete_error = RuntimeError("commit failed")
     with pytest.raises(SimulationFailedError):
         await service.simulate_match("RC-X", uuid.uuid4(), iterations=30)

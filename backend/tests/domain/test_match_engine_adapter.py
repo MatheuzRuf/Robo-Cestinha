@@ -92,7 +92,6 @@ def test_adapter_maps_engine_ids_to_database_ids():
     engine = adapter.run(context, iterations=40, seed=3)
     result = adapter.to_domain_result(engine, context, iterations=40)
 
-    home_engine = context.home_team.catalog_id
     assert result.winner_team_id in {
         context.home_team.id,
         context.away_team.id,

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import uuid
-
 from app.data_ingestion.schemas import Player as EnginePlayer
 from app.data_ingestion.schemas import PlayerAttributes, Team as EngineTeam
 from app.data_ingestion.schemas import TeamStats
