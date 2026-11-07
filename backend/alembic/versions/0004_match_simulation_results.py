@@ -56,9 +56,7 @@ def upgrade() -> None:
         sa.Column("type", sa.String(), nullable=False),
         sa.Column("team_id", postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column("player_id", postgresql.UUID(as_uuid=True), nullable=True),
-        sa.Column(
-            "target_player_id", postgresql.UUID(as_uuid=True), nullable=True
-        ),
+        sa.Column("target_player_id", postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column("payload", sa.JSON(), nullable=False),
     )
     op.create_unique_constraint(
