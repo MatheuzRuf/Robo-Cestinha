@@ -199,9 +199,11 @@ dependency rule: `api → domain → db`, and `engine`/`data_ingestion` know
 nothing about sessions/users/HTTP (see `backend/AGENTS.md`).
 
 - **API** — `api/main.py` mounts routers `GET /health` and `POST /sessions`
-  (CORS allowed origin defaults to `http://localhost:5173`, env
-  `API_CORS_ORIGINS`). Routers are thin: they parse and delegate to
-  request-scoped services from `api/factories.py`.
+  (CORS: any loopback origin `localhost`/`127.0.0.1`/`[::1]` on any port is
+  allowed for local dev, so Vite's auto-selected port always works even when
+  5173 is taken; non-loopback origins require the exact list in env
+  `API_CORS_ORIGINS`, default `http://localhost:5173`). Routers are thin: they
+  parse and delegate to request-scoped services from `api/factories.py`.
 - **Domain** — `domain/sessions/` (create session + owner) and
   `domain/bracket/` (seed an N-team single-elimination bracket as linked
   `Match` rows where later rounds start `locked`).
