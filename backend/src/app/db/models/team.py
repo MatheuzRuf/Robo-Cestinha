@@ -1,7 +1,7 @@
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, String
+from sqlalchemy import JSON, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -22,6 +22,7 @@ class Team(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     catalog_id: Mapped[str | None] = mapped_column(String, nullable=True, unique=True)
     abbreviation: Mapped[str | None] = mapped_column(String, nullable=True)
+    nba_team_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     team_stats: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     players: Mapped[list["Player"]] = relationship(back_populates="team")

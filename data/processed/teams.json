@@ -1,6 +1,7 @@
 [
   {
     "team_id": "atl",
+    "nba_team_id": 1610612737,
     "name": "Atlanta Hawks",
     "abbreviation": "ATL",
     "roster": [
@@ -35,6 +36,7 @@
   },
   {
     "team_id": "bkn",
+    "nba_team_id": 1610612751,
     "name": "Brooklyn Nets",
     "abbreviation": "BKN",
     "roster": [
@@ -68,6 +70,7 @@
   },
   {
     "team_id": "bos",
+    "nba_team_id": 1610612738,
     "name": "Boston Celtics",
     "abbreviation": "BOS",
     "roster": [
@@ -98,6 +101,7 @@
   },
   {
     "team_id": "cha",
+    "nba_team_id": 1610612766,
     "name": "Charlotte Hornets",
     "abbreviation": "CHA",
     "roster": [
@@ -130,6 +134,7 @@
   },
   {
     "team_id": "chi",
+    "nba_team_id": 1610612741,
     "name": "Chicago Bulls",
     "abbreviation": "CHI",
     "roster": [
@@ -163,6 +168,7 @@
   },
   {
     "team_id": "cle",
+    "nba_team_id": 1610612739,
     "name": "Cleveland Cavaliers",
     "abbreviation": "CLE",
     "roster": [
@@ -198,6 +204,7 @@
   },
   {
     "team_id": "dal",
+    "nba_team_id": 1610612742,
     "name": "Dallas Mavericks",
     "abbreviation": "DAL",
     "roster": [
@@ -230,6 +237,7 @@
   },
   {
     "team_id": "den",
+    "nba_team_id": 1610612743,
     "name": "Denver Nuggets",
     "abbreviation": "DEN",
     "roster": [
@@ -262,6 +270,7 @@
   },
   {
     "team_id": "det",
+    "nba_team_id": 1610612765,
     "name": "Detroit Pistons",
     "abbreviation": "DET",
     "roster": [
@@ -294,6 +303,7 @@
   },
   {
     "team_id": "gsw",
+    "nba_team_id": 1610612744,
     "name": "Golden State Warriors",
     "abbreviation": "GSW",
     "roster": [
@@ -326,6 +336,7 @@
   },
   {
     "team_id": "hou",
+    "nba_team_id": 1610612745,
     "name": "Houston Rockets",
     "abbreviation": "HOU",
     "roster": [
@@ -355,6 +366,7 @@
   },
   {
     "team_id": "ind",
+    "nba_team_id": 1610612754,
     "name": "Indiana Pacers",
     "abbreviation": "IND",
     "roster": [
@@ -389,6 +401,7 @@
   },
   {
     "team_id": "lac",
+    "nba_team_id": 1610612746,
     "name": "LA Clippers",
     "abbreviation": "LAC",
     "roster": [
@@ -422,6 +435,7 @@
   },
   {
     "team_id": "lal",
+    "nba_team_id": 1610612747,
     "name": "Los Angeles Lakers",
     "abbreviation": "LAL",
     "roster": [
@@ -453,6 +467,7 @@
   },
   {
     "team_id": "mem",
+    "nba_team_id": 1610612763,
     "name": "Memphis Grizzlies",
     "abbreviation": "MEM",
     "roster": [
@@ -491,6 +506,7 @@
   },
   {
     "team_id": "mia",
+    "nba_team_id": 1610612748,
     "name": "Miami Heat",
     "abbreviation": "MIA",
     "roster": [
@@ -521,6 +537,7 @@
   },
   {
     "team_id": "mil",
+    "nba_team_id": 1610612749,
     "name": "Milwaukee Bucks",
     "abbreviation": "MIL",
     "roster": [
@@ -554,6 +571,7 @@
   },
   {
     "team_id": "min",
+    "nba_team_id": 1610612750,
     "name": "Minnesota Timberwolves",
     "abbreviation": "MIN",
     "roster": [
@@ -586,6 +604,7 @@
   },
   {
     "team_id": "nop",
+    "nba_team_id": 1610612740,
     "name": "New Orleans Pelicans",
     "abbreviation": "NOP",
     "roster": [
@@ -617,6 +636,7 @@
   },
   {
     "team_id": "nyk",
+    "nba_team_id": 1610612752,
     "name": "New York Knicks",
     "abbreviation": "NYK",
     "roster": [
@@ -648,6 +668,7 @@
   },
   {
     "team_id": "okc",
+    "nba_team_id": 1610612760,
     "name": "Oklahoma City Thunder",
     "abbreviation": "OKC",
     "roster": [
@@ -679,6 +700,7 @@
   },
   {
     "team_id": "orl",
+    "nba_team_id": 1610612753,
     "name": "Orlando Magic",
     "abbreviation": "ORL",
     "roster": [
@@ -710,6 +732,7 @@
   },
   {
     "team_id": "phi",
+    "nba_team_id": 1610612755,
     "name": "Philadelphia 76ers",
     "abbreviation": "PHI",
     "roster": [
@@ -743,6 +766,7 @@
   },
   {
     "team_id": "phx",
+    "nba_team_id": 1610612756,
     "name": "Phoenix Suns",
     "abbreviation": "PHX",
     "roster": [
@@ -775,6 +799,7 @@
   },
   {
     "team_id": "por",
+    "nba_team_id": 1610612757,
     "name": "Portland Trail Blazers",
     "abbreviation": "POR",
     "roster": [
@@ -807,6 +832,7 @@
   },
   {
     "team_id": "sac",
+    "nba_team_id": 1610612758,
     "name": "Sacramento Kings",
     "abbreviation": "SAC",
     "roster": [
@@ -840,6 +866,7 @@
   },
   {
     "team_id": "sas",
+    "nba_team_id": 1610612759,
     "name": "San Antonio Spurs",
     "abbreviation": "SAS",
     "roster": [
@@ -872,6 +899,7 @@
   },
   {
     "team_id": "tor",
+    "nba_team_id": 1610612761,
     "name": "Toronto Raptors",
     "abbreviation": "TOR",
     "roster": [
@@ -903,6 +931,7 @@
   },
   {
     "team_id": "uta",
+    "nba_team_id": 1610612762,
     "name": "Utah Jazz",
     "abbreviation": "UTA",
     "roster": [
@@ -938,6 +967,7 @@
   },
   {
     "team_id": "was",
+    "nba_team_id": 1610612764,
     "name": "Washington Wizards",
     "abbreviation": "WAS",
     "roster": [

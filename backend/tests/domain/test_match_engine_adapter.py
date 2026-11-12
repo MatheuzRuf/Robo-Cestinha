@@ -33,16 +33,19 @@ def _make_context():
         catalog_id="home_t",
         name="Home",
         abbreviation="HM",
+        nba_team_id=1610612737,
     )
     away = _record(
         id=away_id,
         catalog_id="away_t",
         name="Away",
         abbreviation="AW",
+        nba_team_id=1610612738,
     )
     home_players = [
         _record(
             id=uuid.uuid4(),
+            nba_player_id=1630000 + i,
             catalog_id=f"hp{i}",
             name=f"HP{i}",
             team_id=home_id,
@@ -56,6 +59,7 @@ def _make_context():
     away_players = [
         _record(
             id=uuid.uuid4(),
+            nba_player_id=1631000 + i,
             catalog_id=f"ap{i}",
             name=f"AP{i}",
             team_id=away_id,
@@ -101,7 +105,10 @@ def test_adapter_maps_engine_ids_to_database_ids():
     assert len(result.players) == 10
     for player in result.players:
         assert player["playerId"] in player_ids
+        assert player["nbaPlayerId"] is not None
         assert player["side"] in ("home", "away")
+    assert result.teams["home"]["nbaTeamId"] == context.home_team.nba_team_id
+    assert result.teams["away"]["nbaTeamId"] == context.away_team.nba_team_id
 
     for frame in result.frames:
         assert 0 <= frame["ball"]["x"] <= 94

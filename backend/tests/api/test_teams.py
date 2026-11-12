@@ -13,6 +13,12 @@ async def test_team_locker_claim_rejects_duplicate_claims():
         snapshot = await teams.get_team_locker(session_hash, user_id="user-one")
         assert snapshot["totalTeamCount"] == 8
         assert snapshot["openTeamCount"] == 8
+        assert all(team["nbaTeamId"] for team in snapshot["teams"])
+        assert all(
+            player["nbaPlayerId"] is None or player["nbaPlayerId"] > 0
+            for team in snapshot["teams"]
+            for player in team["players"]
+        )
 
         updated = await teams.claim_team(
             session_hash,

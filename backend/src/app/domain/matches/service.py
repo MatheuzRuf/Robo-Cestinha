@@ -119,11 +119,13 @@ class MatchService:
             teams={
                 "home": {
                     "teamId": home_team.id,
+                    "nbaTeamId": getattr(home_team, "nba_team_id", None),
                     "name": home_team.name,
                     "abbreviation": home_team.abbreviation,
                 },
                 "away": {
                     "teamId": away_team.id,
+                    "nbaTeamId": getattr(away_team, "nba_team_id", None),
                     "name": away_team.name,
                     "abbreviation": away_team.abbreviation,
                 },
@@ -148,6 +150,7 @@ class MatchService:
             for player in players:
                 yield {
                     "playerId": player.id,
+                    "nbaPlayerId": getattr(player, "nba_player_id", None),
                     "teamId": player.team_id,
                     "side": side,
                     "name": player.name,

@@ -1,6 +1,7 @@
 [
   {
     "player_id": "asa_newell",
+    "nba_player_id": 1642854,
     "name": "Asa Newell",
     "team_id": "atl",
     "position": "F",
@@ -23,6 +24,7 @@
   },
   {
     "player_id": "buddy_hield",
+    "nba_player_id": 1627741,
     "name": "Buddy Hield",
     "team_id": "atl",
     "position": "G",
@@ -45,6 +47,7 @@
   },
   {
     "player_id": "cj_mccollum",
+    "nba_player_id": 203468,
     "name": "CJ McCollum",
     "team_id": "atl",
     "position": "G",
@@ -67,6 +70,7 @@
   },
   {
     "player_id": "caleb_houstan",
+    "nba_player_id": 1631216,
     "name": "Caleb Houstan",
     "team_id": "atl",
     "position": "X",
@@ -89,6 +93,7 @@
   },
   {
     "player_id": "christian_koloko",
+    "nba_player_id": 1631132,
     "name": "Christian Koloko",
     "team_id": "atl",
     "position": "C",
@@ -111,6 +116,7 @@
   },
   {
     "player_id": "corey_kispert",
+    "nba_player_id": 1630557,
     "name": "Corey Kispert",
     "team_id": "atl",
     "position": "F",
@@ -133,6 +139,7 @@
   },
   {
     "player_id": "dyson_daniels",
+    "nba_player_id": 1630700,
     "name": "Dyson Daniels",
     "team_id": "atl",
     "position": "G",
@@ -155,6 +162,7 @@
   },
   {
     "player_id": "gabe_vincent",
+    "nba_player_id": 1629216,
     "name": "Gabe Vincent",
     "team_id": "atl",
     "position": "G",
@@ -177,6 +185,7 @@
   },
   {
     "player_id": "jacob_toppin",
+    "nba_player_id": 1631210,
     "name": "Jacob Toppin",
     "team_id": "atl",
     "position": "X",
@@ -199,6 +208,7 @@
   },
   {
     "player_id": "jalen_johnson",
+    "nba_player_id": 1630552,
     "name": "Jalen Johnson",
     "team_id": "atl",
     "position": "F",
@@ -221,6 +231,7 @@
   },
   {
     "player_id": "jock_landale",
+    "nba_player_id": 1629111,
     "name": "Jock Landale",
     "team_id": "atl",
     "position": "C",
@@ -243,6 +254,7 @@
   },
   {
     "player_id": "jonathan_kuminga",
+    "nba_player_id": 1630228,
     "name": "Jonathan Kuminga",
     "team_id": "atl",
     "position": "F",
@@ -265,6 +277,7 @@
   },
   {
     "player_id": "keaton_wallace",
+    "nba_player_id": 1630811,
     "name": "Keaton Wallace",
     "team_id": "atl",
     "position": "G",
@@ -287,6 +300,7 @@
   },
   {
     "player_id": "keshon_gilbert",
+    "nba_player_id": null,
     "name": "Keshon Gilbert",
     "team_id": "atl",
     "position": "G",
@@ -309,6 +323,7 @@
   },
   {
     "player_id": "mouhamed_gueye",
+    "nba_player_id": 1631243,
     "name": "Mouhamed Gueye",
     "team_id": "atl",
     "position": "F",
@@ -331,6 +346,7 @@
   },
   {
     "player_id": "nfaly_dante",
+    "nba_player_id": 1642368,
     "name": "N'Faly Dante",
     "team_id": "atl",
     "position": "X",
@@ -353,6 +369,7 @@
   },
   {
     "player_id": "nickeil_alexander_walker",
+    "nba_player_id": 1629638,
     "name": "Nickeil Alexander-Walker",
     "team_id": "atl",
     "position": "G",
@@ -375,6 +392,7 @@
   },
   {
     "player_id": "onyeka_okongwu",
+    "nba_player_id": 1630168,
     "name": "Onyeka Okongwu",
     "team_id": "atl",
     "position": "F-C",
@@ -397,6 +415,7 @@
   },
   {
     "player_id": "rayj_dennis",
+    "nba_player_id": 1642484,
     "name": "RayJ Dennis",
     "team_id": "atl",
     "position": "G",
@@ -419,6 +438,7 @@
   },
   {
     "player_id": "tony_bradley",
+    "nba_player_id": 1628396,
     "name": "Tony Bradley",
     "team_id": "atl",
     "position": "C-F",
@@ -441,6 +461,7 @@
   },
   {
     "player_id": "zaccharie_risacher",
+    "nba_player_id": 1642258,
     "name": "Zaccharie Risacher",
     "team_id": "atl",
     "position": "F",
@@ -463,6 +484,7 @@
   },
   {
     "player_id": "ben_saraf",
+    "nba_player_id": 1642879,
     "name": "Ben Saraf",
     "team_id": "bkn",
     "position": "G",
@@ -485,6 +507,7 @@
   },
   {
     "player_id": "chaney_johnson",
+    "nba_player_id": null,
     "name": "Chaney Johnson",
     "team_id": "bkn",
     "position": "G-F",
@@ -507,6 +530,7 @@
   },
   {
     "player_id": "danny_wolf",
+    "nba_player_id": 1642874,
     "name": "Danny Wolf",
     "team_id": "bkn",
     "position": "F",
@@ -529,6 +553,7 @@
   },
   {
     "player_id": "dayron_sharpe",
+    "nba_player_id": 1630549,
     "name": "Day'Ron Sharpe",
     "team_id": "bkn",
     "position": "C",
@@ -551,6 +576,7 @@
   },
   {
     "player_id": "drake_powell",
+    "nba_player_id": 1642962,
     "name": "Drake Powell",
     "team_id": "bkn",
     "position": "G-F",
@@ -573,6 +599,7 @@
   },
   {
     "player_id": "ej_liddell",
+    "nba_player_id": 1630604,
     "name": "E.J. Liddell",
     "team_id": "bkn",
     "position": "F",
@@ -595,6 +622,7 @@
   },
   {
     "player_id": "egor_demin",
+    "nba_player_id": 1642856,
     "name": "Egor Dëmin",
     "team_id": "bkn",
     "position": "G",
@@ -617,6 +645,7 @@
   },
   {
     "player_id": "grant_nelson",
+    "nba_player_id": null,
     "name": "Grant Nelson",
     "team_id": "bkn",
     "position": "X",
@@ -639,6 +668,7 @@
   },
   {
     "player_id": "jalen_wilson",
+    "nba_player_id": 1630592,
     "name": "Jalen Wilson",
     "team_id": "bkn",
     "position": "F",
@@ -661,6 +691,7 @@
   },
   {
     "player_id": "josh_minott",
+    "nba_player_id": 1631169,
     "name": "Josh Minott",
     "team_id": "bkn",
     "position": "F",
@@ -683,6 +714,7 @@
   },
   {
     "player_id": "malachi_smith",
+    "nba_player_id": null,
     "name": "Malachi Smith",
     "team_id": "bkn",
     "position": "G",
@@ -705,6 +737,7 @@
   },
   {
     "player_id": "michael_porter_jr",
+    "nba_player_id": 1629008,
     "name": "Michael Porter Jr.",
     "team_id": "bkn",
     "position": "F",
@@ -727,6 +760,7 @@
   },
   {
     "player_id": "nic_claxton",
+    "nba_player_id": 1629651,
     "name": "Nic Claxton",
     "team_id": "bkn",
     "position": "C",
@@ -749,6 +783,7 @@
   },
   {
     "player_id": "noah_clowney",
+    "nba_player_id": 1641730,
     "name": "Noah Clowney",
     "team_id": "bkn",
     "position": "F-C",
@@ -771,6 +806,7 @@
   },
   {
     "player_id": "nolan_traore",
+    "nba_player_id": 1642849,
     "name": "Nolan Traore",
     "team_id": "bkn",
     "position": "G",
@@ -793,6 +829,7 @@
   },
   {
     "player_id": "ochai_agbaji",
+    "nba_player_id": 1630534,
     "name": "Ochai Agbaji",
     "team_id": "bkn",
     "position": "G",
@@ -815,6 +852,7 @@
   },
   {
     "player_id": "terance_mann",
+    "nba_player_id": 1629611,
     "name": "Terance Mann",
     "team_id": "bkn",
     "position": "G-F",
@@ -837,6 +875,7 @@
   },
   {
     "player_id": "trevon_scott",
+    "nba_player_id": 1630286,
     "name": "Trevon Scott",
     "team_id": "bkn",
     "position": "X",
@@ -859,6 +898,7 @@
   },
   {
     "player_id": "tyson_etienne",
+    "nba_player_id": 1630623,
     "name": "Tyson Etienne",
     "team_id": "bkn",
     "position": "G",
@@ -881,6 +921,7 @@
   },
   {
     "player_id": "ziaire_williams",
+    "nba_player_id": 1630533,
     "name": "Ziaire Williams",
     "team_id": "bkn",
     "position": "F",
@@ -903,6 +944,7 @@
   },
   {
     "player_id": "amari_williams",
+    "nba_player_id": 1642873,
     "name": "Amari Williams",
     "team_id": "bos",
     "position": "F-C",
@@ -925,6 +967,7 @@
   },
   {
     "player_id": "baylor_scheierman",
+    "nba_player_id": 1631248,
     "name": "Baylor Scheierman",
     "team_id": "bos",
     "position": "G",
@@ -947,6 +990,7 @@
   },
   {
     "player_id": "chris_boucher",
+    "nba_player_id": 1628449,
     "name": "Chris Boucher",
     "team_id": "bos",
     "position": "X",
@@ -969,6 +1013,7 @@
   },
   {
     "player_id": "dalano_banton",
+    "nba_player_id": 1630625,
     "name": "Dalano Banton",
     "team_id": "bos",
     "position": "F",
@@ -991,6 +1036,7 @@
   },
   {
     "player_id": "derrick_white",
+    "nba_player_id": 1628401,
     "name": "Derrick White",
     "team_id": "bos",
     "position": "G",
@@ -1013,6 +1059,7 @@
   },
   {
     "player_id": "hugo_gonzalez",
+    "nba_player_id": 1642864,
     "name": "Hugo González",
     "team_id": "bos",
     "position": "G",
@@ -1035,6 +1082,7 @@
   },
   {
     "player_id": "jaylen_brown",
+    "nba_player_id": 1627759,
     "name": "Jaylen Brown",
     "team_id": "bos",
     "position": "G-F",
@@ -1057,6 +1105,7 @@
   },
   {
     "player_id": "jayson_tatum",
+    "nba_player_id": 1628369,
     "name": "Jayson Tatum",
     "team_id": "bos",
     "position": "F-G",
@@ -1079,6 +1128,7 @@
   },
   {
     "player_id": "john_tonje",
+    "nba_player_id": 1642910,
     "name": "John Tonje",
     "team_id": "bos",
     "position": "G",
@@ -1101,6 +1151,7 @@
   },
   {
     "player_id": "jordan_walsh",
+    "nba_player_id": 1641775,
     "name": "Jordan Walsh",
     "team_id": "bos",
     "position": "G",
@@ -1123,6 +1174,7 @@
   },
   {
     "player_id": "luka_garza",
+    "nba_player_id": 1630568,
     "name": "Luka Garza",
     "team_id": "bos",
     "position": "C",
@@ -1145,6 +1197,7 @@
   },
   {
     "player_id": "max_shulga",
+    "nba_player_id": 1642917,
     "name": "Max Shulga",
     "team_id": "bos",
     "position": "G",
@@ -1167,6 +1220,7 @@
   },
   {
     "player_id": "neemias_queta",
+    "nba_player_id": 1629674,
     "name": "Neemias Queta",
     "team_id": "bos",
     "position": "C",
@@ -1189,6 +1243,7 @@
   },
   {
     "player_id": "nikola_vucevic",
+    "nba_player_id": 202696,
     "name": "Nikola Vučević",
     "team_id": "bos",
     "position": "C",
@@ -1211,6 +1266,7 @@
   },
   {
     "player_id": "payton_pritchard",
+    "nba_player_id": 1630202,
     "name": "Payton Pritchard",
     "team_id": "bos",
     "position": "G",
@@ -1233,6 +1289,7 @@
   },
   {
     "player_id": "ron_harper_jr",
+    "nba_player_id": 1631199,
     "name": "Ron Harper Jr.",
     "team_id": "bos",
     "position": "G-F",
@@ -1255,6 +1312,7 @@
   },
   {
     "player_id": "sam_hauser",
+    "nba_player_id": 1630573,
     "name": "Sam Hauser",
     "team_id": "bos",
     "position": "F",
@@ -1277,6 +1335,7 @@
   },
   {
     "player_id": "antonio_reeves",
+    "nba_player_id": 1641810,
     "name": "Antonio Reeves",
     "team_id": "cha",
     "position": "G",
@@ -1299,6 +1358,7 @@
   },
   {
     "player_id": "brandon_miller",
+    "nba_player_id": 1641706,
     "name": "Brandon Miller",
     "team_id": "cha",
     "position": "F",
@@ -1321,6 +1381,7 @@
   },
   {
     "player_id": "coby_white",
+    "nba_player_id": 1629632,
     "name": "Coby White",
     "team_id": "cha",
     "position": "G",
@@ -1343,6 +1404,7 @@
   },
   {
     "player_id": "drew_peterson",
+    "nba_player_id": 1641809,
     "name": "Drew Peterson",
     "team_id": "cha",
     "position": "X",
@@ -1365,6 +1427,7 @@
   },
   {
     "player_id": "grant_williams",
+    "nba_player_id": 1629684,
     "name": "Grant Williams",
     "team_id": "cha",
     "position": "F",
@@ -1387,6 +1450,7 @@
   },
   {
     "player_id": "josh_green",
+    "nba_player_id": 1630182,
     "name": "Josh Green",
     "team_id": "cha",
     "position": "G",
@@ -1409,6 +1473,7 @@
   },
   {
     "player_id": "kon_knueppel",
+    "nba_player_id": 1642851,
     "name": "Kon Knueppel",
     "team_id": "cha",
     "position": "G-F",
@@ -1431,6 +1496,7 @@
   },
   {
     "player_id": "lamelo_ball",
+    "nba_player_id": 1630163,
     "name": "LaMelo Ball",
     "team_id": "cha",
     "position": "G",
@@ -1453,6 +1519,7 @@
   },
   {
     "player_id": "liam_mcneeley",
+    "nba_player_id": 1642862,
     "name": "Liam McNeeley",
     "team_id": "cha",
     "position": "F",
@@ -1475,6 +1542,7 @@
   },
   {
     "player_id": "miles_bridges",
+    "nba_player_id": 1628970,
     "name": "Miles Bridges",
     "team_id": "cha",
     "position": "F",
@@ -1497,6 +1565,7 @@
   },
   {
     "player_id": "moussa_diabate",
+    "nba_player_id": 1631217,
     "name": "Moussa Diabaté",
     "team_id": "cha",
     "position": "F",
@@ -1519,6 +1588,7 @@
   },
   {
     "player_id": "pj_hall",
+    "nba_player_id": 1641790,
     "name": "PJ Hall",
     "team_id": "cha",
     "position": "C",
@@ -1541,6 +1611,7 @@
   },
   {
     "player_id": "pat_connaughton",
+    "nba_player_id": 1626192,
     "name": "Pat Connaughton",
     "team_id": "cha",
     "position": "G",
@@ -1563,6 +1634,7 @@
   },
   {
     "player_id": "ryan_kalkbrenner",
+    "nba_player_id": 1641750,
     "name": "Ryan Kalkbrenner",
     "team_id": "cha",
     "position": "C",
@@ -1585,6 +1657,7 @@
   },
   {
     "player_id": "sion_james",
+    "nba_player_id": 1642883,
     "name": "Sion James",
     "team_id": "cha",
     "position": "G",
@@ -1607,6 +1680,7 @@
   },
   {
     "player_id": "tidjane_salaun",
+    "nba_player_id": 1642275,
     "name": "Tidjane Salaün",
     "team_id": "cha",
     "position": "F",
@@ -1629,6 +1703,7 @@
   },
   {
     "player_id": "tosan_evbuomwan",
+    "nba_player_id": 1641787,
     "name": "Tosan Evbuomwan",
     "team_id": "cha",
     "position": "F",
@@ -1651,6 +1726,7 @@
   },
   {
     "player_id": "tre_mann",
+    "nba_player_id": 1630544,
     "name": "Tre Mann",
     "team_id": "cha",
     "position": "G",
@@ -1673,6 +1749,7 @@
   },
   {
     "player_id": "xavier_tillman",
+    "nba_player_id": 1630214,
     "name": "Xavier Tillman",
     "team_id": "cha",
     "position": "F",
@@ -1695,6 +1772,7 @@
   },
   {
     "player_id": "anfernee_simons",
+    "nba_player_id": 1629014,
     "name": "Anfernee Simons",
     "team_id": "chi",
     "position": "G",
@@ -1717,6 +1795,7 @@
   },
   {
     "player_id": "collin_sexton",
+    "nba_player_id": 1629012,
     "name": "Collin Sexton",
     "team_id": "chi",
     "position": "G",
@@ -1739,6 +1818,7 @@
   },
   {
     "player_id": "guerschon_yabusele",
+    "nba_player_id": 1627824,
     "name": "Guerschon Yabusele",
     "team_id": "chi",
     "position": "F",
@@ -1761,6 +1841,7 @@
   },
   {
     "player_id": "isaac_okoro",
+    "nba_player_id": 1630171,
     "name": "Isaac Okoro",
     "team_id": "chi",
     "position": "F-G",
@@ -1783,6 +1864,7 @@
   },
   {
     "player_id": "jaden_ivey",
+    "nba_player_id": 1631093,
     "name": "Jaden Ivey",
     "team_id": "chi",
     "position": "X",
@@ -1805,6 +1887,7 @@
   },
   {
     "player_id": "jalen_smith",
+    "nba_player_id": 1630188,
     "name": "Jalen Smith",
     "team_id": "chi",
     "position": "F-C",
@@ -1827,6 +1910,7 @@
   },
   {
     "player_id": "josh_giddey",
+    "nba_player_id": 1630581,
     "name": "Josh Giddey",
     "team_id": "chi",
     "position": "G",
@@ -1849,6 +1933,7 @@
   },
   {
     "player_id": "lachlan_olbrich",
+    "nba_player_id": 1642950,
     "name": "Lachlan Olbrich",
     "team_id": "chi",
     "position": "C",
@@ -1871,6 +1956,7 @@
   },
   {
     "player_id": "leonard_miller",
+    "nba_player_id": 1631159,
     "name": "Leonard Miller",
     "team_id": "chi",
     "position": "F",
@@ -1893,6 +1979,7 @@
   },
   {
     "player_id": "mac_mcclung",
+    "nba_player_id": 1630644,
     "name": "Mac McClung",
     "team_id": "chi",
     "position": "G",
@@ -1915,6 +2002,7 @@
   },
   {
     "player_id": "matas_buzelis",
+    "nba_player_id": 1641824,
     "name": "Matas Buzelis",
     "team_id": "chi",
     "position": "F",
@@ -1937,6 +2025,7 @@
   },
   {
     "player_id": "mouhamadou_gueye",
+    "nba_player_id": 1631338,
     "name": "Mouhamadou Gueye",
     "team_id": "chi",
     "position": "F",
@@ -1959,6 +2048,7 @@
   },
   {
     "player_id": "nick_richards",
+    "nba_player_id": 1630208,
     "name": "Nick Richards",
     "team_id": "chi",
     "position": "C",
@@ -1981,6 +2071,7 @@
   },
   {
     "player_id": "noa_essengue",
+    "nba_player_id": 1642855,
     "name": "Noa Essengue",
     "team_id": "chi",
     "position": "F",
@@ -2003,6 +2094,7 @@
   },
   {
     "player_id": "patrick_williams",
+    "nba_player_id": 1630172,
     "name": "Patrick Williams",
     "team_id": "chi",
     "position": "F",
@@ -2025,6 +2117,7 @@
   },
   {
     "player_id": "rob_dillingham",
+    "nba_player_id": 1642265,
     "name": "Rob Dillingham",
     "team_id": "chi",
     "position": "G",
@@ -2047,6 +2140,7 @@
   },
   {
     "player_id": "tre_jones",
+    "nba_player_id": 1630200,
     "name": "Tre Jones",
     "team_id": "chi",
     "position": "G",
@@ -2069,6 +2163,7 @@
   },
   {
     "player_id": "trentyn_flowers",
+    "nba_player_id": 1642280,
     "name": "Trentyn Flowers",
     "team_id": "chi",
     "position": "X",
@@ -2091,6 +2186,7 @@
   },
   {
     "player_id": "yuki_kawamura",
+    "nba_player_id": 1642530,
     "name": "Yuki Kawamura",
     "team_id": "chi",
     "position": "G",
@@ -2113,6 +2209,7 @@
   },
   {
     "player_id": "zach_collins",
+    "nba_player_id": 1628380,
     "name": "Zach Collins",
     "team_id": "chi",
     "position": "F-C",
@@ -2135,6 +2232,7 @@
   },
   {
     "player_id": "chris_livingston",
+    "nba_player_id": 1641753,
     "name": "Chris Livingston",
     "team_id": "cle",
     "position": "X",
@@ -2157,6 +2255,7 @@
   },
   {
     "player_id": "craig_porter_jr",
+    "nba_player_id": 1641854,
     "name": "Craig Porter Jr.",
     "team_id": "cle",
     "position": "G",
@@ -2179,6 +2278,7 @@
   },
   {
     "player_id": "darius_brown_ii",
+    "nba_player_id": null,
     "name": "Darius Brown II",
     "team_id": "cle",
     "position": "X",
@@ -2201,6 +2301,7 @@
   },
   {
     "player_id": "dean_wade",
+    "nba_player_id": 1629731,
     "name": "Dean Wade",
     "team_id": "cle",
     "position": "F-C",
@@ -2223,6 +2324,7 @@
   },
   {
     "player_id": "dennis_schroder",
+    "nba_player_id": 203471,
     "name": "Dennis Schröder",
     "team_id": "cle",
     "position": "G",
@@ -2245,6 +2347,7 @@
   },
   {
     "player_id": "donovan_mitchell",
+    "nba_player_id": 1628378,
     "name": "Donovan Mitchell",
     "team_id": "cle",
     "position": "G",
@@ -2267,6 +2370,7 @@
   },
   {
     "player_id": "evan_mobley",
+    "nba_player_id": 1630596,
     "name": "Evan Mobley",
     "team_id": "cle",
     "position": "C",
@@ -2289,6 +2393,7 @@
   },
   {
     "player_id": "james_harden",
+    "nba_player_id": 201935,
     "name": "James Harden",
     "team_id": "cle",
     "position": "G",
@@ -2311,6 +2416,7 @@
   },
   {
     "player_id": "jarrett_allen",
+    "nba_player_id": 1628386,
     "name": "Jarrett Allen",
     "team_id": "cle",
     "position": "C",
@@ -2333,6 +2439,7 @@
   },
   {
     "player_id": "jaylon_tyson",
+    "nba_player_id": 1642281,
     "name": "Jaylon Tyson",
     "team_id": "cle",
     "position": "G-F",
@@ -2355,6 +2462,7 @@
   },
   {
     "player_id": "keon_ellis",
+    "nba_player_id": 1631165,
     "name": "Keon Ellis",
     "team_id": "cle",
     "position": "G",
@@ -2377,6 +2485,7 @@
   },
   {
     "player_id": "larry_nance_jr",
+    "nba_player_id": 1626204,
     "name": "Larry Nance Jr.",
     "team_id": "cle",
     "position": "F-C",
@@ -2399,6 +2508,7 @@
   },
   {
     "player_id": "lonzo_ball",
+    "nba_player_id": 1628366,
     "name": "Lonzo Ball",
     "team_id": "cle",
     "position": "X",
@@ -2421,6 +2531,7 @@
   },
   {
     "player_id": "luke_travers",
+    "nba_player_id": 1631247,
     "name": "Luke Travers",
     "team_id": "cle",
     "position": "X",
@@ -2443,6 +2554,7 @@
   },
   {
     "player_id": "max_strus",
+    "nba_player_id": 1629622,
     "name": "Max Strus",
     "team_id": "cle",
     "position": "G-F",
@@ -2465,6 +2577,7 @@
   },
   {
     "player_id": "naeqwan_tomlin",
+    "nba_player_id": 1641772,
     "name": "Nae'Qwan Tomlin",
     "team_id": "cle",
     "position": "F",
@@ -2487,6 +2600,7 @@
   },
   {
     "player_id": "olivier_sarr",
+    "nba_player_id": 1630846,
     "name": "Olivier Sarr",
     "team_id": "cle",
     "position": "C",
@@ -2509,6 +2623,7 @@
   },
   {
     "player_id": "riley_minix",
+    "nba_player_id": 1642434,
     "name": "Riley Minix",
     "team_id": "cle",
     "position": "F",
@@ -2531,6 +2646,7 @@
   },
   {
     "player_id": "sam_merrill",
+    "nba_player_id": 1630241,
     "name": "Sam Merrill",
     "team_id": "cle",
     "position": "G",
@@ -2553,6 +2669,7 @@
   },
   {
     "player_id": "thomas_bryant",
+    "nba_player_id": 1628418,
     "name": "Thomas Bryant",
     "team_id": "cle",
     "position": "C-F",
@@ -2575,6 +2692,7 @@
   },
   {
     "player_id": "tristan_enaruna",
+    "nba_player_id": null,
     "name": "Tristan Enaruna",
     "team_id": "cle",
     "position": "F",
@@ -2597,6 +2715,7 @@
   },
   {
     "player_id": "tyrese_proctor",
+    "nba_player_id": 1642878,
     "name": "Tyrese Proctor",
     "team_id": "cle",
     "position": "G",
@@ -2619,6 +2738,7 @@
   },
   {
     "player_id": "aj_johnson",
+    "nba_player_id": 1642358,
     "name": "AJ Johnson",
     "team_id": "dal",
     "position": "G",
@@ -2641,6 +2761,7 @@
   },
   {
     "player_id": "brandon_williams",
+    "nba_player_id": 1630314,
     "name": "Brandon Williams",
     "team_id": "dal",
     "position": "G",
@@ -2663,6 +2784,7 @@
   },
   {
     "player_id": "caleb_martin",
+    "nba_player_id": 1628997,
     "name": "Caleb Martin",
     "team_id": "dal",
     "position": "F",
@@ -2685,6 +2807,7 @@
   },
   {
     "player_id": "cooper_flagg",
+    "nba_player_id": 1642843,
     "name": "Cooper Flagg",
     "team_id": "dal",
     "position": "F",
@@ -2707,6 +2830,7 @@
   },
   {
     "player_id": "daniel_gafford",
+    "nba_player_id": 1629655,
     "name": "Daniel Gafford",
     "team_id": "dal",
     "position": "F-C",
@@ -2729,6 +2853,7 @@
   },
   {
     "player_id": "dereck_lively_ii",
+    "nba_player_id": 1641726,
     "name": "Dereck Lively II",
     "team_id": "dal",
     "position": "C",
@@ -2751,6 +2876,7 @@
   },
   {
     "player_id": "dwight_powell",
+    "nba_player_id": 203939,
     "name": "Dwight Powell",
     "team_id": "dal",
     "position": "F-C",
@@ -2773,6 +2899,7 @@
   },
   {
     "player_id": "jeremiah_robinson_earl",
+    "nba_player_id": 1630526,
     "name": "Jeremiah Robinson-Earl",
     "team_id": "dal",
     "position": "X",
@@ -2795,6 +2922,7 @@
   },
   {
     "player_id": "john_poulakidas",
+    "nba_player_id": null,
     "name": "John Poulakidas",
     "team_id": "dal",
     "position": "G",
@@ -2817,6 +2945,7 @@
   },
   {
     "player_id": "khris_middleton",
+    "nba_player_id": 203114,
     "name": "Khris Middleton",
     "team_id": "dal",
     "position": "F",
@@ -2839,6 +2968,7 @@
   },
   {
     "player_id": "klay_thompson",
+    "nba_player_id": 202691,
     "name": "Klay Thompson",
     "team_id": "dal",
     "position": "G",
@@ -2861,6 +2991,7 @@
   },
   {
     "player_id": "marvin_bagley_iii",
+    "nba_player_id": 1628963,
     "name": "Marvin Bagley III",
     "team_id": "dal",
     "position": "F",
@@ -2883,6 +3014,7 @@
   },
   {
     "player_id": "max_christie",
+    "nba_player_id": 1631108,
     "name": "Max Christie",
     "team_id": "dal",
     "position": "G",
@@ -2905,6 +3037,7 @@
   },
   {
     "player_id": "miles_kelly",
+    "nba_player_id": 1642939,
     "name": "Miles Kelly",
     "team_id": "dal",
     "position": "X",
@@ -2927,6 +3060,7 @@
   },
   {
     "player_id": "moussa_cisse",
+    "nba_player_id": 1630619,
     "name": "Moussa Cisse",
     "team_id": "dal",
     "position": "C",
@@ -2949,6 +3083,7 @@
   },
   {
     "player_id": "naji_marshall",
+    "nba_player_id": 1630230,
     "name": "Naji Marshall",
     "team_id": "dal",
     "position": "F",
@@ -2971,6 +3106,7 @@
   },
   {
     "player_id": "pj_washington",
+    "nba_player_id": 1629023,
     "name": "P.J. Washington",
     "team_id": "dal",
     "position": "F",
@@ -2993,6 +3129,7 @@
   },
   {
     "player_id": "ryan_nembhard",
+    "nba_player_id": 1642948,
     "name": "Ryan Nembhard",
     "team_id": "dal",
     "position": "G",
@@ -3015,6 +3152,7 @@
   },
   {
     "player_id": "tyler_smith",
+    "nba_player_id": 1641890,
     "name": "Tyler Smith",
     "team_id": "dal",
     "position": "F",
@@ -3037,6 +3175,7 @@
   },
   {
     "player_id": "aaron_gordon",
+    "nba_player_id": 203932,
     "name": "Aaron Gordon",
     "team_id": "den",
     "position": "F",
@@ -3059,6 +3198,7 @@
   },
   {
     "player_id": "bruce_brown",
+    "nba_player_id": 1628971,
     "name": "Bruce Brown",
     "team_id": "den",
     "position": "G-F",
@@ -3081,6 +3221,7 @@
   },
   {
     "player_id": "cameron_johnson",
+    "nba_player_id": 1629661,
     "name": "Cameron Johnson",
     "team_id": "den",
     "position": "F",
@@ -3103,6 +3244,7 @@
   },
   {
     "player_id": "christian_braun",
+    "nba_player_id": 1631128,
     "name": "Christian Braun",
     "team_id": "den",
     "position": "G",
@@ -3125,6 +3267,7 @@
   },
   {
     "player_id": "curtis_jones",
+    "nba_player_id": 1642938,
     "name": "Curtis Jones",
     "team_id": "den",
     "position": "G",
@@ -3147,6 +3290,7 @@
   },
   {
     "player_id": "daron_holmes_ii",
+    "nba_player_id": 1641747,
     "name": "DaRon Holmes II",
     "team_id": "den",
     "position": "F",
@@ -3169,6 +3313,7 @@
   },
   {
     "player_id": "david_roddy",
+    "nba_player_id": 1631223,
     "name": "David Roddy",
     "team_id": "den",
     "position": "F",
@@ -3191,6 +3336,7 @@
   },
   {
     "player_id": "hunter_tyson",
+    "nba_player_id": 1641816,
     "name": "Hunter Tyson",
     "team_id": "den",
     "position": "X",
@@ -3213,6 +3359,7 @@
   },
   {
     "player_id": "jalen_pickett",
+    "nba_player_id": 1629618,
     "name": "Jalen Pickett",
     "team_id": "den",
     "position": "G",
@@ -3235,6 +3382,7 @@
   },
   {
     "player_id": "jamal_murray",
+    "nba_player_id": 1627750,
     "name": "Jamal Murray",
     "team_id": "den",
     "position": "G",
@@ -3257,6 +3405,7 @@
   },
   {
     "player_id": "jonas_valanciunas",
+    "nba_player_id": 202685,
     "name": "Jonas Valanciunas",
     "team_id": "den",
     "position": "C",
@@ -3279,6 +3428,7 @@
   },
   {
     "player_id": "julian_strawther",
+    "nba_player_id": 1631124,
     "name": "Julian Strawther",
     "team_id": "den",
     "position": "G",
@@ -3301,6 +3451,7 @@
   },
   {
     "player_id": "kj_simpson",
+    "nba_player_id": 1642354,
     "name": "KJ Simpson",
     "team_id": "den",
     "position": "G",
@@ -3323,6 +3474,7 @@
   },
   {
     "player_id": "nikola_jokic",
+    "nba_player_id": 203999,
     "name": "Nikola Jokić",
     "team_id": "den",
     "position": "C",
@@ -3345,6 +3497,7 @@
   },
   {
     "player_id": "peyton_watson",
+    "nba_player_id": 1631212,
     "name": "Peyton Watson",
     "team_id": "den",
     "position": "G",
@@ -3367,6 +3520,7 @@
   },
   {
     "player_id": "spencer_jones",
+    "nba_player_id": 1642461,
     "name": "Spencer Jones",
     "team_id": "den",
     "position": "F",
@@ -3389,6 +3543,7 @@
   },
   {
     "player_id": "tim_hardaway_jr",
+    "nba_player_id": 203501,
     "name": "Tim Hardaway Jr.",
     "team_id": "den",
     "position": "G-F",
@@ -3411,6 +3566,7 @@
   },
   {
     "player_id": "tyus_jones",
+    "nba_player_id": 1626145,
     "name": "Tyus Jones",
     "team_id": "den",
     "position": "G",
@@ -3433,6 +3589,7 @@
   },
   {
     "player_id": "zeke_nnaji",
+    "nba_player_id": 1630192,
     "name": "Zeke Nnaji",
     "team_id": "den",
     "position": "F-C",
@@ -3455,6 +3612,7 @@
   },
   {
     "player_id": "ausar_thompson",
+    "nba_player_id": 1641709,
     "name": "Ausar Thompson",
     "team_id": "det",
     "position": "G-F",
@@ -3477,6 +3635,7 @@
   },
   {
     "player_id": "bobi_klintman",
+    "nba_player_id": 1641752,
     "name": "Bobi Klintman",
     "team_id": "det",
     "position": "X",
@@ -3499,6 +3658,7 @@
   },
   {
     "player_id": "cade_cunningham",
+    "nba_player_id": 1630595,
     "name": "Cade Cunningham",
     "team_id": "det",
     "position": "G",
@@ -3521,6 +3681,7 @@
   },
   {
     "player_id": "caris_levert",
+    "nba_player_id": 1627747,
     "name": "Caris LeVert",
     "team_id": "det",
     "position": "G",
@@ -3543,6 +3704,7 @@
   },
   {
     "player_id": "chaz_lanier",
+    "nba_player_id": 1642404,
     "name": "Chaz Lanier",
     "team_id": "det",
     "position": "G",
@@ -3565,6 +3727,7 @@
   },
   {
     "player_id": "colby_jones",
+    "nba_player_id": 1641732,
     "name": "Colby Jones",
     "team_id": "det",
     "position": "X",
@@ -3587,6 +3750,7 @@
   },
   {
     "player_id": "daniss_jenkins",
+    "nba_player_id": 1642450,
     "name": "Daniss Jenkins",
     "team_id": "det",
     "position": "G",
@@ -3609,6 +3773,7 @@
   },
   {
     "player_id": "duncan_robinson",
+    "nba_player_id": 1629130,
     "name": "Duncan Robinson",
     "team_id": "det",
     "position": "F",
@@ -3631,6 +3796,7 @@
   },
   {
     "player_id": "isaac_jones",
+    "nba_player_id": 1642403,
     "name": "Isaac Jones",
     "team_id": "det",
     "position": "F",
@@ -3653,6 +3819,7 @@
   },
   {
     "player_id": "isaiah_stewart",
+    "nba_player_id": 1630191,
     "name": "Isaiah Stewart",
     "team_id": "det",
     "position": "F-C",
@@ -3675,6 +3842,7 @@
   },
   {
     "player_id": "jalen_duren",
+    "nba_player_id": 1631105,
     "name": "Jalen Duren",
     "team_id": "det",
     "position": "C",
@@ -3697,6 +3865,7 @@
   },
   {
     "player_id": "javonte_green",
+    "nba_player_id": 1629750,
     "name": "Javonte Green",
     "team_id": "det",
     "position": "G",
@@ -3719,6 +3888,7 @@
   },
   {
     "player_id": "kevin_huerter",
+    "nba_player_id": 1628989,
     "name": "Kevin Huerter",
     "team_id": "det",
     "position": "G-F",
@@ -3741,6 +3911,7 @@
   },
   {
     "player_id": "marcus_sasser",
+    "nba_player_id": 1631204,
     "name": "Marcus Sasser",
     "team_id": "det",
     "position": "G",
@@ -3763,6 +3934,7 @@
   },
   {
     "player_id": "paul_reed",
+    "nba_player_id": 1630194,
     "name": "Paul Reed",
     "team_id": "det",
     "position": "F",
@@ -3785,6 +3957,7 @@
   },
   {
     "player_id": "ronald_holland_ii",
+    "nba_player_id": 1641842,
     "name": "Ronald Holland II",
     "team_id": "det",
     "position": "F",
@@ -3807,6 +3980,7 @@
   },
   {
     "player_id": "tobias_harris",
+    "nba_player_id": 202699,
     "name": "Tobias Harris",
     "team_id": "det",
     "position": "F",
@@ -3829,6 +4003,7 @@
   },
   {
     "player_id": "tolu_smith",
+    "nba_player_id": 1642449,
     "name": "Tolu Smith",
     "team_id": "det",
     "position": "F",
@@ -3851,6 +4026,7 @@
   },
   {
     "player_id": "wendell_moore_jr",
+    "nba_player_id": 1631111,
     "name": "Wendell Moore Jr.",
     "team_id": "det",
     "position": "G",
@@ -3873,6 +4049,7 @@
   },
   {
     "player_id": "al_horford",
+    "nba_player_id": 201143,
     "name": "Al Horford",
     "team_id": "gsw",
     "position": "C-F",
@@ -3895,6 +4072,7 @@
   },
   {
     "player_id": "brandin_podziemski",
+    "nba_player_id": 1641764,
     "name": "Brandin Podziemski",
     "team_id": "gsw",
     "position": "G",
@@ -3917,6 +4095,7 @@
   },
   {
     "player_id": "charles_bassey",
+    "nba_player_id": 1629646,
     "name": "Charles Bassey",
     "team_id": "gsw",
     "position": "C-F",
@@ -3939,6 +4118,7 @@
   },
   {
     "player_id": "deanthony_melton",
+    "nba_player_id": 1629001,
     "name": "De'Anthony Melton",
     "team_id": "gsw",
     "position": "G",
@@ -3961,6 +4141,7 @@
   },
   {
     "player_id": "draymond_green",
+    "nba_player_id": 203110,
     "name": "Draymond Green",
     "team_id": "gsw",
     "position": "F",
@@ -3983,6 +4164,7 @@
   },
   {
     "player_id": "gary_payton_ii",
+    "nba_player_id": 1627780,
     "name": "Gary Payton II",
     "team_id": "gsw",
     "position": "G",
@@ -4005,6 +4187,7 @@
   },
   {
     "player_id": "gui_santos",
+    "nba_player_id": 1630611,
     "name": "Gui Santos",
     "team_id": "gsw",
     "position": "F",
@@ -4027,6 +4210,7 @@
   },
   {
     "player_id": "jimmy_butler_iii",
+    "nba_player_id": 202710,
     "name": "Jimmy Butler III",
     "team_id": "gsw",
     "position": "F",
@@ -4049,6 +4233,7 @@
   },
   {
     "player_id": "kristaps_porzingis",
+    "nba_player_id": 204001,
     "name": "Kristaps Porziņģis",
     "team_id": "gsw",
     "position": "F-C",
@@ -4071,6 +4256,7 @@
   },
   {
     "player_id": "lj_cryer",
+    "nba_player_id": null,
     "name": "LJ Cryer",
     "team_id": "gsw",
     "position": "G",
@@ -4093,6 +4279,7 @@
   },
   {
     "player_id": "malevy_leons",
+    "nba_player_id": 1642502,
     "name": "Malevy Leons",
     "team_id": "gsw",
     "position": "F",
@@ -4115,6 +4302,7 @@
   },
   {
     "player_id": "moses_moody",
+    "nba_player_id": 1630541,
     "name": "Moses Moody",
     "team_id": "gsw",
     "position": "G",
@@ -4137,6 +4325,7 @@
   },
   {
     "player_id": "nate_williams",
+    "nba_player_id": 1631466,
     "name": "Nate Williams",
     "team_id": "gsw",
     "position": "G",
@@ -4159,6 +4348,7 @@
   },
   {
     "player_id": "omer_yurtseven",
+    "nba_player_id": 1630209,
     "name": "Omer Yurtseven",
     "team_id": "gsw",
     "position": "X",
@@ -4181,6 +4371,7 @@
   },
   {
     "player_id": "pat_spencer",
+    "nba_player_id": 1630311,
     "name": "Pat Spencer",
     "team_id": "gsw",
     "position": "G",
@@ -4203,6 +4394,7 @@
   },
   {
     "player_id": "quinten_post",
+    "nba_player_id": 1642366,
     "name": "Quinten Post",
     "team_id": "gsw",
     "position": "C",
@@ -4225,6 +4417,7 @@
   },
   {
     "player_id": "seth_curry",
+    "nba_player_id": 203552,
     "name": "Seth Curry",
     "team_id": "gsw",
     "position": "G",
@@ -4247,6 +4440,7 @@
   },
   {
     "player_id": "stephen_curry",
+    "nba_player_id": 201939,
     "name": "Stephen Curry",
     "team_id": "gsw",
     "position": "G",
@@ -4269,6 +4463,7 @@
   },
   {
     "player_id": "will_richard",
+    "nba_player_id": 1642954,
     "name": "Will Richard",
     "team_id": "gsw",
     "position": "G",
@@ -4291,6 +4486,7 @@
   },
   {
     "player_id": "aaron_holiday",
+    "nba_player_id": 1628988,
     "name": "Aaron Holiday",
     "team_id": "hou",
     "position": "G",
@@ -4313,6 +4509,7 @@
   },
   {
     "player_id": "alperen_sengun",
+    "nba_player_id": 1630578,
     "name": "Alperen Sengun",
     "team_id": "hou",
     "position": "C",
@@ -4335,6 +4532,7 @@
   },
   {
     "player_id": "amen_thompson",
+    "nba_player_id": 1641708,
     "name": "Amen Thompson",
     "team_id": "hou",
     "position": "G-F",
@@ -4357,6 +4555,7 @@
   },
   {
     "player_id": "clint_capela",
+    "nba_player_id": 203991,
     "name": "Clint Capela",
     "team_id": "hou",
     "position": "C",
@@ -4379,6 +4578,7 @@
   },
   {
     "player_id": "dorian_finney_smith",
+    "nba_player_id": 1627827,
     "name": "Dorian Finney-Smith",
     "team_id": "hou",
     "position": "F",
@@ -4401,6 +4601,7 @@
   },
   {
     "player_id": "isaiah_crawford",
+    "nba_player_id": 1642384,
     "name": "Isaiah Crawford",
     "team_id": "hou",
     "position": "F",
@@ -4423,6 +4624,7 @@
   },
   {
     "player_id": "jd_davison",
+    "nba_player_id": 1631120,
     "name": "JD Davison",
     "team_id": "hou",
     "position": "G",
@@ -4445,6 +4647,7 @@
   },
   {
     "player_id": "jabari_smith_jr",
+    "nba_player_id": 1631095,
     "name": "Jabari Smith Jr.",
     "team_id": "hou",
     "position": "F",
@@ -4467,6 +4670,7 @@
   },
   {
     "player_id": "jaesean_tate",
+    "nba_player_id": 1630256,
     "name": "Jae'Sean Tate",
     "team_id": "hou",
     "position": "F",
@@ -4489,6 +4693,7 @@
   },
   {
     "player_id": "jeff_green",
+    "nba_player_id": 201145,
     "name": "Jeff Green",
     "team_id": "hou",
     "position": "F",
@@ -4511,6 +4716,7 @@
   },
   {
     "player_id": "josh_okogie",
+    "nba_player_id": 1629006,
     "name": "Josh Okogie",
     "team_id": "hou",
     "position": "G",
@@ -4533,6 +4739,7 @@
   },
   {
     "player_id": "kevin_durant",
+    "nba_player_id": 201142,
     "name": "Kevin Durant",
     "team_id": "hou",
     "position": "F",
@@ -4555,6 +4762,7 @@
   },
   {
     "player_id": "reed_sheppard",
+    "nba_player_id": 1642263,
     "name": "Reed Sheppard",
     "team_id": "hou",
     "position": "G",
@@ -4577,6 +4785,7 @@
   },
   {
     "player_id": "steven_adams",
+    "nba_player_id": 203500,
     "name": "Steven Adams",
     "team_id": "hou",
     "position": "C",
@@ -4599,6 +4808,7 @@
   },
   {
     "player_id": "tari_eason",
+    "nba_player_id": 1631106,
     "name": "Tari Eason",
     "team_id": "hou",
     "position": "F",
@@ -4621,6 +4831,7 @@
   },
   {
     "player_id": "tristen_newton",
+    "nba_player_id": 1641803,
     "name": "Tristen Newton",
     "team_id": "hou",
     "position": "G",
@@ -4643,6 +4854,7 @@
   },
   {
     "player_id": "aaron_nesmith",
+    "nba_player_id": 1630174,
     "name": "Aaron Nesmith",
     "team_id": "ind",
     "position": "G-F",
@@ -4665,6 +4877,7 @@
   },
   {
     "player_id": "andrew_nembhard",
+    "nba_player_id": 1629614,
     "name": "Andrew Nembhard",
     "team_id": "ind",
     "position": "G-F",
@@ -4687,6 +4900,7 @@
   },
   {
     "player_id": "ben_sheppard",
+    "nba_player_id": 1641767,
     "name": "Ben Sheppard",
     "team_id": "ind",
     "position": "G",
@@ -4709,6 +4923,7 @@
   },
   {
     "player_id": "cody_martin",
+    "nba_player_id": 1628998,
     "name": "Cody Martin",
     "team_id": "ind",
     "position": "X",
@@ -4731,6 +4946,7 @@
   },
   {
     "player_id": "ethan_thompson",
+    "nba_player_id": 1630679,
     "name": "Ethan Thompson",
     "team_id": "ind",
     "position": "G",
@@ -4753,6 +4969,7 @@
   },
   {
     "player_id": "garrison_mathews",
+    "nba_player_id": 1629726,
     "name": "Garrison Mathews",
     "team_id": "ind",
     "position": "X",
@@ -4775,6 +4992,7 @@
   },
   {
     "player_id": "ivica_zubac",
+    "nba_player_id": 1627826,
     "name": "Ivica Zubac",
     "team_id": "ind",
     "position": "C",
@@ -4797,6 +5015,7 @@
   },
   {
     "player_id": "jalen_slawson",
+    "nba_player_id": 1641771,
     "name": "Jalen Slawson",
     "team_id": "ind",
     "position": "F",
@@ -4819,6 +5038,7 @@
   },
   {
     "player_id": "james_wiseman",
+    "nba_player_id": 1630164,
     "name": "James Wiseman",
     "team_id": "ind",
     "position": "X",
@@ -4841,6 +5061,7 @@
   },
   {
     "player_id": "jarace_walker",
+    "nba_player_id": 1641716,
     "name": "Jarace Walker",
     "team_id": "ind",
     "position": "F",
@@ -4863,6 +5084,7 @@
   },
   {
     "player_id": "jay_huff",
+    "nba_player_id": 1630643,
     "name": "Jay Huff",
     "team_id": "ind",
     "position": "C",
@@ -4885,6 +5107,7 @@
   },
   {
     "player_id": "johnny_furphy",
+    "nba_player_id": 1642277,
     "name": "Johnny Furphy",
     "team_id": "ind",
     "position": "G",
@@ -4907,6 +5130,7 @@
   },
   {
     "player_id": "kam_jones",
+    "nba_player_id": 1642880,
     "name": "Kam Jones",
     "team_id": "ind",
     "position": "G",
@@ -4929,6 +5153,7 @@
   },
   {
     "player_id": "kobe_brown",
+    "nba_player_id": 1641738,
     "name": "Kobe Brown",
     "team_id": "ind",
     "position": "F",
@@ -4951,6 +5176,7 @@
   },
   {
     "player_id": "micah_potter",
+    "nba_player_id": 1630695,
     "name": "Micah Potter",
     "team_id": "ind",
     "position": "C",
@@ -4973,6 +5199,7 @@
   },
   {
     "player_id": "monte_morris",
+    "nba_player_id": 1628420,
     "name": "Monte Morris",
     "team_id": "ind",
     "position": "X",
@@ -4995,6 +5222,7 @@
   },
   {
     "player_id": "obi_toppin",
+    "nba_player_id": 1630167,
     "name": "Obi Toppin",
     "team_id": "ind",
     "position": "F",
@@ -5017,6 +5245,7 @@
   },
   {
     "player_id": "pascal_siakam",
+    "nba_player_id": 1627783,
     "name": "Pascal Siakam",
     "team_id": "ind",
     "position": "F",
@@ -5039,6 +5268,7 @@
   },
   {
     "player_id": "quenton_jackson",
+    "nba_player_id": 1631245,
     "name": "Quenton Jackson",
     "team_id": "ind",
     "position": "G",
@@ -5061,6 +5291,7 @@
   },
   {
     "player_id": "tj_mcconnell",
+    "nba_player_id": 204456,
     "name": "T.J. McConnell",
     "team_id": "ind",
     "position": "G",
@@ -5083,6 +5314,7 @@
   },
   {
     "player_id": "taelon_peter",
+    "nba_player_id": 1643007,
     "name": "Taelon Peter",
     "team_id": "ind",
     "position": "G",
@@ -5105,6 +5337,7 @@
   },
   {
     "player_id": "bennedict_mathurin",
+    "nba_player_id": 1631097,
     "name": "Bennedict Mathurin",
     "team_id": "lac",
     "position": "G-F",
@@ -5127,6 +5360,7 @@
   },
   {
     "player_id": "bogdan_bogdanovic",
+    "nba_player_id": 203992,
     "name": "Bogdan Bogdanović",
     "team_id": "lac",
     "position": "G",
@@ -5149,6 +5383,7 @@
   },
   {
     "player_id": "bradley_beal",
+    "nba_player_id": 203078,
     "name": "Bradley Beal",
     "team_id": "lac",
     "position": "G",
@@ -5171,6 +5406,7 @@
   },
   {
     "player_id": "brook_lopez",
+    "nba_player_id": 201572,
     "name": "Brook Lopez",
     "team_id": "lac",
     "position": "C",
@@ -5193,6 +5429,7 @@
   },
   {
     "player_id": "cam_christie",
+    "nba_player_id": 1642353,
     "name": "Cam Christie",
     "team_id": "lac",
     "position": "G",
@@ -5215,6 +5452,7 @@
   },
   {
     "player_id": "chris_paul",
+    "nba_player_id": 101108,
     "name": "Chris Paul",
     "team_id": "lac",
     "position": "X",
@@ -5237,6 +5475,7 @@
   },
   {
     "player_id": "darius_garland",
+    "nba_player_id": 1629636,
     "name": "Darius Garland",
     "team_id": "lac",
     "position": "G",
@@ -5259,6 +5498,7 @@
   },
   {
     "player_id": "derrick_jones_jr",
+    "nba_player_id": 1627884,
     "name": "Derrick Jones Jr.",
     "team_id": "lac",
     "position": "F",
@@ -5281,6 +5521,7 @@
   },
   {
     "player_id": "isaiah_jackson",
+    "nba_player_id": 1630543,
     "name": "Isaiah Jackson",
     "team_id": "lac",
     "position": "F",
@@ -5303,6 +5544,7 @@
   },
   {
     "player_id": "jahmyl_telfort",
+    "nba_player_id": 1643141,
     "name": "Jahmyl Telfort",
     "team_id": "lac",
     "position": "X",
@@ -5325,6 +5567,7 @@
   },
   {
     "player_id": "john_collins",
+    "nba_player_id": 1628381,
     "name": "John Collins",
     "team_id": "lac",
     "position": "F-C",
@@ -5347,6 +5590,7 @@
   },
   {
     "player_id": "jordan_miller",
+    "nba_player_id": 1641757,
     "name": "Jordan Miller",
     "team_id": "lac",
     "position": "G",
@@ -5369,6 +5613,7 @@
   },
   {
     "player_id": "kawhi_leonard",
+    "nba_player_id": 202695,
     "name": "Kawhi Leonard",
     "team_id": "lac",
     "position": "F",
@@ -5391,6 +5636,7 @@
   },
   {
     "player_id": "kobe_sanders",
+    "nba_player_id": 1642920,
     "name": "Kobe Sanders",
     "team_id": "lac",
     "position": "G",
@@ -5413,6 +5659,7 @@
   },
   {
     "player_id": "kris_dunn",
+    "nba_player_id": 1627739,
     "name": "Kris Dunn",
     "team_id": "lac",
     "position": "G",
@@ -5435,6 +5682,7 @@
   },
   {
     "player_id": "nicolas_batum",
+    "nba_player_id": 201587,
     "name": "Nicolas Batum",
     "team_id": "lac",
     "position": "G-F",
@@ -5457,6 +5705,7 @@
   },
   {
     "player_id": "norchad_omier",
+    "nba_player_id": null,
     "name": "Norchad Omier",
     "team_id": "lac",
     "position": "F",
@@ -5479,6 +5728,7 @@
   },
   {
     "player_id": "sean_pedulla",
+    "nba_player_id": null,
     "name": "Sean Pedulla",
     "team_id": "lac",
     "position": "G",
@@ -5501,6 +5751,7 @@
   },
   {
     "player_id": "tyty_washington_jr",
+    "nba_player_id": 1631102,
     "name": "TyTy Washington Jr.",
     "team_id": "lac",
     "position": "G",
@@ -5523,6 +5774,7 @@
   },
   {
     "player_id": "yanic_konan_niederhauser",
+    "nba_player_id": 1642949,
     "name": "Yanic Konan Niederhäuser",
     "team_id": "lac",
     "position": "C",
@@ -5545,6 +5797,7 @@
   },
   {
     "player_id": "adou_thiero",
+    "nba_player_id": 1642876,
     "name": "Adou Thiero",
     "team_id": "lal",
     "position": "G",
@@ -5567,6 +5820,7 @@
   },
   {
     "player_id": "austin_reaves",
+    "nba_player_id": 1630559,
     "name": "Austin Reaves",
     "team_id": "lal",
     "position": "G",
@@ -5589,6 +5843,7 @@
   },
   {
     "player_id": "bronny_james",
+    "nba_player_id": 1642355,
     "name": "Bronny James",
     "team_id": "lal",
     "position": "G",
@@ -5611,6 +5866,7 @@
   },
   {
     "player_id": "chris_manon",
+    "nba_player_id": 1643024,
     "name": "Chris Mañon",
     "team_id": "lal",
     "position": "G",
@@ -5633,6 +5889,7 @@
   },
   {
     "player_id": "dalton_knecht",
+    "nba_player_id": 1642261,
     "name": "Dalton Knecht",
     "team_id": "lal",
     "position": "F",
@@ -5655,6 +5912,7 @@
   },
   {
     "player_id": "deandre_ayton",
+    "nba_player_id": 1629028,
     "name": "Deandre Ayton",
     "team_id": "lal",
     "position": "C",
@@ -5677,6 +5935,7 @@
   },
   {
     "player_id": "drew_timme",
+    "nba_player_id": 1631166,
     "name": "Drew Timme",
     "team_id": "lal",
     "position": "F",
@@ -5699,6 +5958,7 @@
   },
   {
     "player_id": "jake_laravia",
+    "nba_player_id": 1631222,
     "name": "Jake LaRavia",
     "team_id": "lal",
     "position": "F",
@@ -5721,6 +5981,7 @@
   },
   {
     "player_id": "jarred_vanderbilt",
+    "nba_player_id": 1629020,
     "name": "Jarred Vanderbilt",
     "team_id": "lal",
     "position": "F",
@@ -5743,6 +6004,7 @@
   },
   {
     "player_id": "jaxson_hayes",
+    "nba_player_id": 1629637,
     "name": "Jaxson Hayes",
     "team_id": "lal",
     "position": "C-F",
@@ -5765,6 +6027,7 @@
   },
   {
     "player_id": "kobe_bufkin",
+    "nba_player_id": 1641723,
     "name": "Kobe Bufkin",
     "team_id": "lal",
     "position": "X",
@@ -5787,6 +6050,7 @@
   },
   {
     "player_id": "lebron_james",
+    "nba_player_id": 2544,
     "name": "LeBron James",
     "team_id": "lal",
     "position": "F",
@@ -5809,6 +6073,7 @@
   },
   {
     "player_id": "luka_doncic",
+    "nba_player_id": 1629029,
     "name": "Luka Dončić",
     "team_id": "lal",
     "position": "F-G",
@@ -5831,6 +6096,7 @@
   },
   {
     "player_id": "luke_kennard",
+    "nba_player_id": 1628379,
     "name": "Luke Kennard",
     "team_id": "lal",
     "position": "G",
@@ -5853,6 +6119,7 @@
   },
   {
     "player_id": "marcus_smart",
+    "nba_player_id": 203935,
     "name": "Marcus Smart",
     "team_id": "lal",
     "position": "G",
@@ -5875,6 +6142,7 @@
   },
   {
     "player_id": "maxi_kleber",
+    "nba_player_id": 1628467,
     "name": "Maxi Kleber",
     "team_id": "lal",
     "position": "F",
@@ -5897,6 +6165,7 @@
   },
   {
     "player_id": "nick_smith_jr",
+    "nba_player_id": 1641733,
     "name": "Nick Smith Jr.",
     "team_id": "lal",
     "position": "G",
@@ -5919,6 +6188,7 @@
   },
   {
     "player_id": "rui_hachimura",
+    "nba_player_id": 1629060,
     "name": "Rui Hachimura",
     "team_id": "lal",
     "position": "F",
@@ -5941,6 +6211,7 @@
   },
   {
     "player_id": "adama_bal",
+    "nba_player_id": null,
     "name": "Adama Bal",
     "team_id": "mem",
     "position": "X",
@@ -5963,6 +6234,7 @@
   },
   {
     "player_id": "brandon_clarke",
+    "nba_player_id": 1629634,
     "name": "Brandon Clarke",
     "team_id": "mem",
     "position": "F",
@@ -5985,6 +6257,7 @@
   },
   {
     "player_id": "cam_spencer",
+    "nba_player_id": 1642285,
     "name": "Cam Spencer",
     "team_id": "mem",
     "position": "G",
@@ -6007,6 +6280,7 @@
   },
   {
     "player_id": "cedric_coward",
+    "nba_player_id": 1642907,
     "name": "Cedric Coward",
     "team_id": "mem",
     "position": "G",
@@ -6029,6 +6303,7 @@
   },
   {
     "player_id": "dariq_whitehead",
+    "nba_player_id": 1641727,
     "name": "Dariq Whitehead",
     "team_id": "mem",
     "position": "X",
@@ -6051,6 +6326,7 @@
   },
   {
     "player_id": "dejon_jarreau",
+    "nba_player_id": 1630610,
     "name": "DeJon Jarreau",
     "team_id": "mem",
     "position": "X",
@@ -6073,6 +6349,7 @@
   },
   {
     "player_id": "gg_jackson",
+    "nba_player_id": 1641713,
     "name": "GG Jackson",
     "team_id": "mem",
     "position": "F",
@@ -6095,6 +6372,7 @@
   },
   {
     "player_id": "ja_morant",
+    "nba_player_id": 1629630,
     "name": "Ja Morant",
     "team_id": "mem",
     "position": "G",
@@ -6117,6 +6395,7 @@
   },
   {
     "player_id": "jahmai_mashack",
+    "nba_player_id": null,
     "name": "Jahmai Mashack",
     "team_id": "mem",
     "position": "G",
@@ -6139,6 +6418,7 @@
   },
   {
     "player_id": "javon_small",
+    "nba_player_id": 1642914,
     "name": "Javon Small",
     "team_id": "mem",
     "position": "G",
@@ -6161,6 +6441,7 @@
   },
   {
     "player_id": "jaylen_wells",
+    "nba_player_id": 1642377,
     "name": "Jaylen Wells",
     "team_id": "mem",
     "position": "F",
@@ -6183,6 +6464,7 @@
   },
   {
     "player_id": "kentavious_caldwell_pope",
+    "nba_player_id": 203484,
     "name": "Kentavious Caldwell-Pope",
     "team_id": "mem",
     "position": "G",
@@ -6205,6 +6487,7 @@
   },
   {
     "player_id": "lawson_lovering",
+    "nba_player_id": null,
     "name": "Lawson Lovering",
     "team_id": "mem",
     "position": "X",
@@ -6227,6 +6510,7 @@
   },
   {
     "player_id": "lucas_williamson",
+    "nba_player_id": null,
     "name": "Lucas Williamson",
     "team_id": "mem",
     "position": "X",
@@ -6249,6 +6533,7 @@
   },
   {
     "player_id": "olivier_maxence_prosper",
+    "nba_player_id": 1641765,
     "name": "Olivier-Maxence Prosper",
     "team_id": "mem",
     "position": "F",
@@ -6271,6 +6556,7 @@
   },
   {
     "player_id": "rayan_rupert",
+    "nba_player_id": 1641712,
     "name": "Rayan Rupert",
     "team_id": "mem",
     "position": "G-F",
@@ -6293,6 +6579,7 @@
   },
   {
     "player_id": "santi_aldama",
+    "nba_player_id": 1630583,
     "name": "Santi Aldama",
     "team_id": "mem",
     "position": "F-C",
@@ -6315,6 +6602,7 @@
   },
   {
     "player_id": "scotty_pippen_jr",
+    "nba_player_id": 1630590,
     "name": "Scotty Pippen Jr.",
     "team_id": "mem",
     "position": "G",
@@ -6337,6 +6625,7 @@
   },
   {
     "player_id": "taj_gibson",
+    "nba_player_id": 201959,
     "name": "Taj Gibson",
     "team_id": "mem",
     "position": "F",
@@ -6359,6 +6648,7 @@
   },
   {
     "player_id": "taylor_hendricks",
+    "nba_player_id": 1641707,
     "name": "Taylor Hendricks",
     "team_id": "mem",
     "position": "F",
@@ -6381,6 +6671,7 @@
   },
   {
     "player_id": "toby_okani",
+    "nba_player_id": null,
     "name": "Toby Okani",
     "team_id": "mem",
     "position": "X",
@@ -6403,6 +6694,7 @@
   },
   {
     "player_id": "ty_jerome",
+    "nba_player_id": 1629660,
     "name": "Ty Jerome",
     "team_id": "mem",
     "position": "G-F",
@@ -6425,6 +6717,7 @@
   },
   {
     "player_id": "tyler_burton",
+    "nba_player_id": null,
     "name": "Tyler Burton",
     "team_id": "mem",
     "position": "X",
@@ -6447,6 +6740,7 @@
   },
   {
     "player_id": "walter_clayton_jr",
+    "nba_player_id": 1642383,
     "name": "Walter Clayton Jr.",
     "team_id": "mem",
     "position": "G",
@@ -6469,6 +6763,7 @@
   },
   {
     "player_id": "zach_edey",
+    "nba_player_id": 1641744,
     "name": "Zach Edey",
     "team_id": "mem",
     "position": "C",
@@ -6491,6 +6786,7 @@
   },
   {
     "player_id": "andrew_wiggins",
+    "nba_player_id": 203952,
     "name": "Andrew Wiggins",
     "team_id": "mia",
     "position": "F",
@@ -6513,6 +6809,7 @@
   },
   {
     "player_id": "bam_adebayo",
+    "nba_player_id": 1628389,
     "name": "Bam Adebayo",
     "team_id": "mia",
     "position": "C-F",
@@ -6535,6 +6832,7 @@
   },
   {
     "player_id": "davion_mitchell",
+    "nba_player_id": 1630558,
     "name": "Davion Mitchell",
     "team_id": "mia",
     "position": "G",
@@ -6557,6 +6855,7 @@
   },
   {
     "player_id": "dru_smith",
+    "nba_player_id": 1630696,
     "name": "Dru Smith",
     "team_id": "mia",
     "position": "G",
@@ -6579,6 +6878,7 @@
   },
   {
     "player_id": "jahmir_young",
+    "nba_player_id": 1642443,
     "name": "Jahmir Young",
     "team_id": "mia",
     "position": "G",
@@ -6601,6 +6901,7 @@
   },
   {
     "player_id": "jaime_jaquez_jr",
+    "nba_player_id": 1631170,
     "name": "Jaime Jaquez Jr.",
     "team_id": "mia",
     "position": "G",
@@ -6623,6 +6924,7 @@
   },
   {
     "player_id": "kasparas_jakucionis",
+    "nba_player_id": 1642857,
     "name": "Kasparas Jakučionis",
     "team_id": "mia",
     "position": "G",
@@ -6645,6 +6947,7 @@
   },
   {
     "player_id": "kelel_ware",
+    "nba_player_id": 1642276,
     "name": "Kel'el Ware",
     "team_id": "mia",
     "position": "C",
@@ -6667,6 +6970,7 @@
   },
   {
     "player_id": "keshad_johnson",
+    "nba_player_id": 1642352,
     "name": "Keshad Johnson",
     "team_id": "mia",
     "position": "F",
@@ -6689,6 +6993,7 @@
   },
   {
     "player_id": "myron_gardner",
+    "nba_player_id": 1642066,
     "name": "Myron Gardner",
     "team_id": "mia",
     "position": "F",
@@ -6711,6 +7016,7 @@
   },
   {
     "player_id": "nikola_jovic",
+    "nba_player_id": 1631107,
     "name": "Nikola Jović",
     "team_id": "mia",
     "position": "F",
@@ -6733,6 +7039,7 @@
   },
   {
     "player_id": "norman_powell",
+    "nba_player_id": 1626181,
     "name": "Norman Powell",
     "team_id": "mia",
     "position": "G",
@@ -6755,6 +7062,7 @@
   },
   {
     "player_id": "pelle_larsson",
+    "nba_player_id": 1641796,
     "name": "Pelle Larsson",
     "team_id": "mia",
     "position": "G",
@@ -6777,6 +7085,7 @@
   },
   {
     "player_id": "simone_fontecchio",
+    "nba_player_id": 1631323,
     "name": "Simone Fontecchio",
     "team_id": "mia",
     "position": "F",
@@ -6799,6 +7108,7 @@
   },
   {
     "player_id": "trevor_keels",
+    "nba_player_id": 1631211,
     "name": "Trevor Keels",
     "team_id": "mia",
     "position": "G",
@@ -6821,6 +7131,7 @@
   },
   {
     "player_id": "tyler_herro",
+    "nba_player_id": 1629639,
     "name": "Tyler Herro",
     "team_id": "mia",
     "position": "G",
@@ -6843,6 +7154,7 @@
   },
   {
     "player_id": "vladislav_goldin",
+    "nba_player_id": 1642884,
     "name": "Vladislav Goldin",
     "team_id": "mia",
     "position": "C",
@@ -6865,6 +7177,7 @@
   },
   {
     "player_id": "aj_green",
+    "nba_player_id": 1631260,
     "name": "AJ Green",
     "team_id": "mil",
     "position": "G",
@@ -6887,6 +7200,7 @@
   },
   {
     "player_id": "alex_antetokounmpo",
+    "nba_player_id": 1630828,
     "name": "Alex Antetokounmpo",
     "team_id": "mil",
     "position": "F",
@@ -6909,6 +7223,7 @@
   },
   {
     "player_id": "andre_jackson_jr",
+    "nba_player_id": 1641748,
     "name": "Andre Jackson Jr.",
     "team_id": "mil",
     "position": "G",
@@ -6931,6 +7246,7 @@
   },
   {
     "player_id": "bobby_portis_jr",
+    "nba_player_id": 1626171,
     "name": "Bobby Portis Jr.",
     "team_id": "mil",
     "position": "F",
@@ -6953,6 +7269,7 @@
   },
   {
     "player_id": "cam_thomas",
+    "nba_player_id": 1630560,
     "name": "Cam Thomas",
     "team_id": "mil",
     "position": "X",
@@ -6975,6 +7292,7 @@
   },
   {
     "player_id": "cole_anthony",
+    "nba_player_id": 1630175,
     "name": "Cole Anthony",
     "team_id": "mil",
     "position": "X",
@@ -6997,6 +7315,7 @@
   },
   {
     "player_id": "cormac_ryan",
+    "nba_player_id": null,
     "name": "Cormac Ryan",
     "team_id": "mil",
     "position": "G",
@@ -7019,6 +7338,7 @@
   },
   {
     "player_id": "gary_harris",
+    "nba_player_id": 203914,
     "name": "Gary Harris",
     "team_id": "mil",
     "position": "G",
@@ -7041,6 +7361,7 @@
   },
   {
     "player_id": "gary_trent_jr",
+    "nba_player_id": 1629018,
     "name": "Gary Trent Jr.",
     "team_id": "mil",
     "position": "G",
@@ -7063,6 +7384,7 @@
   },
   {
     "player_id": "giannis_antetokounmpo",
+    "nba_player_id": 203507,
     "name": "Giannis Antetokounmpo",
     "team_id": "mil",
     "position": "F",
@@ -7085,6 +7407,7 @@
   },
   {
     "player_id": "jericho_sims",
+    "nba_player_id": 1630579,
     "name": "Jericho Sims",
     "team_id": "mil",
     "position": "C",
@@ -7107,6 +7430,7 @@
   },
   {
     "player_id": "kevin_porter_jr",
+    "nba_player_id": 1629645,
     "name": "Kevin Porter Jr.",
     "team_id": "mil",
     "position": "G-F",
@@ -7129,6 +7453,7 @@
   },
   {
     "player_id": "kyle_kuzma",
+    "nba_player_id": 1628398,
     "name": "Kyle Kuzma",
     "team_id": "mil",
     "position": "F",
@@ -7151,6 +7476,7 @@
   },
   {
     "player_id": "mark_sears",
+    "nba_player_id": 1641813,
     "name": "Mark Sears",
     "team_id": "mil",
     "position": "X",
@@ -7173,6 +7499,7 @@
   },
   {
     "player_id": "myles_turner",
+    "nba_player_id": 1626167,
     "name": "Myles Turner",
     "team_id": "mil",
     "position": "C-F",
@@ -7195,6 +7522,7 @@
   },
   {
     "player_id": "ousmane_dieng",
+    "nba_player_id": 1631172,
     "name": "Ousmane Dieng",
     "team_id": "mil",
     "position": "F",
@@ -7217,6 +7545,7 @@
   },
   {
     "player_id": "pete_nance",
+    "nba_player_id": 1631250,
     "name": "Pete Nance",
     "team_id": "mil",
     "position": "F",
@@ -7239,6 +7568,7 @@
   },
   {
     "player_id": "ryan_rollins",
+    "nba_player_id": 1631157,
     "name": "Ryan Rollins",
     "team_id": "mil",
     "position": "G",
@@ -7261,6 +7591,7 @@
   },
   {
     "player_id": "taurean_prince",
+    "nba_player_id": 1627752,
     "name": "Taurean Prince",
     "team_id": "mil",
     "position": "F",
@@ -7283,6 +7614,7 @@
   },
   {
     "player_id": "thanasis_antetokounmpo",
+    "nba_player_id": 203648,
     "name": "Thanasis Antetokounmpo",
     "team_id": "mil",
     "position": "F",
@@ -7305,6 +7637,7 @@
   },
   {
     "player_id": "anthony_edwards",
+    "nba_player_id": 1630162,
     "name": "Anthony Edwards",
     "team_id": "min",
     "position": "G",
@@ -7327,6 +7660,7 @@
   },
   {
     "player_id": "ayo_dosunmu",
+    "nba_player_id": 1630245,
     "name": "Ayo Dosunmu",
     "team_id": "min",
     "position": "G",
@@ -7349,6 +7683,7 @@
   },
   {
     "player_id": "bones_hyland",
+    "nba_player_id": 1630538,
     "name": "Bones Hyland",
     "team_id": "min",
     "position": "G",
@@ -7371,6 +7706,7 @@
   },
   {
     "player_id": "donte_divincenzo",
+    "nba_player_id": 1628978,
     "name": "Donte DiVincenzo",
     "team_id": "min",
     "position": "G",
@@ -7393,6 +7729,7 @@
   },
   {
     "player_id": "enrique_freeman",
+    "nba_player_id": 1642402,
     "name": "Enrique Freeman",
     "team_id": "min",
     "position": "F",
@@ -7415,6 +7752,7 @@
   },
   {
     "player_id": "jaden_mcdaniels",
+    "nba_player_id": 1630183,
     "name": "Jaden McDaniels",
     "team_id": "min",
     "position": "F",
@@ -7437,6 +7775,7 @@
   },
   {
     "player_id": "jaylen_clark",
+    "nba_player_id": 1641740,
     "name": "Jaylen Clark",
     "team_id": "min",
     "position": "G",
@@ -7459,6 +7798,7 @@
   },
   {
     "player_id": "joan_beringer",
+    "nba_player_id": 1642866,
     "name": "Joan Beringer",
     "team_id": "min",
     "position": "F",
@@ -7481,6 +7821,7 @@
   },
   {
     "player_id": "joe_ingles",
+    "nba_player_id": 204060,
     "name": "Joe Ingles",
     "team_id": "min",
     "position": "F-G",
@@ -7503,6 +7844,7 @@
   },
   {
     "player_id": "johnny_juzang",
+    "nba_player_id": 1630548,
     "name": "Johnny Juzang",
     "team_id": "min",
     "position": "X",
@@ -7525,6 +7867,7 @@
   },
   {
     "player_id": "julian_phillips",
+    "nba_player_id": 1641763,
     "name": "Julian Phillips",
     "team_id": "min",
     "position": "F",
@@ -7547,6 +7890,7 @@
   },
   {
     "player_id": "julius_randle",
+    "nba_player_id": 203944,
     "name": "Julius Randle",
     "team_id": "min",
     "position": "F-C",
@@ -7569,6 +7913,7 @@
   },
   {
     "player_id": "kyle_anderson",
+    "nba_player_id": 203937,
     "name": "Kyle Anderson",
     "team_id": "min",
     "position": "F-G",
@@ -7591,6 +7936,7 @@
   },
   {
     "player_id": "mike_conley",
+    "nba_player_id": 201144,
     "name": "Mike Conley",
     "team_id": "min",
     "position": "G",
@@ -7613,6 +7959,7 @@
   },
   {
     "player_id": "naz_reid",
+    "nba_player_id": 1629675,
     "name": "Naz Reid",
     "team_id": "min",
     "position": "C-F",
@@ -7635,6 +7982,7 @@
   },
   {
     "player_id": "rocco_zikarsky",
+    "nba_player_id": 1642911,
     "name": "Rocco Zikarsky",
     "team_id": "min",
     "position": "C",
@@ -7657,6 +8005,7 @@
   },
   {
     "player_id": "rudy_gobert",
+    "nba_player_id": 203497,
     "name": "Rudy Gobert",
     "team_id": "min",
     "position": "C",
@@ -7679,6 +8028,7 @@
   },
   {
     "player_id": "terrence_shannon_jr",
+    "nba_player_id": 1630545,
     "name": "Terrence Shannon Jr",
     "team_id": "min",
     "position": "G-F",
@@ -7701,6 +8051,7 @@
   },
   {
     "player_id": "zyon_pullin",
+    "nba_player_id": 1642389,
     "name": "Zyon Pullin",
     "team_id": "min",
     "position": "G",
@@ -7723,6 +8074,7 @@
   },
   {
     "player_id": "bryce_mcgowens",
+    "nba_player_id": 1631121,
     "name": "Bryce McGowens",
     "team_id": "nop",
     "position": "G",
@@ -7745,6 +8097,7 @@
   },
   {
     "player_id": "deandre_jordan",
+    "nba_player_id": 201599,
     "name": "DeAndre Jordan",
     "team_id": "nop",
     "position": "C",
@@ -7767,6 +8120,7 @@
   },
   {
     "player_id": "dejounte_murray",
+    "nba_player_id": 1627749,
     "name": "Dejounte Murray",
     "team_id": "nop",
     "position": "G",
@@ -7789,6 +8143,7 @@
   },
   {
     "player_id": "derik_queen",
+    "nba_player_id": 1642852,
     "name": "Derik Queen",
     "team_id": "nop",
     "position": "C",
@@ -7811,6 +8166,7 @@
   },
   {
     "player_id": "herbert_jones",
+    "nba_player_id": 1630529,
     "name": "Herbert Jones",
     "team_id": "nop",
     "position": "F",
@@ -7833,6 +8189,7 @@
   },
   {
     "player_id": "hunter_dickinson",
+    "nba_player_id": 1630621,
     "name": "Hunter Dickinson",
     "team_id": "nop",
     "position": "C",
@@ -7855,6 +8212,7 @@
   },
   {
     "player_id": "jeremiah_fears",
+    "nba_player_id": 1642847,
     "name": "Jeremiah Fears",
     "team_id": "nop",
     "position": "G",
@@ -7877,6 +8235,7 @@
   },
   {
     "player_id": "jordan_hawkins",
+    "nba_player_id": 1641722,
     "name": "Jordan Hawkins",
     "team_id": "nop",
     "position": "G",
@@ -7899,6 +8258,7 @@
   },
   {
     "player_id": "jordan_poole",
+    "nba_player_id": 1629673,
     "name": "Jordan Poole",
     "team_id": "nop",
     "position": "G",
@@ -7921,6 +8281,7 @@
   },
   {
     "player_id": "josh_oduro",
+    "nba_player_id": null,
     "name": "Josh Oduro",
     "team_id": "nop",
     "position": "C",
@@ -7943,6 +8304,7 @@
   },
   {
     "player_id": "karlo_matkovic",
+    "nba_player_id": 1631255,
     "name": "Karlo Matković",
     "team_id": "nop",
     "position": "F-C",
@@ -7965,6 +8327,7 @@
   },
   {
     "player_id": "kevon_looney",
+    "nba_player_id": 1626172,
     "name": "Kevon Looney",
     "team_id": "nop",
     "position": "F",
@@ -7987,6 +8350,7 @@
   },
   {
     "player_id": "micah_peavy",
+    "nba_player_id": 1642877,
     "name": "Micah Peavy",
     "team_id": "nop",
     "position": "G-F",
@@ -8009,6 +8373,7 @@
   },
   {
     "player_id": "saddiq_bey",
+    "nba_player_id": 1630180,
     "name": "Saddiq Bey",
     "team_id": "nop",
     "position": "G-F",
@@ -8031,6 +8396,7 @@
   },
   {
     "player_id": "trey_alexander",
+    "nba_player_id": 1641725,
     "name": "Trey Alexander",
     "team_id": "nop",
     "position": "G",
@@ -8053,6 +8419,7 @@
   },
   {
     "player_id": "trey_murphy_iii",
+    "nba_player_id": 1630530,
     "name": "Trey Murphy III",
     "team_id": "nop",
     "position": "F",
@@ -8075,6 +8442,7 @@
   },
   {
     "player_id": "yves_missi",
+    "nba_player_id": 1642274,
     "name": "Yves Missi",
     "team_id": "nop",
     "position": "C",
@@ -8097,6 +8465,7 @@
   },
   {
     "player_id": "zion_williamson",
+    "nba_player_id": 1629627,
     "name": "Zion Williamson",
     "team_id": "nop",
     "position": "F",
@@ -8119,6 +8488,7 @@
   },
   {
     "player_id": "ariel_hukporti",
+    "nba_player_id": 1630574,
     "name": "Ariel Hukporti",
     "team_id": "nyk",
     "position": "C",
@@ -8141,6 +8511,7 @@
   },
   {
     "player_id": "dillon_jones",
+    "nba_player_id": 1641794,
     "name": "Dillon Jones",
     "team_id": "nyk",
     "position": "F",
@@ -8163,6 +8534,7 @@
   },
   {
     "player_id": "jalen_brunson",
+    "nba_player_id": 1628973,
     "name": "Jalen Brunson",
     "team_id": "nyk",
     "position": "G",
@@ -8185,6 +8557,7 @@
   },
   {
     "player_id": "jeremy_sochan",
+    "nba_player_id": 1631110,
     "name": "Jeremy Sochan",
     "team_id": "nyk",
     "position": "F",
@@ -8207,6 +8580,7 @@
   },
   {
     "player_id": "jordan_clarkson",
+    "nba_player_id": 203903,
     "name": "Jordan Clarkson",
     "team_id": "nyk",
     "position": "G",
@@ -8229,6 +8603,7 @@
   },
   {
     "player_id": "jose_alvarado",
+    "nba_player_id": 1630631,
     "name": "Jose Alvarado",
     "team_id": "nyk",
     "position": "G",
@@ -8251,6 +8626,7 @@
   },
   {
     "player_id": "josh_hart",
+    "nba_player_id": 1628404,
     "name": "Josh Hart",
     "team_id": "nyk",
     "position": "G",
@@ -8273,6 +8649,7 @@
   },
   {
     "player_id": "karl_anthony_towns",
+    "nba_player_id": 1626157,
     "name": "Karl-Anthony Towns",
     "team_id": "nyk",
     "position": "C-F",
@@ -8295,6 +8672,7 @@
   },
   {
     "player_id": "kevin_mccullar_jr",
+    "nba_player_id": 1641755,
     "name": "Kevin McCullar Jr.",
     "team_id": "nyk",
     "position": "G",
@@ -8317,6 +8695,7 @@
   },
   {
     "player_id": "landry_shamet",
+    "nba_player_id": 1629013,
     "name": "Landry Shamet",
     "team_id": "nyk",
     "position": "G",
@@ -8339,6 +8718,7 @@
   },
   {
     "player_id": "mikal_bridges",
+    "nba_player_id": 1628969,
     "name": "Mikal Bridges",
     "team_id": "nyk",
     "position": "G-F",
@@ -8361,6 +8741,7 @@
   },
   {
     "player_id": "miles_mcbride",
+    "nba_player_id": 1630540,
     "name": "Miles McBride",
     "team_id": "nyk",
     "position": "G",
@@ -8383,6 +8764,7 @@
   },
   {
     "player_id": "mitchell_robinson",
+    "nba_player_id": 1629011,
     "name": "Mitchell Robinson",
     "team_id": "nyk",
     "position": "C-F",
@@ -8405,6 +8787,7 @@
   },
   {
     "player_id": "mohamed_diawara",
+    "nba_player_id": 1642885,
     "name": "Mohamed Diawara",
     "team_id": "nyk",
     "position": "F",
@@ -8427,6 +8810,7 @@
   },
   {
     "player_id": "og_anunoby",
+    "nba_player_id": 1628384,
     "name": "OG Anunoby",
     "team_id": "nyk",
     "position": "F-G",
@@ -8449,6 +8833,7 @@
   },
   {
     "player_id": "pacome_dadiet",
+    "nba_player_id": 1642359,
     "name": "Pacôme Dadiet",
     "team_id": "nyk",
     "position": "F",
@@ -8471,6 +8856,7 @@
   },
   {
     "player_id": "trey_jemison_iii",
+    "nba_player_id": 1641998,
     "name": "Trey Jemison III",
     "team_id": "nyk",
     "position": "C",
@@ -8493,6 +8879,7 @@
   },
   {
     "player_id": "tyler_kolek",
+    "nba_player_id": 1642278,
     "name": "Tyler Kolek",
     "team_id": "nyk",
     "position": "G",
@@ -8515,6 +8902,7 @@
   },
   {
     "player_id": "aaron_wiggins",
+    "nba_player_id": 1630598,
     "name": "Aaron Wiggins",
     "team_id": "okc",
     "position": "G",
@@ -8537,6 +8925,7 @@
   },
   {
     "player_id": "ajay_mitchell",
+    "nba_player_id": 1642349,
     "name": "Ajay Mitchell",
     "team_id": "okc",
     "position": "G",
@@ -8559,6 +8948,7 @@
   },
   {
     "player_id": "alex_caruso",
+    "nba_player_id": 1627936,
     "name": "Alex Caruso",
     "team_id": "okc",
     "position": "G",
@@ -8581,6 +8971,7 @@
   },
   {
     "player_id": "branden_carlson",
+    "nba_player_id": 1642382,
     "name": "Branden Carlson",
     "team_id": "okc",
     "position": "C",
@@ -8603,6 +8994,7 @@
   },
   {
     "player_id": "brooks_barnhizer",
+    "nba_player_id": 1642964,
     "name": "Brooks Barnhizer",
     "team_id": "okc",
     "position": "G",
@@ -8625,6 +9017,7 @@
   },
   {
     "player_id": "buddy_boeheim",
+    "nba_player_id": 1631205,
     "name": "Buddy Boeheim",
     "team_id": "okc",
     "position": "X",
@@ -8647,6 +9040,7 @@
   },
   {
     "player_id": "cason_wallace",
+    "nba_player_id": 1641717,
     "name": "Cason Wallace",
     "team_id": "okc",
     "position": "G",
@@ -8669,6 +9063,7 @@
   },
   {
     "player_id": "chet_holmgren",
+    "nba_player_id": 1631096,
     "name": "Chet Holmgren",
     "team_id": "okc",
     "position": "C-F",
@@ -8691,6 +9086,7 @@
   },
   {
     "player_id": "isaiah_hartenstein",
+    "nba_player_id": 1628392,
     "name": "Isaiah Hartenstein",
     "team_id": "okc",
     "position": "C-F",
@@ -8713,6 +9109,7 @@
   },
   {
     "player_id": "isaiah_joe",
+    "nba_player_id": 1630198,
     "name": "Isaiah Joe",
     "team_id": "okc",
     "position": "G",
@@ -8735,6 +9132,7 @@
   },
   {
     "player_id": "jalen_williams",
+    "nba_player_id": 1631114,
     "name": "Jalen Williams",
     "team_id": "okc",
     "position": "G-F",
@@ -8757,6 +9155,7 @@
   },
   {
     "player_id": "jared_mccain",
+    "nba_player_id": 1642272,
     "name": "Jared McCain",
     "team_id": "okc",
     "position": "G",
@@ -8779,6 +9178,7 @@
   },
   {
     "player_id": "jaylin_williams",
+    "nba_player_id": 1631119,
     "name": "Jaylin Williams",
     "team_id": "okc",
     "position": "F",
@@ -8801,6 +9201,7 @@
   },
   {
     "player_id": "kenrich_williams",
+    "nba_player_id": 1629026,
     "name": "Kenrich Williams",
     "team_id": "okc",
     "position": "G-F",
@@ -8823,6 +9224,7 @@
   },
   {
     "player_id": "luguentz_dort",
+    "nba_player_id": 1629652,
     "name": "Luguentz Dort",
     "team_id": "okc",
     "position": "G",
@@ -8845,6 +9247,7 @@
   },
   {
     "player_id": "nikola_topic",
+    "nba_player_id": 1642260,
     "name": "Nikola Topić",
     "team_id": "okc",
     "position": "G",
@@ -8867,6 +9270,7 @@
   },
   {
     "player_id": "payton_sandfort",
+    "nba_player_id": null,
     "name": "Payton Sandfort",
     "team_id": "okc",
     "position": "F",
@@ -8889,6 +9293,7 @@
   },
   {
     "player_id": "shai_gilgeous_alexander",
+    "nba_player_id": 1628983,
     "name": "Shai Gilgeous-Alexander",
     "team_id": "okc",
     "position": "G",
@@ -8911,6 +9316,7 @@
   },
   {
     "player_id": "alex_morales",
+    "nba_player_id": null,
     "name": "Alex Morales",
     "team_id": "orl",
     "position": "G",
@@ -8933,6 +9339,7 @@
   },
   {
     "player_id": "anthony_black",
+    "nba_player_id": 1641710,
     "name": "Anthony Black",
     "team_id": "orl",
     "position": "G",
@@ -8955,6 +9362,7 @@
   },
   {
     "player_id": "colin_castleton",
+    "nba_player_id": 1630658,
     "name": "Colin Castleton",
     "team_id": "orl",
     "position": "C",
@@ -8977,6 +9385,7 @@
   },
   {
     "player_id": "desmond_bane",
+    "nba_player_id": 1630217,
     "name": "Desmond Bane",
     "team_id": "orl",
     "position": "G",
@@ -8999,6 +9408,7 @@
   },
   {
     "player_id": "franz_wagner",
+    "nba_player_id": 1630532,
     "name": "Franz Wagner",
     "team_id": "orl",
     "position": "F",
@@ -9021,6 +9431,7 @@
   },
   {
     "player_id": "goga_bitadze",
+    "nba_player_id": 1629048,
     "name": "Goga Bitadze",
     "team_id": "orl",
     "position": "C-F",
@@ -9043,6 +9454,7 @@
   },
   {
     "player_id": "jalen_suggs",
+    "nba_player_id": 1630591,
     "name": "Jalen Suggs",
     "team_id": "orl",
     "position": "G",
@@ -9065,6 +9477,7 @@
   },
   {
     "player_id": "jamal_cain",
+    "nba_player_id": 1631288,
     "name": "Jamal Cain",
     "team_id": "orl",
     "position": "F",
@@ -9087,6 +9500,7 @@
   },
   {
     "player_id": "jase_richardson",
+    "nba_player_id": 1642859,
     "name": "Jase Richardson",
     "team_id": "orl",
     "position": "G",
@@ -9109,6 +9523,7 @@
   },
   {
     "player_id": "jett_howard",
+    "nba_player_id": 1641724,
     "name": "Jett Howard",
     "team_id": "orl",
     "position": "G",
@@ -9131,6 +9546,7 @@
   },
   {
     "player_id": "jevon_carter",
+    "nba_player_id": 1628975,
     "name": "Jevon Carter",
     "team_id": "orl",
     "position": "G",
@@ -9153,6 +9569,7 @@
   },
   {
     "player_id": "jonathan_isaac",
+    "nba_player_id": 1628371,
     "name": "Jonathan Isaac",
     "team_id": "orl",
     "position": "F",
@@ -9175,6 +9592,7 @@
   },
   {
     "player_id": "moritz_wagner",
+    "nba_player_id": 1629021,
     "name": "Moritz Wagner",
     "team_id": "orl",
     "position": "F-C",
@@ -9197,6 +9615,7 @@
   },
   {
     "player_id": "noah_penda",
+    "nba_player_id": 1642869,
     "name": "Noah Penda",
     "team_id": "orl",
     "position": "G-F",
@@ -9219,6 +9638,7 @@
   },
   {
     "player_id": "orlando_robinson",
+    "nba_player_id": 1631115,
     "name": "Orlando Robinson",
     "team_id": "orl",
     "position": "X",
@@ -9241,6 +9661,7 @@
   },
   {
     "player_id": "paolo_banchero",
+    "nba_player_id": 1631094,
     "name": "Paolo Banchero",
     "team_id": "orl",
     "position": "F",
@@ -9263,6 +9684,7 @@
   },
   {
     "player_id": "tristan_da_silva",
+    "nba_player_id": 1641783,
     "name": "Tristan da Silva",
     "team_id": "orl",
     "position": "F",
@@ -9285,6 +9707,7 @@
   },
   {
     "player_id": "wendell_carter_jr",
+    "nba_player_id": 1628976,
     "name": "Wendell Carter Jr.",
     "team_id": "orl",
     "position": "C-F",
@@ -9307,6 +9730,7 @@
   },
   {
     "player_id": "adem_bona",
+    "nba_player_id": 1641737,
     "name": "Adem Bona",
     "team_id": "phi",
     "position": "F",
@@ -9329,6 +9753,7 @@
   },
   {
     "player_id": "andre_drummond",
+    "nba_player_id": 203083,
     "name": "Andre Drummond",
     "team_id": "phi",
     "position": "C",
@@ -9351,6 +9776,7 @@
   },
   {
     "player_id": "cameron_payne",
+    "nba_player_id": 1626166,
     "name": "Cameron Payne",
     "team_id": "phi",
     "position": "X",
@@ -9373,6 +9799,7 @@
   },
   {
     "player_id": "dalen_terry",
+    "nba_player_id": 1631207,
     "name": "Dalen Terry",
     "team_id": "phi",
     "position": "F",
@@ -9395,6 +9822,7 @@
   },
   {
     "player_id": "dominick_barlow",
+    "nba_player_id": 1631230,
     "name": "Dominick Barlow",
     "team_id": "phi",
     "position": "F",
@@ -9417,6 +9845,7 @@
   },
   {
     "player_id": "eric_gordon",
+    "nba_player_id": 201569,
     "name": "Eric Gordon",
     "team_id": "phi",
     "position": "X",
@@ -9439,6 +9868,7 @@
   },
   {
     "player_id": "hunter_sallis",
+    "nba_player_id": 1642282,
     "name": "Hunter Sallis",
     "team_id": "phi",
     "position": "X",
@@ -9461,6 +9891,7 @@
   },
   {
     "player_id": "jabari_walker",
+    "nba_player_id": 1631133,
     "name": "Jabari Walker",
     "team_id": "phi",
     "position": "F",
@@ -9483,6 +9914,7 @@
   },
   {
     "player_id": "joel_embiid",
+    "nba_player_id": 203954,
     "name": "Joel Embiid",
     "team_id": "phi",
     "position": "C-F",
@@ -9505,6 +9937,7 @@
   },
   {
     "player_id": "johni_broome",
+    "nba_player_id": 1641780,
     "name": "Johni Broome",
     "team_id": "phi",
     "position": "F",
@@ -9527,6 +9960,7 @@
   },
   {
     "player_id": "justin_edwards",
+    "nba_player_id": 1642348,
     "name": "Justin Edwards",
     "team_id": "phi",
     "position": "F",
@@ -9549,6 +9983,7 @@
   },
   {
     "player_id": "kelly_oubre_jr",
+    "nba_player_id": 1626162,
     "name": "Kelly Oubre Jr.",
     "team_id": "phi",
     "position": "F-G",
@@ -9571,6 +10006,7 @@
   },
   {
     "player_id": "kyle_lowry",
+    "nba_player_id": 200768,
     "name": "Kyle Lowry",
     "team_id": "phi",
     "position": "G",
@@ -9593,6 +10029,7 @@
   },
   {
     "player_id": "marjon_beauchamp",
+    "nba_player_id": 1630699,
     "name": "MarJon Beauchamp",
     "team_id": "phi",
     "position": "F",
@@ -9615,6 +10052,7 @@
   },
   {
     "player_id": "paul_george",
+    "nba_player_id": 202331,
     "name": "Paul George",
     "team_id": "phi",
     "position": "F",
@@ -9637,6 +10075,7 @@
   },
   {
     "player_id": "quentin_grimes",
+    "nba_player_id": 1629656,
     "name": "Quentin Grimes",
     "team_id": "phi",
     "position": "G",
@@ -9659,6 +10098,7 @@
   },
   {
     "player_id": "trendon_watford",
+    "nba_player_id": 1630570,
     "name": "Trendon Watford",
     "team_id": "phi",
     "position": "G-F",
@@ -9681,6 +10121,7 @@
   },
   {
     "player_id": "tyrese_martin",
+    "nba_player_id": 1631213,
     "name": "Tyrese Martin",
     "team_id": "phi",
     "position": "F",
@@ -9703,6 +10144,7 @@
   },
   {
     "player_id": "tyrese_maxey",
+    "nba_player_id": 1630178,
     "name": "Tyrese Maxey",
     "team_id": "phi",
     "position": "G",
@@ -9725,6 +10167,7 @@
   },
   {
     "player_id": "vj_edgecombe",
+    "nba_player_id": 1642845,
     "name": "VJ Edgecombe",
     "team_id": "phi",
     "position": "G",
@@ -9747,6 +10190,7 @@
   },
   {
     "player_id": "amir_coffey",
+    "nba_player_id": 1629599,
     "name": "Amir Coffey",
     "team_id": "phx",
     "position": "G-F",
@@ -9769,6 +10213,7 @@
   },
   {
     "player_id": "cj_huntley",
+    "nba_player_id": 1643047,
     "name": "CJ Huntley",
     "team_id": "phx",
     "position": "F",
@@ -9791,6 +10236,7 @@
   },
   {
     "player_id": "collin_gillespie",
+    "nba_player_id": 1631221,
     "name": "Collin Gillespie",
     "team_id": "phx",
     "position": "G",
@@ -9813,6 +10259,7 @@
   },
   {
     "player_id": "devin_booker",
+    "nba_player_id": 1626164,
     "name": "Devin Booker",
     "team_id": "phx",
     "position": "G",
@@ -9835,6 +10282,7 @@
   },
   {
     "player_id": "dillon_brooks",
+    "nba_player_id": 1628415,
     "name": "Dillon Brooks",
     "team_id": "phx",
     "position": "G-F",
@@ -9857,6 +10305,7 @@
   },
   {
     "player_id": "grayson_allen",
+    "nba_player_id": 1628960,
     "name": "Grayson Allen",
     "team_id": "phx",
     "position": "G",
@@ -9879,6 +10328,7 @@
   },
   {
     "player_id": "haywood_highsmith",
+    "nba_player_id": 1629312,
     "name": "Haywood Highsmith",
     "team_id": "phx",
     "position": "F",
@@ -9901,6 +10351,7 @@
   },
   {
     "player_id": "isaiah_livers",
+    "nba_player_id": 1630587,
     "name": "Isaiah Livers",
     "team_id": "phx",
     "position": "F",
@@ -9923,6 +10374,7 @@
   },
   {
     "player_id": "jalen_green",
+    "nba_player_id": 1630224,
     "name": "Jalen Green",
     "team_id": "phx",
     "position": "G",
@@ -9945,6 +10397,7 @@
   },
   {
     "player_id": "jamaree_bouyea",
+    "nba_player_id": 1631123,
     "name": "Jamaree Bouyea",
     "team_id": "phx",
     "position": "G",
@@ -9967,6 +10420,7 @@
   },
   {
     "player_id": "jordan_goodwin",
+    "nba_player_id": 1630692,
     "name": "Jordan Goodwin",
     "team_id": "phx",
     "position": "G",
@@ -9989,6 +10443,7 @@
   },
   {
     "player_id": "khaman_maluach",
+    "nba_player_id": 1642863,
     "name": "Khaman Maluach",
     "team_id": "phx",
     "position": "C",
@@ -10011,6 +10466,7 @@
   },
   {
     "player_id": "koby_brea",
+    "nba_player_id": 1642886,
     "name": "Koby Brea",
     "team_id": "phx",
     "position": "G",
@@ -10033,6 +10489,7 @@
   },
   {
     "player_id": "mark_williams",
+    "nba_player_id": 1631109,
     "name": "Mark Williams",
     "team_id": "phx",
     "position": "C",
@@ -10055,6 +10512,7 @@
   },
   {
     "player_id": "nigel_hayes_davis",
+    "nba_player_id": 1628502,
     "name": "Nigel Hayes-Davis",
     "team_id": "phx",
     "position": "X",
@@ -10077,6 +10535,7 @@
   },
   {
     "player_id": "oso_ighodaro",
+    "nba_player_id": 1642345,
     "name": "Oso Ighodaro",
     "team_id": "phx",
     "position": "F",
@@ -10099,6 +10558,7 @@
   },
   {
     "player_id": "rasheer_fleming",
+    "nba_player_id": 1642853,
     "name": "Rasheer Fleming",
     "team_id": "phx",
     "position": "F",
@@ -10121,6 +10581,7 @@
   },
   {
     "player_id": "royce_oneale",
+    "nba_player_id": 1626220,
     "name": "Royce O'Neale",
     "team_id": "phx",
     "position": "F",
@@ -10143,6 +10604,7 @@
   },
   {
     "player_id": "ryan_dunn",
+    "nba_player_id": 1642346,
     "name": "Ryan Dunn",
     "team_id": "phx",
     "position": "F",
@@ -10165,6 +10627,7 @@
   },
   {
     "player_id": "blake_wesley",
+    "nba_player_id": 1631104,
     "name": "Blake Wesley",
     "team_id": "por",
     "position": "G",
@@ -10187,6 +10650,7 @@
   },
   {
     "player_id": "caleb_love",
+    "nba_player_id": 1631126,
     "name": "Caleb Love",
     "team_id": "por",
     "position": "G",
@@ -10209,6 +10673,7 @@
   },
   {
     "player_id": "chris_youngblood",
+    "nba_player_id": 1642959,
     "name": "Chris Youngblood",
     "team_id": "por",
     "position": "G",
@@ -10231,6 +10696,7 @@
   },
   {
     "player_id": "deni_avdija",
+    "nba_player_id": 1630166,
     "name": "Deni Avdija",
     "team_id": "por",
     "position": "F",
@@ -10253,6 +10719,7 @@
   },
   {
     "player_id": "donovan_clingan",
+    "nba_player_id": 1642270,
     "name": "Donovan Clingan",
     "team_id": "por",
     "position": "C",
@@ -10275,6 +10742,7 @@
   },
   {
     "player_id": "duop_reath",
+    "nba_player_id": 1641871,
     "name": "Duop Reath",
     "team_id": "por",
     "position": "X",
@@ -10297,6 +10765,7 @@
   },
   {
     "player_id": "javonte_cooke",
+    "nba_player_id": 1631451,
     "name": "Javonte Cooke",
     "team_id": "por",
     "position": "X",
@@ -10319,6 +10788,7 @@
   },
   {
     "player_id": "jayson_kent",
+    "nba_player_id": null,
     "name": "Jayson Kent",
     "team_id": "por",
     "position": "F",
@@ -10341,6 +10811,7 @@
   },
   {
     "player_id": "jerami_grant",
+    "nba_player_id": 203924,
     "name": "Jerami Grant",
     "team_id": "por",
     "position": "F",
@@ -10363,6 +10834,7 @@
   },
   {
     "player_id": "jrue_holiday",
+    "nba_player_id": 201950,
     "name": "Jrue Holiday",
     "team_id": "por",
     "position": "G",
@@ -10385,6 +10857,7 @@
   },
   {
     "player_id": "kris_murray",
+    "nba_player_id": 1631200,
     "name": "Kris Murray",
     "team_id": "por",
     "position": "F",
@@ -10407,6 +10880,7 @@
   },
   {
     "player_id": "matisse_thybulle",
+    "nba_player_id": 1629680,
     "name": "Matisse Thybulle",
     "team_id": "por",
     "position": "G-F",
@@ -10429,6 +10903,7 @@
   },
   {
     "player_id": "robert_williams_iii",
+    "nba_player_id": 1629057,
     "name": "Robert Williams III",
     "team_id": "por",
     "position": "C-F",
@@ -10451,6 +10926,7 @@
   },
   {
     "player_id": "scoot_henderson",
+    "nba_player_id": 1630703,
     "name": "Scoot Henderson",
     "team_id": "por",
     "position": "G",
@@ -10473,6 +10949,7 @@
   },
   {
     "player_id": "shaedon_sharpe",
+    "nba_player_id": 1631101,
     "name": "Shaedon Sharpe",
     "team_id": "por",
     "position": "G",
@@ -10495,6 +10972,7 @@
   },
   {
     "player_id": "sidy_cissoko",
+    "nba_player_id": 1631321,
     "name": "Sidy Cissoko",
     "team_id": "por",
     "position": "G",
@@ -10517,6 +10995,7 @@
   },
   {
     "player_id": "toumani_camara",
+    "nba_player_id": 1641739,
     "name": "Toumani Camara",
     "team_id": "por",
     "position": "F",
@@ -10539,6 +11018,7 @@
   },
   {
     "player_id": "vit_krejci",
+    "nba_player_id": 1630249,
     "name": "Vít Krejčí",
     "team_id": "por",
     "position": "G",
@@ -10561,6 +11041,7 @@
   },
   {
     "player_id": "hansen_yang",
+    "nba_player_id": 1642905,
     "name": "Yang Hansen",
     "team_id": "por",
     "position": "C",
@@ -10583,6 +11064,7 @@
   },
   {
     "player_id": "daquan_jeffries",
+    "nba_player_id": 1629610,
     "name": "DaQuan Jeffries",
     "team_id": "sac",
     "position": "X",
@@ -10605,6 +11087,7 @@
   },
   {
     "player_id": "daeqwon_plowden",
+    "nba_player_id": 1631342,
     "name": "Daeqwon Plowden",
     "team_id": "sac",
     "position": "G-F",
@@ -10627,6 +11110,7 @@
   },
   {
     "player_id": "dario_saric",
+    "nba_player_id": 203967,
     "name": "Dario Saric",
     "team_id": "sac",
     "position": "X",
@@ -10649,6 +11133,7 @@
   },
   {
     "player_id": "deandre_hunter",
+    "nba_player_id": 1629631,
     "name": "De'Andre Hunter",
     "team_id": "sac",
     "position": "F-G",
@@ -10671,6 +11156,7 @@
   },
   {
     "player_id": "demar_derozan",
+    "nba_player_id": 201942,
     "name": "DeMar DeRozan",
     "team_id": "sac",
     "position": "G-F",
@@ -10693,6 +11179,7 @@
   },
   {
     "player_id": "devin_carter",
+    "nba_player_id": 1642269,
     "name": "Devin Carter",
     "team_id": "sac",
     "position": "G",
@@ -10715,6 +11202,7 @@
   },
   {
     "player_id": "domantas_sabonis",
+    "nba_player_id": 1627734,
     "name": "Domantas Sabonis",
     "team_id": "sac",
     "position": "F-C",
@@ -10737,6 +11225,7 @@
   },
   {
     "player_id": "doug_mcdermott",
+    "nba_player_id": 203926,
     "name": "Doug McDermott",
     "team_id": "sac",
     "position": "F",
@@ -10759,6 +11248,7 @@
   },
   {
     "player_id": "drew_eubanks",
+    "nba_player_id": 1629234,
     "name": "Drew Eubanks",
     "team_id": "sac",
     "position": "F-C",
@@ -10781,6 +11271,7 @@
   },
   {
     "player_id": "dylan_cardwell",
+    "nba_player_id": 1642928,
     "name": "Dylan Cardwell",
     "team_id": "sac",
     "position": "C",
@@ -10803,6 +11294,7 @@
   },
   {
     "player_id": "isaiah_stevens",
+    "nba_player_id": 1641815,
     "name": "Isaiah Stevens",
     "team_id": "sac",
     "position": "G",
@@ -10825,6 +11317,7 @@
   },
   {
     "player_id": "keegan_murray",
+    "nba_player_id": 1631099,
     "name": "Keegan Murray",
     "team_id": "sac",
     "position": "F",
@@ -10847,6 +11340,7 @@
   },
   {
     "player_id": "killian_hayes",
+    "nba_player_id": 1630165,
     "name": "Killian Hayes",
     "team_id": "sac",
     "position": "G",
@@ -10869,6 +11363,7 @@
   },
   {
     "player_id": "malik_monk",
+    "nba_player_id": 1628370,
     "name": "Malik Monk",
     "team_id": "sac",
     "position": "G",
@@ -10891,6 +11386,7 @@
   },
   {
     "player_id": "maxime_raynaud",
+    "nba_player_id": 1642875,
     "name": "Maxime Raynaud",
     "team_id": "sac",
     "position": "C",
@@ -10913,6 +11409,7 @@
   },
   {
     "player_id": "nique_clifford",
+    "nba_player_id": 1642363,
     "name": "Nique Clifford",
     "team_id": "sac",
     "position": "G",
@@ -10935,6 +11432,7 @@
   },
   {
     "player_id": "patrick_baldwin_jr",
+    "nba_player_id": 1631116,
     "name": "Patrick Baldwin Jr.",
     "team_id": "sac",
     "position": "F",
@@ -10957,6 +11455,7 @@
   },
   {
     "player_id": "precious_achiuwa",
+    "nba_player_id": 1630173,
     "name": "Precious Achiuwa",
     "team_id": "sac",
     "position": "F",
@@ -10979,6 +11478,7 @@
   },
   {
     "player_id": "russell_westbrook",
+    "nba_player_id": 201566,
     "name": "Russell Westbrook",
     "team_id": "sac",
     "position": "G",
@@ -11001,6 +11501,7 @@
   },
   {
     "player_id": "zach_lavine",
+    "nba_player_id": 203897,
     "name": "Zach LaVine",
     "team_id": "sac",
     "position": "G",
@@ -11023,6 +11524,7 @@
   },
   {
     "player_id": "bismack_biyombo",
+    "nba_player_id": 202687,
     "name": "Bismack Biyombo",
     "team_id": "sas",
     "position": "C",
@@ -11045,6 +11547,7 @@
   },
   {
     "player_id": "carter_bryant",
+    "nba_player_id": 1642868,
     "name": "Carter Bryant",
     "team_id": "sas",
     "position": "F",
@@ -11067,6 +11570,7 @@
   },
   {
     "player_id": "david_jones_garcia",
+    "nba_player_id": 1642357,
     "name": "David Jones Garcia",
     "team_id": "sas",
     "position": "G",
@@ -11089,6 +11593,7 @@
   },
   {
     "player_id": "deaaron_fox",
+    "nba_player_id": 1628368,
     "name": "De'Aaron Fox",
     "team_id": "sas",
     "position": "G",
@@ -11111,6 +11616,7 @@
   },
   {
     "player_id": "devin_vassell",
+    "nba_player_id": 1630170,
     "name": "Devin Vassell",
     "team_id": "sas",
     "position": "G-F",
@@ -11133,6 +11639,7 @@
   },
   {
     "player_id": "dylan_harper",
+    "nba_player_id": 1642844,
     "name": "Dylan Harper",
     "team_id": "sas",
     "position": "G",
@@ -11155,6 +11662,7 @@
   },
   {
     "player_id": "emanuel_miller",
+    "nba_player_id": 1641801,
     "name": "Emanuel Miller",
     "team_id": "sas",
     "position": "F",
@@ -11177,6 +11685,7 @@
   },
   {
     "player_id": "harrison_barnes",
+    "nba_player_id": 203084,
     "name": "Harrison Barnes",
     "team_id": "sas",
     "position": "F",
@@ -11199,6 +11708,7 @@
   },
   {
     "player_id": "harrison_ingram",
+    "nba_player_id": 1631127,
     "name": "Harrison Ingram",
     "team_id": "sas",
     "position": "F",
@@ -11221,6 +11731,7 @@
   },
   {
     "player_id": "jordan_mclaughlin",
+    "nba_player_id": 1629162,
     "name": "Jordan McLaughlin",
     "team_id": "sas",
     "position": "G",
@@ -11243,6 +11754,7 @@
   },
   {
     "player_id": "julian_champagnie",
+    "nba_player_id": 1630577,
     "name": "Julian Champagnie",
     "team_id": "sas",
     "position": "F",
@@ -11265,6 +11777,7 @@
   },
   {
     "player_id": "keldon_johnson",
+    "nba_player_id": 1629640,
     "name": "Keldon Johnson",
     "team_id": "sas",
     "position": "F-G",
@@ -11287,6 +11800,7 @@
   },
   {
     "player_id": "kelly_olynyk",
+    "nba_player_id": 203482,
     "name": "Kelly Olynyk",
     "team_id": "sas",
     "position": "F-C",
@@ -11309,6 +11823,7 @@
   },
   {
     "player_id": "lindy_waters_iii",
+    "nba_player_id": 1630322,
     "name": "Lindy Waters III",
     "team_id": "sas",
     "position": "F",
@@ -11331,6 +11846,7 @@
   },
   {
     "player_id": "luke_kornet",
+    "nba_player_id": 1628436,
     "name": "Luke Kornet",
     "team_id": "sas",
     "position": "C-F",
@@ -11353,6 +11869,7 @@
   },
   {
     "player_id": "mason_plumlee",
+    "nba_player_id": 203486,
     "name": "Mason Plumlee",
     "team_id": "sas",
     "position": "F-C",
@@ -11375,6 +11892,7 @@
   },
   {
     "player_id": "stanley_umude",
+    "nba_player_id": 1630649,
     "name": "Stanley Umude",
     "team_id": "sas",
     "position": "X",
@@ -11397,6 +11915,7 @@
   },
   {
     "player_id": "stephon_castle",
+    "nba_player_id": 1642264,
     "name": "Stephon Castle",
     "team_id": "sas",
     "position": "G",
@@ -11419,6 +11938,7 @@
   },
   {
     "player_id": "victor_wembanyama",
+    "nba_player_id": 1641705,
     "name": "Victor Wembanyama",
     "team_id": "sas",
     "position": "F-C",
@@ -11441,6 +11961,7 @@
   },
   {
     "player_id": "aj_lawson",
+    "nba_player_id": 1630639,
     "name": "A.J. Lawson",
     "team_id": "tor",
     "position": "G",
@@ -11463,6 +11984,7 @@
   },
   {
     "player_id": "alijah_martin",
+    "nba_player_id": 1642918,
     "name": "Alijah Martin",
     "team_id": "tor",
     "position": "G",
@@ -11485,6 +12007,7 @@
   },
   {
     "player_id": "brandon_ingram",
+    "nba_player_id": 1627742,
     "name": "Brandon Ingram",
     "team_id": "tor",
     "position": "F",
@@ -11507,6 +12030,7 @@
   },
   {
     "player_id": "chucky_hepburn",
+    "nba_player_id": 1642935,
     "name": "Chucky Hepburn",
     "team_id": "tor",
     "position": "G",
@@ -11529,6 +12053,7 @@
   },
   {
     "player_id": "collin_murray_boyles",
+    "nba_player_id": 1642867,
     "name": "Collin Murray-Boyles",
     "team_id": "tor",
     "position": "F",
@@ -11551,6 +12076,7 @@
   },
   {
     "player_id": "garrett_temple",
+    "nba_player_id": 202066,
     "name": "Garrett Temple",
     "team_id": "tor",
     "position": "G-F",
@@ -11573,6 +12099,7 @@
   },
   {
     "player_id": "gradey_dick",
+    "nba_player_id": 1641711,
     "name": "Gradey Dick",
     "team_id": "tor",
     "position": "G-F",
@@ -11595,6 +12122,7 @@
   },
   {
     "player_id": "immanuel_quickley",
+    "nba_player_id": 1630193,
     "name": "Immanuel Quickley",
     "team_id": "tor",
     "position": "G",
@@ -11617,6 +12145,7 @@
   },
   {
     "player_id": "jakobe_walter",
+    "nba_player_id": 1642266,
     "name": "Ja'Kobe Walter",
     "team_id": "tor",
     "position": "G",
@@ -11639,6 +12168,7 @@
   },
   {
     "player_id": "jakob_poeltl",
+    "nba_player_id": 1627751,
     "name": "Jakob Poeltl",
     "team_id": "tor",
     "position": "C",
@@ -11661,6 +12191,7 @@
   },
   {
     "player_id": "jamal_shead",
+    "nba_player_id": 1642347,
     "name": "Jamal Shead",
     "team_id": "tor",
     "position": "G",
@@ -11683,6 +12214,7 @@
   },
   {
     "player_id": "jamison_battle",
+    "nba_player_id": 1642419,
     "name": "Jamison Battle",
     "team_id": "tor",
     "position": "F",
@@ -11705,6 +12237,7 @@
   },
   {
     "player_id": "jonathan_mogbo",
+    "nba_player_id": 1642367,
     "name": "Jonathan Mogbo",
     "team_id": "tor",
     "position": "F",
@@ -11727,6 +12260,7 @@
   },
   {
     "player_id": "markelle_fultz",
+    "nba_player_id": 1628365,
     "name": "Markelle Fultz",
     "team_id": "tor",
     "position": "X",
@@ -11749,6 +12283,7 @@
   },
   {
     "player_id": "rj_barrett",
+    "nba_player_id": 1629628,
     "name": "RJ Barrett",
     "team_id": "tor",
     "position": "F-G",
@@ -11771,6 +12306,7 @@
   },
   {
     "player_id": "sandro_mamukelashvili",
+    "nba_player_id": 1630572,
     "name": "Sandro Mamukelashvili",
     "team_id": "tor",
     "position": "F-C",
@@ -11793,6 +12329,7 @@
   },
   {
     "player_id": "scottie_barnes",
+    "nba_player_id": 1630567,
     "name": "Scottie Barnes",
     "team_id": "tor",
     "position": "F-G",
@@ -11815,6 +12352,7 @@
   },
   {
     "player_id": "trayce_jackson_davis",
+    "nba_player_id": 1631218,
     "name": "Trayce Jackson-Davis",
     "team_id": "tor",
     "position": "F",
@@ -11837,6 +12375,7 @@
   },
   {
     "player_id": "ace_bailey",
+    "nba_player_id": 1642846,
     "name": "Ace Bailey",
     "team_id": "uta",
     "position": "F",
@@ -11859,6 +12398,7 @@
   },
   {
     "player_id": "andersson_garcia",
+    "nba_player_id": null,
     "name": "Andersson Garcia",
     "team_id": "uta",
     "position": "X",
@@ -11881,6 +12421,7 @@
   },
   {
     "player_id": "bez_mbeng",
+    "nba_player_id": null,
     "name": "Bez Mbeng",
     "team_id": "uta",
     "position": "G",
@@ -11903,6 +12444,7 @@
   },
   {
     "player_id": "blake_hinson",
+    "nba_player_id": null,
     "name": "Blake Hinson",
     "team_id": "uta",
     "position": "F",
@@ -11925,6 +12467,7 @@
   },
   {
     "player_id": "brice_sensabaugh",
+    "nba_player_id": 1641729,
     "name": "Brice Sensabaugh",
     "team_id": "uta",
     "position": "F",
@@ -11947,6 +12490,7 @@
   },
   {
     "player_id": "cody_williams",
+    "nba_player_id": 1642262,
     "name": "Cody Williams",
     "team_id": "uta",
     "position": "F",
@@ -11969,6 +12513,7 @@
   },
   {
     "player_id": "elijah_harkless",
+    "nba_player_id": 1641989,
     "name": "Elijah Harkless",
     "team_id": "uta",
     "position": "G",
@@ -11991,6 +12536,7 @@
   },
   {
     "player_id": "hayden_gray",
+    "nba_player_id": null,
     "name": "Hayden Gray",
     "team_id": "uta",
     "position": "G",
@@ -12013,6 +12559,7 @@
   },
   {
     "player_id": "isaiah_collier",
+    "nba_player_id": 1642268,
     "name": "Isaiah Collier",
     "team_id": "uta",
     "position": "G",
@@ -12035,6 +12582,7 @@
   },
   {
     "player_id": "jaren_jackson_jr",
+    "nba_player_id": 1628991,
     "name": "Jaren Jackson Jr.",
     "team_id": "uta",
     "position": "F-C",
@@ -12057,6 +12605,7 @@
   },
   {
     "player_id": "john_konchar",
+    "nba_player_id": 1629723,
     "name": "John Konchar",
     "team_id": "uta",
     "position": "G",
@@ -12079,6 +12628,7 @@
   },
   {
     "player_id": "jusuf_nurkic",
+    "nba_player_id": 203994,
     "name": "Jusuf Nurkić",
     "team_id": "uta",
     "position": "C",
@@ -12101,6 +12651,7 @@
   },
   {
     "player_id": "kennedy_chandler",
+    "nba_player_id": 1631113,
     "name": "Kennedy Chandler",
     "team_id": "uta",
     "position": "X",
@@ -12123,6 +12674,7 @@
   },
   {
     "player_id": "kevin_love",
+    "nba_player_id": 201567,
     "name": "Kevin Love",
     "team_id": "uta",
     "position": "F-C",
@@ -12145,6 +12697,7 @@
   },
   {
     "player_id": "keyonte_george",
+    "nba_player_id": 1641718,
     "name": "Keyonte George",
     "team_id": "uta",
     "position": "G",
@@ -12167,6 +12720,7 @@
   },
   {
     "player_id": "kyle_filipowski",
+    "nba_player_id": 1642271,
     "name": "Kyle Filipowski",
     "team_id": "uta",
     "position": "C",
@@ -12189,6 +12743,7 @@
   },
   {
     "player_id": "lauri_markkanen",
+    "nba_player_id": 1628374,
     "name": "Lauri Markkanen",
     "team_id": "uta",
     "position": "F-C",
@@ -12211,6 +12766,7 @@
   },
   {
     "player_id": "mo_bamba",
+    "nba_player_id": 1628964,
     "name": "Mo Bamba",
     "team_id": "uta",
     "position": "X",
@@ -12233,6 +12789,7 @@
   },
   {
     "player_id": "oscar_tshiebwe",
+    "nba_player_id": 1631131,
     "name": "Oscar Tshiebwe",
     "team_id": "uta",
     "position": "F-C",
@@ -12255,6 +12812,7 @@
   },
   {
     "player_id": "svi_mykhailiuk",
+    "nba_player_id": 1629004,
     "name": "Svi Mykhailiuk",
     "team_id": "uta",
     "position": "G-F",
@@ -12277,6 +12835,7 @@
   },
   {
     "player_id": "vince_williams_jr",
+    "nba_player_id": 1631246,
     "name": "Vince Williams Jr.",
     "team_id": "uta",
     "position": "X",
@@ -12299,6 +12858,7 @@
   },
   {
     "player_id": "walker_kessler",
+    "nba_player_id": 1631117,
     "name": "Walker Kessler",
     "team_id": "uta",
     "position": "C",
@@ -12321,6 +12881,7 @@
   },
   {
     "player_id": "alex_sarr",
+    "nba_player_id": 1642259,
     "name": "Alex Sarr",
     "team_id": "was",
     "position": "C",
@@ -12343,6 +12904,7 @@
   },
   {
     "player_id": "alondes_williams",
+    "nba_player_id": 1631214,
     "name": "Alondes Williams",
     "team_id": "was",
     "position": "X",
@@ -12365,6 +12927,7 @@
   },
   {
     "player_id": "anthony_davis",
+    "nba_player_id": 203076,
     "name": "Anthony Davis",
     "team_id": "was",
     "position": "F-C",
@@ -12387,6 +12950,7 @@
   },
   {
     "player_id": "anthony_gill",
+    "nba_player_id": 1630264,
     "name": "Anthony Gill",
     "team_id": "was",
     "position": "F",
@@ -12409,6 +12973,7 @@
   },
   {
     "player_id": "bilal_coulibaly",
+    "nba_player_id": 1641731,
     "name": "Bilal Coulibaly",
     "team_id": "was",
     "position": "G",
@@ -12431,6 +12996,7 @@
   },
   {
     "player_id": "bub_carrington",
+    "nba_player_id": 1642267,
     "name": "Bub Carrington",
     "team_id": "was",
     "position": "G",
@@ -12453,6 +13019,7 @@
   },
   {
     "player_id": "cam_whitmore",
+    "nba_player_id": 1641715,
     "name": "Cam Whitmore",
     "team_id": "was",
     "position": "F",
@@ -12475,6 +13042,7 @@
   },
   {
     "player_id": "dangelo_russell",
+    "nba_player_id": 1626156,
     "name": "D'Angelo Russell",
     "team_id": "was",
     "position": "G",
@@ -12497,6 +13065,7 @@
   },
   {
     "player_id": "jaden_hardy",
+    "nba_player_id": 1630702,
     "name": "Jaden Hardy",
     "team_id": "was",
     "position": "G",
@@ -12519,6 +13088,7 @@
   },
   {
     "player_id": "jamir_watkins",
+    "nba_player_id": 1642364,
     "name": "Jamir Watkins",
     "team_id": "was",
     "position": "F",
@@ -12541,6 +13111,7 @@
   },
   {
     "player_id": "julian_reese",
+    "nba_player_id": null,
     "name": "Julian Reese",
     "team_id": "was",
     "position": "F",
@@ -12563,6 +13134,7 @@
   },
   {
     "player_id": "justin_champagnie",
+    "nba_player_id": 1630551,
     "name": "Justin Champagnie",
     "team_id": "was",
     "position": "G-F",
@@ -12585,6 +13157,7 @@
   },
   {
     "player_id": "kadary_richmond",
+    "nba_player_id": null,
     "name": "Kadary Richmond",
     "team_id": "was",
     "position": "X",
@@ -12607,6 +13180,7 @@
   },
   {
     "player_id": "kyshawn_george",
+    "nba_player_id": 1642273,
     "name": "Kyshawn George",
     "team_id": "was",
     "position": "F",
@@ -12629,6 +13203,7 @@
   },
   {
     "player_id": "leaky_black",
+    "nba_player_id": 1641778,
     "name": "Leaky Black",
     "team_id": "was",
     "position": "F",
@@ -12651,6 +13226,7 @@
   },
   {
     "player_id": "malaki_branham",
+    "nba_player_id": 1631103,
     "name": "Malaki Branham",
     "team_id": "was",
     "position": "X",
@@ -12673,6 +13249,7 @@
   },
   {
     "player_id": "sharife_cooper",
+    "nba_player_id": 1630536,
     "name": "Sharife Cooper",
     "team_id": "was",
     "position": "G",
@@ -12695,6 +13272,7 @@
   },
   {
     "player_id": "skal_labissiere",
+    "nba_player_id": 1627746,
     "name": "Skal Labissiere",
     "team_id": "was",
     "position": "X",
@@ -12717,6 +13295,7 @@
   },
   {
     "player_id": "trae_young",
+    "nba_player_id": 1629027,
     "name": "Trae Young",
     "team_id": "was",
     "position": "G",
@@ -12739,6 +13318,7 @@
   },
   {
     "player_id": "tre_johnson",
+    "nba_player_id": 1642848,
     "name": "Tre Johnson",
     "team_id": "was",
     "position": "G",
@@ -12761,6 +13341,7 @@
   },
   {
     "player_id": "tristan_vukcevic",
+    "nba_player_id": 1641774,
     "name": "Tristan Vukcevic",
     "team_id": "was",
     "position": "F",
@@ -12783,6 +13364,7 @@
   },
   {
     "player_id": "will_riley",
+    "nba_player_id": 1642860,
     "name": "Will Riley",
     "team_id": "was",
     "position": "F",

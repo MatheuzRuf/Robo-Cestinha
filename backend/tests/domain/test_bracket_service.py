@@ -16,10 +16,17 @@ class FakeBracketRepository:
         self.session_id = uuid.uuid4()
         self.owner_id = uuid.uuid4()
         self.session = SimpleNamespace(id=self.session_id, owner_id=self.owner_id)
-        self.team_ids = [uuid.uuid4() for _ in range(8)]
-        self.team_names = {
-            team_id: f"Team {index}" for index, team_id in enumerate(self.team_ids)
-        }
+        self.teams = [
+            SimpleNamespace(
+                id=uuid.uuid4(),
+                name=f"Team {index}",
+                abbreviation=f"T{index}",
+                nba_team_id=1610612737 + index,
+            )
+            for index in range(8)
+        ]
+        self.team_ids = [team.id for team in self.teams]
+        self.teams_by_id = {team.id: team for team in self.teams}
         self.matches: list[Match] = []
         self.commits = 0
 
@@ -27,8 +34,8 @@ class FakeBracketRepository:
         return [
             (
                 match,
-                self.team_names.get(match.home_team_id),
-                self.team_names.get(match.away_team_id),
+                self.teams_by_id.get(match.home_team_id),
+                self.teams_by_id.get(match.away_team_id),
             )
             for match in sorted(
                 self.matches, key=lambda item: (item.round, item.slot_in_round)
@@ -91,6 +98,11 @@ async def test_owner_generation_persists_one_complete_bracket():
     ]
     assert all(
         match["home_team"] is not None and match["away_team"] is not None
+        for match in bracket["rounds"][0]["matches"]
+    )
+    assert all(
+        match["home_team"]["nba_team_id"] is not None
+        and match["away_team"]["nba_team_id"] is not None
         for match in bracket["rounds"][0]["matches"]
     )
     assert repository.commits == 1

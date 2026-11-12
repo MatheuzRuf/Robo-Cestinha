@@ -51,6 +51,7 @@ def build_catalog_records(
                 catalog_id=team.team_id,
                 name=team.name,
                 abbreviation=team.abbreviation,
+                nba_team_id=team.nba_team_id,
                 team_stats=team.team_stats.model_dump(),
             )
         )
@@ -63,6 +64,7 @@ def build_catalog_records(
                     catalog_id=player.player_id,
                     team_id=database_team_id,
                     name=player.name,
+                    nba_player_id=player.nba_player_id,
                     position=player.position,
                     position5=player.position5,
                     is_starter=player.is_starter,
@@ -81,11 +83,22 @@ async def seed_catalog() -> None:
     teams, players = build_catalog_records(teams_raw, players_raw)
 
     async with AsyncSessionLocal() as db:
-        existing = (await db.execute(select(TeamModel.id))).scalars().all()
+        existing = (await db.execute(select(TeamModel))).scalars().all()
         if existing:
+            seeded_teams = {team.catalog_id: team for team in teams}
+            seeded_players = {player.catalog_id: player for player in players}
+            existing_players = (await db.execute(select(PlayerModel))).scalars().all()
+            for team in existing:
+                source = seeded_teams.get(team.catalog_id)
+                if source is not None:
+                    team.nba_team_id = source.nba_team_id
+            for player in existing_players:
+                source = seeded_players.get(player.catalog_id)
+                if source is not None:
+                    player.nba_player_id = source.nba_player_id
+            await db.commit()
             print(
-                f"Catalog already seeded ({len(existing)} teams found) - skipping. "
-                "Run make reset-db before seeding the selected eight teams."
+                f"Catalog already seeded ({len(existing)} teams found) - synced NBA IDs."
             )
             return
 

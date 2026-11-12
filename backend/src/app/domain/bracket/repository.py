@@ -21,20 +21,20 @@ class BracketRepository(BaseRepository):
 
     async def list_matches(
         self, session_id: uuid.UUID
-    ) -> list[tuple[Match, str | None, str | None]]:
-        """Return matches and their assigned team names in bracket order.
+    ) -> list[tuple[Match, Team | None, Team | None]]:
+        """Return matches and their assigned teams in bracket order.
 
         Args:
             session_id: Session that owns the bracket.
 
         Returns:
-            Match rows with optional home and away team names.
+            Match rows with optional home and away teams.
         """
 
         home_team = aliased(Team)
         away_team = aliased(Team)
         statement = (
-            select(Match, home_team.name, away_team.name)
+            select(Match, home_team, away_team)
             .outerjoin(home_team, Match.home_team_id == home_team.id)
             .outerjoin(away_team, Match.away_team_id == away_team.id)
             .where(Match.session_id == session_id)

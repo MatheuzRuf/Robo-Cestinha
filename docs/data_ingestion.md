@@ -15,8 +15,8 @@ clutch splits) into the two files every downstream component consumes:
 
 | Output | Contents |
 |---|---|
-| `players.json` | 582 players with ≥1 minute played, each with identity (slug, name, team, positions) + the **12 simulator attributes** (all 0–1) + `is_starter` |
-| `teams.json` | 30 teams with name, abbreviation, season, `team_stats` (pace, off/def rating) and a `roster` of player ids |
+| `players.json` | 582 players with ≥1 minute played, each with identity (slug, optional numeric NBA player id, name, team, positions) + the **12 simulator attributes** (all 0–1) + `is_starter` |
+| `teams.json` | 30 teams with numeric NBA team id, name, abbreviation, season, `team_stats` (pace, off/def rating) and a `roster` of player ids |
 | `attributes_table.csv` | flat table: every raw endpoint column + every derived attribute (for ML / debugging) |
 | `data_quality.json` | coverage & sanity report (see §8) |
 
@@ -205,8 +205,15 @@ in statistics.md §2–§6. The only machine-level details worth restating:
 ### 6.4 `_build_players_json` / `_build_teams_json` — the output files
 
 - `players.json`: one object per master row, sorted by `team_id` then name.
-- `teams.json`: one object per team (sorted by `team_abv`), roster built from
+  `nba_player_id` is the numeric `PLAYER_ID` supplied by the NBA stats feed.
+- `teams.json`: one object per team (sorted by `team_abv`), with `nba_team_id`
+  from the NBA `TEAM_ID`; roster built from
   the *players* table (`m`), see §7.
+
+The processed catalog stores NBA IDs rather than a fixed image URL. The frontend
+builds NBA CDN URLs from those IDs and selects the thumbnail or profile image
+rendition needed by each view. Player IDs can be null when the catalog has no
+verified match; those entries use an initials fallback in the UI.
 
 ### 6.5 The contract gate (`schemas.py`) — before any write
 

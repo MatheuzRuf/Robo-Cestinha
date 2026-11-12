@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from app.data_ingestion.schemas import Player as EnginePlayer
-from app.data_ingestion.schemas import PlayerAttributes, Team as EngineTeam
-from app.data_ingestion.schemas import TeamStats
+from app.data_ingestion.schemas import PlayerAttributes, TeamStats
+from app.data_ingestion.schemas import Team as EngineTeam
+from app.domain.matches.types import EngineIdMap, MatchContext, MatchSimulationResult
 from app.engine.entities import LiveTeam
 from app.engine.match_runner import MatchRunner
 from app.engine.schemas import EngineSimulationResult, SimulationEvent, SimulationFrame
-from app.domain.matches.types import EngineIdMap, MatchContext, MatchSimulationResult
 
 GRID_WIDTH = 9.0
 GRID_HEIGHT = 4.0
@@ -77,11 +77,13 @@ class MatchEngineAdapter:
             teams={
                 "home": {
                     "teamId": context.home_team.id,
+                    "nbaTeamId": getattr(context.home_team, "nba_team_id", None),
                     "name": context.home_team.name,
                     "abbreviation": context.home_team.abbreviation,
                 },
                 "away": {
                     "teamId": context.away_team.id,
+                    "nbaTeamId": getattr(context.away_team, "nba_team_id", None),
                     "name": context.away_team.name,
                     "abbreviation": context.away_team.abbreviation,
                 },
@@ -130,6 +132,7 @@ class MatchEngineAdapter:
             for player in players:
                 yield {
                     "playerId": player.id,
+                    "nbaPlayerId": getattr(player, "nba_player_id", None),
                     "teamId": player.team_id,
                     "side": side,
                     "name": player.name,
