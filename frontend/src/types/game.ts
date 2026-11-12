@@ -6,6 +6,7 @@ export interface PlayerState {
   x: number; // feet
   y: number; // feet
   name: string;
+  nbaPlayerId?: number | null;
   number?: number;
   position: string;
 }

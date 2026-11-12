@@ -21,6 +21,8 @@
   --color-warning: #f2b705;
   --color-trajectory-opponent: #22d3ee;
   --color-success: #4c9a6a;
+  --color-team-blue: #1d4ed8;
+  --color-team-red: #dc2626;
 
   /* Keep the in-game court accent independent from UI warning text colors. */
   --color-court-warning: #f2b705;

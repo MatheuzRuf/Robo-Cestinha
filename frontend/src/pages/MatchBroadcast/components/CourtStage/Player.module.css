@@ -1,14 +1,14 @@
 .player {
   fill: var(--team-color);
   stroke: #f8ead7;
-  stroke-width: 1.5;
+  stroke-width: 2;
 }
 
 .playerRing {
   fill: none;
   stroke: var(--team-color);
-  stroke-width: 2;
-  opacity: 0.55;
+  stroke-width: 3;
+  opacity: 1;
 }
 
 .number,

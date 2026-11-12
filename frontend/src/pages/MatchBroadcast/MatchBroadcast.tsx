@@ -26,10 +26,33 @@ export default function MatchBroadcast() {
   const userId = activeSession?.userId ?? null;
   const { t } = useTranslation();
   const requestController = useRef<AbortController | null>(null);
+  const pageRef = useRef<HTMLElement>(null);
   const [simulation, setSimulation] = useState<SimulationResponse | null>(null);
   const [initialFrameIndex, setInitialFrameIndex] = useState(0);
+  const [isFullMode, setIsFullMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(true);
+
+  useEffect(() => {
+    const syncFullMode = () => setIsFullMode(document.fullscreenElement === pageRef.current);
+    document.addEventListener('fullscreenchange', syncFullMode);
+    return () => document.removeEventListener('fullscreenchange', syncFullMode);
+  }, []);
+
+  const toggleFullMode = useCallback(async () => {
+    const page = pageRef.current;
+    if (!page) return;
+
+    try {
+      if (document.fullscreenElement === page) {
+        await document.exitFullscreen();
+      } else {
+        await page.requestFullscreen();
+      }
+    } catch {
+      setIsFullMode(document.fullscreenElement === page);
+    }
+  }, []);
 
   const loadSimulation = useCallback(async () => {
     requestController.current?.abort();
@@ -108,6 +131,7 @@ export default function MatchBroadcast() {
               x: position.x,
               y: position.y,
               name: player.name,
+              nbaPlayerId: player.nbaPlayerId,
               number: player.number ?? undefined,
               position: player.position,
             },
@@ -173,7 +197,7 @@ export default function MatchBroadcast() {
     : undefined;
 
   return (
-    <main className={styles.page}>
+    <main className={styles.page} ref={pageRef}>
       {!sessionHash || !userId ? (
         <div className={styles.statusMessage} role="status">
           {t('match_broadcast.simulation.no_active_session')}
@@ -201,10 +225,9 @@ export default function MatchBroadcast() {
             totalFrames={simulation.frames.length}
             speed={playback.speed}
             setSpeed={playback.setSpeed}
-            isPaused={playback.isPaused}
             isComplete={playback.isComplete}
-            onTogglePause={playback.isPaused ? playback.resume : playback.pause}
-            onRestart={restartPlayback}
+            isFullMode={isFullMode}
+            onToggleFullMode={toggleFullMode}
           />
           <section className={styles.broadcastMainGrid}>
             <div className={styles.centerColumn}>
@@ -224,16 +247,22 @@ export default function MatchBroadcast() {
               <SimulationProgress
                 currentFrame={playback.frameIndex + 1}
                 totalFrames={simulation.frames.length}
+                isPaused={playback.isPaused}
+                isComplete={playback.isComplete}
                 onSeek={playback.seek}
                 onSeekStart={playback.beginSeeking}
                 onSeekEnd={playback.endSeeking}
+                onTogglePause={playback.isPaused ? playback.resume : playback.pause}
+                onRestart={restartPlayback}
               />
             </div>
-            <SimulationEvents
-              events={simulation.events}
-              players={simulation.players}
-              currentIteration={currentSimulationFrame.iteration}
-            />
+            {isFullMode ? null : (
+              <SimulationEvents
+                events={simulation.events}
+                players={simulation.players}
+                currentIteration={currentSimulationFrame.iteration}
+              />
+            )}
           </section>
         </>
       )}

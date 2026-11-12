@@ -1,4 +1,4 @@
-import { CircleDot } from 'lucide-react';
+import { CircleDot, Maximize, Minimize } from 'lucide-react';
 import { Button } from '../../../../components/Button';
 import { NbaImage } from '../../../../components/NbaImage';
 import { SegmentedControl } from '../../../../components/SegmentedControl';
@@ -50,10 +50,9 @@ type ScoreboardProps = {
   totalFrames: number;
   speed: Speed;
   setSpeed: (speed: Speed) => void;
-  isPaused: boolean;
   isComplete: boolean;
-  onTogglePause: () => void;
-  onRestart: () => void;
+  isFullMode: boolean;
+  onToggleFullMode: () => void;
 };
 
 export function Scoreboard({
@@ -66,10 +65,9 @@ export function Scoreboard({
   totalFrames,
   speed,
   setSpeed,
-  isPaused,
   isComplete,
-  onTogglePause,
-  onRestart,
+  isFullMode,
+  onToggleFullMode,
 }: ScoreboardProps) {
   const { t } = useTranslation();
 
@@ -97,15 +95,13 @@ export function Scoreboard({
           value={String(speed)}
           onChange={(value) => setSpeed(Number(value) as Speed)}
         />
-        {isComplete ? (
-          <Button variant="outline" onClick={onRestart}>
-            {t('match_broadcast.simulation.replay')}
-          </Button>
-        ) : (
-          <Button variant="outline" onClick={onTogglePause}>
-            {isPaused ? t('match_broadcast.clock.resume') : t('match_broadcast.clock.pause')}
-          </Button>
-        )}
+        <Button
+          variant="outline"
+          icon={isFullMode ? <Minimize size={16} aria-hidden="true" /> : <Maximize size={16} aria-hidden="true" />}
+          onClick={onToggleFullMode}
+        >
+          {t(isFullMode ? 'match_broadcast.simulation.exit_full_mode' : 'match_broadcast.simulation.full_mode')}
+        </Button>
       </div>
       <TeamSummaryBlock
         side="away"
