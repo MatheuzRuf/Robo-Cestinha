@@ -191,7 +191,7 @@ export const ptBR = {
       frame_progress: 'QUADRO {current} / {total}',
       seek_label: 'Avançar ou voltar pelos quadros da partida',
       basket_made: 'CESTA! +{points}',
-      events_title: 'EVENTOS ({count})',
+      events_title: 'EVENTOS ({visible} / {total})',
       events_empty: 'Nenhum evento disponível.',
       court_label: 'Quadra de basquete animada',
       event_game_started: 'Simulação iniciada.',

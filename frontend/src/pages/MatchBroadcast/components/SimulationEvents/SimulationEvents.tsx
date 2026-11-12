@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import { NbaImage } from '../../../../components/NbaImage';
 import { useTranslation } from '../../../../lib/i18n/i18n';
 import type { SimulationEvent, SimulationPlayer } from '../../../../types/matchBroadcast';
@@ -12,17 +12,22 @@ interface SimulationEventsProps {
 
 export function SimulationEvents({ events, players, currentIteration }: SimulationEventsProps) {
   const { t } = useTranslation();
+  const panelRef = useRef<HTMLElement>(null);
+  const isFollowingLatest = useRef(true);
   const playersById = useMemo(() => new Map(players.map((player) => [player.playerId, player])), [players]);
   const visibleEvents = useMemo(
     () =>
-      [...events].sort((first, second) => {
-        const firstIsCurrent = first.iteration === currentIteration;
-        const secondIsCurrent = second.iteration === currentIteration;
-        if (firstIsCurrent !== secondIsCurrent) return firstIsCurrent ? -1 : 1;
-        return second.sequence - first.sequence;
-      }),
+      events
+        .filter((event) => event.iteration <= currentIteration)
+        .sort((first, second) => second.sequence - first.sequence),
     [currentIteration, events],
   );
+
+  useLayoutEffect(() => {
+    if (isFollowingLatest.current && panelRef.current) {
+      panelRef.current.scrollTop = 0;
+    }
+  }, [currentIteration, visibleEvents.length]);
 
   function eventMessage(event: SimulationEvent) {
     const player = playersById.get(event.playerId ?? '');
@@ -56,10 +61,22 @@ export function SimulationEvents({ events, players, currentIteration }: Simulati
 
   return (
     <section
+      ref={panelRef}
       className={styles.panel}
-      aria-label={t('match_broadcast.simulation.events_title', { count: events.length })}
+      onScroll={(event) => {
+        isFollowingLatest.current = event.currentTarget.scrollTop <= 1;
+      }}
+      aria-label={t('match_broadcast.simulation.events_title', {
+        visible: visibleEvents.length,
+        total: events.length,
+      })}
     >
-      <h2 className={styles.heading}>{t('match_broadcast.simulation.events_title', { count: events.length })}</h2>
+      <h2 className={styles.heading}>
+        {t('match_broadcast.simulation.events_title', {
+          visible: visibleEvents.length,
+          total: events.length,
+        })}
+      </h2>
       {visibleEvents.length === 0 ? (
         <p className={styles.empty}>{t('match_broadcast.simulation.events_empty')}</p>
       ) : (

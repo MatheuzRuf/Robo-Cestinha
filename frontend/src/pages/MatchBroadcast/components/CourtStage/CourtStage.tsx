@@ -58,7 +58,7 @@ export function CourtStage({
   return (
     <div className={styles.stage}>
       <svg
-        viewBox="0 0 940 500"
+        viewBox="-40 -36 1020 572"
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label={t('match_broadcast.simulation.court_label')}

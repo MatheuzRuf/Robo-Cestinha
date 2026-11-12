@@ -191,7 +191,7 @@ export const enUS = {
       frame_progress: 'FRAME {current} / {total}',
       seek_label: 'Seek through match frames',
       basket_made: 'BASKET! +{points}',
-      events_title: 'EVENTS ({count})',
+      events_title: 'EVENTS ({visible} / {total})',
       events_empty: 'No events are available.',
       court_label: 'Animated basketball court',
       event_game_started: 'Simulation started.',
