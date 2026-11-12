@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card } from '../../../components/Card';
+import { NbaImage } from '../../../components/NbaImage';
 import { useTranslation } from '../../../lib/i18n/i18n';
 import type { PlayerAttributes, TeamPlayer } from '../../../types/team';
 import { getPlayerCatalogPercentiles } from '../data/playerStatProfile';
@@ -70,7 +71,15 @@ export function PlayerStatNet({ player, embedded = false }: { player: TeamPlayer
   const content = (
     <>
       <header className={styles.heading}>
-        <div>
+        <NbaImage
+          kind="player"
+          nbaId={player.nbaPlayerId}
+          size="profile"
+          alt={`${player.name} portrait`}
+          fallback={player.name}
+          className={styles.playerPortrait}
+        />
+        <div className={styles.playerIdentity}>
           <p className={styles.eyebrow}>{t('team_locker.player_profile.title')}</p>
           {embedded ? <h3>{player.name}</h3> : <h2>{player.name}</h2>}
         </div>

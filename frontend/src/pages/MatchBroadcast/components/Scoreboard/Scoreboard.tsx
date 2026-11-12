@@ -1,5 +1,6 @@
 import { CircleDot } from 'lucide-react';
 import { Button } from '../../../../components/Button';
+import { NbaImage } from '../../../../components/NbaImage';
 import { SegmentedControl } from '../../../../components/SegmentedControl';
 import { useTranslation } from '../../../../lib/i18n/i18n';
 import type { SimulationTeam, Speed } from '../../../../types/matchBroadcast';
@@ -18,12 +19,21 @@ function TeamSummaryBlock({
 }) {
   return (
     <div className={`${styles.teamSummary} ${side === 'away' ? styles.awaySummary : ''}`}>
-      <div className={styles.teamCopy}>
-        <strong>{team.name}</strong>
-        <span className={styles.teamMeta}>
-          {hasPossession ? <CircleDot className={styles.possessionIcon} size={12} aria-hidden="true" /> : null}
-          {team.abbreviation}
-        </span>
+      <div className={styles.teamIdentity}>
+        <NbaImage
+          kind="team"
+          nbaId={team.nbaTeamId}
+          alt={`${team.name} logo`}
+          fallback={team.abbreviation}
+          className={styles.teamLogo}
+        />
+        <div className={styles.teamCopy}>
+          <strong>{team.name}</strong>
+          <span className={styles.teamMeta}>
+            {hasPossession ? <CircleDot className={styles.possessionIcon} size={12} aria-hidden="true" /> : null}
+            {team.abbreviation}
+          </span>
+        </div>
       </div>
       <strong className={styles.score}>{score}</strong>
     </div>

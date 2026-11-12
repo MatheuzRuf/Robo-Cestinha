@@ -19,6 +19,7 @@ export interface PlayerAttributes {
 
 export interface TeamPlayer {
   id: string;
+  nbaPlayerId?: number | null;
   name: string;
   position: string;
   positionGroup: string;
@@ -34,6 +35,7 @@ export interface TeamStatistics {
 
 export interface LockerTeam {
   id: string;
+  nbaTeamId?: number | null;
   name: string;
   abbreviation: string;
   season: string;
