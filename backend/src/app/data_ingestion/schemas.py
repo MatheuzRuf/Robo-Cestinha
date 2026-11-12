@@ -25,15 +25,15 @@ import re
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
 __all__ = [
-    "SchemaValidationError",
     "Player",
     "PlayerAttributes",
+    "SchemaValidationError",
     "Team",
     "TeamStats",
     "validate_players",
-    "validate_teams",
-    "validate_referential_integrity",
     "validate_processed_output",
+    "validate_referential_integrity",
+    "validate_teams",
 ]
 
 
@@ -74,6 +74,7 @@ class Player(BaseModel):
     model_config = {"extra": "forbid"}
 
     player_id: str = Field(min_length=1)
+    nba_player_id: int | None = Field(default=None, gt=0)
     name: str = Field(min_length=1)
     team_id: str = Field(min_length=1)
     position: str
@@ -124,6 +125,7 @@ class Team(BaseModel):
     model_config = {"extra": "forbid"}
 
     team_id: str = Field(min_length=1)
+    nba_team_id: int | None = Field(default=None, gt=0)
     name: str = Field(min_length=1)
     abbreviation: str = Field(min_length=2, max_length=4)
     roster: list[str]

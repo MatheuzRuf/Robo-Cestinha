@@ -2,12 +2,14 @@ export type Speed = 1 | 1.5 | 2;
 
 export interface SimulationTeam {
   teamId: string;
+  nbaTeamId?: number | null;
   name: string;
   abbreviation: string;
 }
 
 export interface SimulationPlayer {
   playerId: string;
+  nbaPlayerId?: number | null;
   teamId: string;
   side: 'home' | 'away';
   name: string;

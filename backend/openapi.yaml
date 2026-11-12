@@ -187,3 +187,9 @@ components:
           format: uuid
         name:
           type: string
+        abbreviation:
+          type: string
+          nullable: true
+        nba_team_id:
+          type: integer
+          nullable: true

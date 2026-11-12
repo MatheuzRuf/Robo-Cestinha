@@ -1,7 +1,7 @@
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, Boolean, ForeignKey, String
+from sqlalchemy import JSON, Boolean, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -25,6 +25,7 @@ class Player(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     attributes: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     catalog_id: Mapped[str | None] = mapped_column(String, nullable=True, unique=True)
+    nba_player_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     position: Mapped[str | None] = mapped_column(String, nullable=True)
     position5: Mapped[str | None] = mapped_column(String, nullable=True)
     is_starter: Mapped[bool | None] = mapped_column(Boolean, nullable=True)

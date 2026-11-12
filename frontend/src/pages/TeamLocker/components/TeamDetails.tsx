@@ -1,4 +1,5 @@
 import { Card } from '../../../components/Card';
+import { NbaImage } from '../../../components/NbaImage';
 import { useTranslation } from '../../../lib/i18n/i18n';
 import type { LockerTeam } from '../../../types/team';
 import styles from './TeamDetails.module.css';
@@ -15,9 +16,13 @@ export function TeamDetails({ team }: { team: LockerTeam }) {
     <Card className={styles.overviewCard}>
       <div className={styles.teamHeader}>
         <div className={styles.teamIdentity}>
-          <div className={styles.teamAbbreviation} aria-hidden="true">
-            {team.abbreviation}
-          </div>
+          <NbaImage
+            kind="team"
+            nbaId={team.nbaTeamId}
+            alt={`${team.name} logo`}
+            fallback={team.abbreviation}
+            className={styles.teamAbbreviation}
+          />
           <div className={styles.teamHeading}>
             <div className={styles.eyebrow}>
               <span>{team.season}</span>

@@ -28,6 +28,7 @@ def test_catalog_records_include_only_selected_teams_and_their_rostered_players(
         source_team = source_teams[team_id]
         assert team.name == source_team["name"]
         assert team.abbreviation == source_team["abbreviation"]
+        assert team.nba_team_id == source_team["nba_team_id"]
         assert team.team_stats == source_team["team_stats"]
         assert not hasattr(team, "season")
 
@@ -36,6 +37,7 @@ def test_catalog_records_include_only_selected_teams_and_their_rostered_players(
             source_player = source_players[player_id]
             assert player.team_id == team.id
             assert player.name == source_player["name"]
+            assert player.nba_player_id == source_player["nba_player_id"]
             assert player.position == source_player["position"]
             assert player.position5 == source_player["position5"]
             assert player.is_starter == source_player["is_starter"]

@@ -42,6 +42,7 @@ def _load_mock_teams() -> list[dict[str, Any]]:
                 {
                     "id": player["player_id"],
                     "name": player["name"],
+                    "nbaPlayerId": player.get("nba_player_id"),
                     "position": player["position5"],
                     "positionGroup": player["position"],
                     "isStarter": player["is_starter"],
@@ -67,6 +68,7 @@ def _load_mock_teams() -> list[dict[str, Any]]:
             {
                 "id": catalog_team["team_id"],
                 "name": catalog_team["name"],
+                "nbaTeamId": catalog_team.get("nba_team_id"),
                 "abbreviation": catalog_team["abbreviation"],
                 "season": catalog_team["season"],
                 "statistics": {

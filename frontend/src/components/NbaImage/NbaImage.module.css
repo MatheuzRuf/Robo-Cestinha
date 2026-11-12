@@ -1,0 +1,30 @@
+.frame {
+  display: grid;
+  flex: 0 0 auto;
+  overflow: hidden;
+  place-items: center;
+  background: var(--color-bg);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.image[data-kind='player'] {
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.image[data-kind='team'] {
+  object-fit: contain;
+}
+
+.fallbackFrame {
+  color: var(--color-warning);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-align: center;
+}

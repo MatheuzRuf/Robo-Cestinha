@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { Card } from '../../../components/Card';
+import { NbaImage } from '../../../components/NbaImage';
 import { useTranslation } from '../../../lib/i18n/i18n';
 import type { LockerTeam } from '../../../types/team';
 import { PlayerStatNet } from './PlayerStatNet';
@@ -59,15 +60,24 @@ export function TeamRoster({ team, expandedPlayerId, onTogglePlayer }: TeamRoste
                       {player.position}
                     </th>
                     <td>
-                      <button
-                        id={toggleId}
-                        className={styles.playerButton}
-                        type="button"
-                        aria-expanded={isExpanded}
-                        aria-controls={profileId}
-                      >
-                        {player.name}
-                      </button>
+                      <div className={styles.playerCell}>
+                        <NbaImage
+                          kind="player"
+                          nbaId={player.nbaPlayerId}
+                          alt=""
+                          fallback={player.name}
+                          className={styles.playerThumbnail}
+                        />
+                        <button
+                          id={toggleId}
+                          className={styles.playerButton}
+                          type="button"
+                          aria-expanded={isExpanded}
+                          aria-controls={profileId}
+                        >
+                          {player.name}
+                        </button>
+                      </div>
                     </td>
                     <td className={styles.role} data-starter={player.isStarter}>
                       {player.isStarter ? t('team_locker.roster.starter') : t('team_locker.roster.non_starter')}

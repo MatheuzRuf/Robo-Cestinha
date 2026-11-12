@@ -13,9 +13,7 @@ import json
 import numpy as np
 import pandas as pd
 
-from . import config
-from . import bballref
-from . import schemas
+from . import bballref, config, schemas
 from .normalize import (
     ascii_slug,
     league_possessions_per_game,
@@ -366,6 +364,9 @@ def _build_players_json(m: pd.DataFrame) -> list[dict]:
         players.append(
             {
                 "player_id": row.player_id,
+                "nba_player_id": int(row.PLAYER_ID)
+                if pd.notna(row.PLAYER_ID)
+                else None,
                 "name": str(row.NAME),
                 "team_id": str(row.team_id),
                 "position": str(row.POSITION),  # official NBA (G/F/C + combos)
@@ -397,6 +398,7 @@ def _build_teams_json(m: pd.DataFrame, t: pd.DataFrame) -> list[dict]:
         teams.append(
             {
                 "team_id": str(team["team_id"]),
+                "nba_team_id": int(team["TEAM_ID"]),
                 "name": str(team["team_name"]),
                 "abbreviation": abv,
                 "roster": player_ids,

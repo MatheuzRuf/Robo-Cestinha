@@ -100,6 +100,18 @@
   font-size: 0.82rem;
 }
 
+.playerCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.playerThumbnail {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+}
+
 .playerButton {
   padding: 0;
   border: 0;

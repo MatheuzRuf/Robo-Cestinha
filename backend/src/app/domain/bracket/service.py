@@ -2,7 +2,7 @@ import math
 import random
 import uuid
 
-from app.db.models import Match
+from app.db.models import Match, Team
 from app.domain.bracket.repository import BracketRepository
 from app.domain.sessions.service import SessionService
 
@@ -56,7 +56,7 @@ class BracketService:
         }
 
         if generated:
-            for match, home_name, away_name in match_rows:
+            for match, home_team, away_team in match_rows:
                 matches_by_round[match.round].append(
                     {
                         "match_id": match.id,
@@ -65,8 +65,8 @@ class BracketService:
                         "home_score": match.home_score,
                         "away_score": match.away_score,
                         "winner_team_id": match.winner_team_id,
-                        "home_team": self._team_payload(match.home_team_id, home_name),
-                        "away_team": self._team_payload(match.away_team_id, away_name),
+                        "home_team": self._team_payload(match.home_team_id, home_team),
+                        "away_team": self._team_payload(match.away_team_id, away_team),
                     }
                 )
         else:
@@ -124,21 +124,26 @@ class BracketService:
         return await self.get_bracket(session_hash, user_id)
 
     def _team_payload(
-        self, team_id: uuid.UUID | None, team_name: str | None
+        self, team_id: uuid.UUID | None, team: Team | None
     ) -> dict[str, object] | None:
         """Build a response payload for an assigned team.
 
         Args:
             team_id: Assigned team identifier.
-            team_name: Assigned team name.
+            team: Assigned catalog team.
 
         Returns:
             Team details, or None when the slot is empty.
         """
 
-        if team_id is None or team_name is None:
+        if team_id is None or team is None:
             return None
-        return {"id": team_id, "name": team_name}
+        return {
+            "id": team_id,
+            "name": team.name,
+            "abbreviation": team.abbreviation,
+            "nba_team_id": team.nba_team_id,
+        }
 
     async def seed_bracket_for_session(
         self,

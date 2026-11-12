@@ -1,4 +1,5 @@
 import { Check, ChevronRight, ShieldCheck, UsersRound } from 'lucide-react';
+import { NbaImage } from '../../../components/NbaImage';
 import { useTranslation } from '../../../lib/i18n/i18n';
 import type { LockerTeam } from '../../../types/team';
 import styles from './ClubList.module.css';
@@ -84,7 +85,13 @@ function ClubRow({
       aria-label={t('team_locker.select_team', { name: team.name, status: statusLabel })}
       onClick={() => onSelect(team.id)}
     >
-      <span className={styles.abbreviation}>{team.abbreviation}</span>
+      <NbaImage
+        kind="team"
+        nbaId={team.nbaTeamId}
+        alt={`${team.name} logo`}
+        fallback={team.abbreviation}
+        className={styles.abbreviation}
+      />
       <span className={styles.clubInfo}>
         <span className={styles.clubName}>{team.name}</span>
         <span className={styles.clubStatus}>{statusLabel}</span>

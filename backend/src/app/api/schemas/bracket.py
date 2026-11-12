@@ -14,6 +14,8 @@ class BracketTeamResponse(BaseModel):
 
     id: uuid.UUID
     name: str
+    abbreviation: str | None = None
+    nba_team_id: int | None = None
 
 
 class BracketMatchResponse(BaseModel):

@@ -6,6 +6,8 @@ export interface BracketContext {
 export interface BracketTeam {
   id: string;
   name: string;
+  abbreviation?: string | null;
+  nba_team_id?: number | null;
 }
 
 export interface BracketMatch {

@@ -37,6 +37,7 @@ class SimulationTeamSchema(BaseModel):
     """A team in the response pair."""
 
     teamId: uuid.UUID
+    nbaTeamId: int | None = None
     name: str
     abbreviation: str
 
@@ -52,6 +53,7 @@ class PlayerMetadataSchema(BaseModel):
     """Player metadata included once in the response."""
 
     playerId: uuid.UUID
+    nbaPlayerId: int | None = None
     teamId: uuid.UUID
     side: str
     name: str
@@ -139,7 +141,7 @@ class MatchSimulationResponse(BaseModel):
     summary: FinalMatchSummarySchema
 
     @model_validator(mode="after")
-    def _validate_frames(self) -> "MatchSimulationResponse":
+    def _validate_frames(self) -> MatchSimulationResponse:
         iterations = [frame.iteration for frame in self.frames]
         if iterations != list(range(len(self.frames))):
             raise ValueError("frame iterations must start at 0 and be contiguous")

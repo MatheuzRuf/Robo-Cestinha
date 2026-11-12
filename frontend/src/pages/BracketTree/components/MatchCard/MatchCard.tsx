@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../../components/Button';
 import { Card } from '../../../../components/Card';
+import { NbaImage } from '../../../../components/NbaImage';
 import { useTranslation } from '../../../../lib/i18n/i18n';
 import {
   clearMatchPlaybackProgress,
@@ -12,6 +13,8 @@ import styles from './MatchCard.module.css';
 interface MatchTeam {
   id: string;
   name: string;
+  abbreviation?: string | null;
+  nba_team_id?: number | null;
 }
 
 interface MatchCardProps {
@@ -61,11 +64,22 @@ export function MatchCard({
           const score = scores[index];
           return (
             <div key={team?.id ?? index} className={styles.team}>
-              <span
-                className={team?.name ? (isUserTeam ? styles.teamNameHighlight : styles.teamName) : styles.emptyTeam}
-              >
-                {isUserTeam ? `${team?.name} ★` : (team?.name ?? tbdLabel)}
-              </span>
+              {team ? (
+                <span className={styles.teamMain}>
+                  <NbaImage
+                    kind="team"
+                    nbaId={team.nba_team_id}
+                    alt={`${team.name} logo`}
+                    fallback={team.abbreviation ?? team.name}
+                    className={styles.teamLogo}
+                  />
+                  <span className={isUserTeam ? styles.teamNameHighlight : styles.teamName}>
+                    {isUserTeam ? `${team.name} ★` : team.name}
+                  </span>
+                </span>
+              ) : (
+                <span className={styles.emptyTeam}>{tbdLabel}</span>
+              )}
               {score != null ? <span className={styles.score}>{score}</span> : null}
             </div>
           );
