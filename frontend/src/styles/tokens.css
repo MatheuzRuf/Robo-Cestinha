@@ -3,6 +3,7 @@
   --color-surface: #1f1913;
   --color-surface-raised: #2a221a;
   --color-border: #3a2f24;
+  --color-border-input: #3a2f24;
 
   --color-text: #f0e6d2;
   --color-text-muted: #a69a87;
@@ -11,11 +12,18 @@
   --color-primary: #e2661a;
   --color-primary-hover: #f0791f;
   --color-cream-button: #ede3d0;
+  --color-cream-button-text: #14100d;
+
+  --color-header-background: rgba(20, 16, 13, 0.96);
+  --color-modal-backdrop: rgba(20, 16, 13, 0.8);
 
   --color-live: #c1272d;
   --color-warning: #f2b705;
   --color-trajectory-opponent: #22d3ee;
   --color-success: #4c9a6a;
+
+  /* Keep the in-game court accent independent from UI warning text colors. */
+  --color-court-warning: #f2b705;
 
   --font-display: system-ui, sans-serif;
   --font-body: system-ui, sans-serif;
@@ -32,4 +40,29 @@
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-bg: #f4ede0;
+  --color-surface: #fffaf2;
+  --color-surface-raised: #f0e8da;
+  --color-border: #d9ccb6;
+  --color-border-input: #8f806e;
+
+  --color-text: #241a13;
+  --color-text-muted: #62564b;
+  --color-text-inverse: #ffffff;
+
+  --color-primary: #b44a0b;
+  --color-primary-hover: #953a08;
+  --color-cream-button: #e7dac5;
+  --color-cream-button-text: #332416;
+
+  --color-header-background: rgba(244, 237, 224, 0.96);
+  --color-modal-backdrop: rgba(35, 26, 19, 0.48);
+
+  --color-warning: #705000;
+  --color-success: #276b3f;
 }

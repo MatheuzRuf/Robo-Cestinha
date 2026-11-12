@@ -18,6 +18,8 @@ export const ptBR = {
     default_session_name: 'Torneio',
     hello_user: 'Olá, {name}',
     leave_session: 'Sair da sessão',
+    switch_to_light_theme: 'Mudar para o tema claro',
+    switch_to_dark_theme: 'Mudar para o tema escuro',
   },
   home: {
     hero: {

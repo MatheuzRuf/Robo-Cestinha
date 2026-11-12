@@ -18,6 +18,8 @@ export const enUS = {
     default_session_name: 'Tournament',
     hello_user: 'Hello, {name}',
     leave_session: 'Leave session',
+    switch_to_light_theme: 'Switch to light theme',
+    switch_to_dark_theme: 'Switch to dark theme',
   },
   home: {
     hero: {

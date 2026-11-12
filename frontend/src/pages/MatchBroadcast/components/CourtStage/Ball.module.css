@@ -13,7 +13,7 @@
 }
 
 .sameTeamTrajectory {
-  stroke: var(--color-warning);
+  stroke: var(--color-court-warning);
 }
 
 .opponentTrajectory {

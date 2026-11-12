@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ChevronDown, UsersRound } from 'lucide-react';
+import { ChevronDown, Moon, Sun, UsersRound } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from '../../lib/i18n/i18n';
+import { useTheme } from '../../lib/theme/useTheme';
 import styles from './AppShell.module.css';
 
 interface AppShellProps {
@@ -24,8 +25,10 @@ export function AppShell({
   children,
 }: AppShellProps) {
   const { t } = useTranslation();
+  const { theme, setTheme } = useTheme();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const themeToggleLabel = t(theme === 'dark' ? 'shell.switch_to_light_theme' : 'shell.switch_to_dark_theme');
 
   useEffect(() => {
     if (!isUserMenuOpen) return;
@@ -124,6 +127,16 @@ export function AppShell({
                 ) : null}
               </div>
             ) : null}
+            <button
+              type="button"
+              className={styles.themeToggle}
+              aria-label={themeToggleLabel}
+              aria-pressed={theme === 'light'}
+              title={themeToggleLabel}
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            >
+              {theme === 'dark' ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
+            </button>
           </div>
         </div>
       </header>

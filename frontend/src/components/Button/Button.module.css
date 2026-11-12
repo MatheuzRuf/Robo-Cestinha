@@ -32,7 +32,7 @@
 
 .secondary {
   background: var(--color-cream-button);
-  color: var(--color-text-inverse);
+  color: var(--color-cream-button-text);
 }
 
 .outline {

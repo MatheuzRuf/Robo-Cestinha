@@ -1,7 +1,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(20, 16, 13, 0.8);
+  background: var(--color-modal-backdrop);
   display: grid;
   place-items: center;
   padding: var(--space-6);
