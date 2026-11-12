@@ -1,4 +1,5 @@
 import { MatchCard } from '../MatchCard/MatchCard';
+import type { MatchPlaybackContext, MatchPlaybackProgress } from '../../../../lib/storage/matchPlaybackProgress';
 import styles from './RoundColumn.module.css';
 
 export interface RoundMatch {
@@ -6,6 +7,8 @@ export interface RoundMatch {
   matchId: string | null;
   userTeamId: string | null;
   status: string | null;
+  playbackContext: MatchPlaybackContext | null;
+  playbackProgress: MatchPlaybackProgress | null;
   homeScore: number | null;
   awayScore: number | null;
   teams: readonly [{ id: string; name: string } | null, { id: string; name: string } | null];

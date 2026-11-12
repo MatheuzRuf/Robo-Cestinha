@@ -2,16 +2,23 @@ import { useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { useTranslation } from '../../lib/i18n/i18n';
+import { getMatchPlaybackProgress } from '../../lib/storage/matchPlaybackProgress';
 import { useBracketStore } from '../../stores/bracketStore';
 import { useSessionStore } from '../../stores/sessionStore';
 import type { BracketSnapshot } from '../../types/bracket';
 import styles from './MatchBroadcast.module.css';
 
-function findLiveMatchId(bracket: BracketSnapshot | null): string | null {
+function findLiveMatchId(bracket: BracketSnapshot | null, sessionHash: string, userId: string): string | null {
   if (!bracket) return null;
 
-  // Prefer the next playable match, then replay the first finished one. This
-  // skips future rounds that are still locked (their teams are not assigned).
+  for (const round of bracket.rounds) {
+    for (const match of round.matches) {
+      if (!match.match_id) continue;
+      const progress = getMatchPlaybackProgress({ sessionHash, userId, matchId: match.match_id });
+      if (progress && !progress.isComplete) return match.match_id;
+    }
+  }
+
   for (const round of bracket.rounds) {
     for (const match of round.matches) {
       if (match.match_id && match.status === 'ready') return match.match_id;
@@ -79,7 +86,7 @@ export default function LiveMatchEntry() {
     );
   }
 
-  const matchId = findLiveMatchId(bracket);
+  const matchId = findLiveMatchId(bracket, activeSession.sessionHash, activeSession.userId);
   if (!matchId) {
     return (
       <main className={styles.page}>

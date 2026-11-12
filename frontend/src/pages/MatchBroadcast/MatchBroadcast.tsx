@@ -4,6 +4,7 @@ import { Button } from '../../components/Button';
 import { simulationService } from '../../services/simulationService';
 import { useSessionStore } from '../../stores/sessionStore';
 import { useTranslation } from '../../lib/i18n/i18n';
+import { getMatchPlaybackProgress, saveMatchPlaybackProgress } from '../../lib/storage/matchPlaybackProgress';
 import type { PlayerState, Team } from '../../types/game';
 import type { SimulationResponse } from '../../types/matchBroadcast';
 import { useGameFrames } from './hooks/useGameFrames';
@@ -18,10 +19,15 @@ const DEFAULT_ITERATIONS_LIMIT = 1000;
 export default function MatchBroadcast() {
   const { matchId: routeMatchId } = useParams();
   const matchId = routeMatchId ?? 'demo';
-  const sessionHash = useSessionStore((state) => state.activeSessionHash);
+  const activeSession = useSessionStore(
+    (state) => state.recentSessions.find((session) => session.sessionHash === state.activeSessionHash) ?? null,
+  );
+  const sessionHash = activeSession?.sessionHash ?? null;
+  const userId = activeSession?.userId ?? null;
   const { t } = useTranslation();
   const requestController = useRef<AbortController | null>(null);
   const [simulation, setSimulation] = useState<SimulationResponse | null>(null);
+  const [initialFrameIndex, setInitialFrameIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(true);
 
@@ -29,8 +35,7 @@ export default function MatchBroadcast() {
     requestController.current?.abort();
     requestController.current = null;
 
-    if (!sessionHash) {
-      setSimulation(null);
+    if (!sessionHash || !userId) {
       setIsPending(false);
       return;
     }
@@ -55,6 +60,12 @@ export default function MatchBroadcast() {
           signal: controller.signal,
         }));
       if (controller.signal.aborted) return;
+      const progress = getMatchPlaybackProgress({ sessionHash, userId, matchId });
+      const savedIterationIndex = progress
+        ? data.frames.findIndex((frame) => frame.iteration === progress.iteration)
+        : -1;
+      const restoredFrameIndex = savedIterationIndex >= 0 ? savedIterationIndex : (progress?.frameIndex ?? 0);
+      setInitialFrameIndex(Math.min(Math.max(0, restoredFrameIndex), data.frames.length - 1));
       setSimulation(data);
     } catch (cause) {
       if (controller.signal.aborted) return;
@@ -63,7 +74,7 @@ export default function MatchBroadcast() {
     } finally {
       if (!controller.signal.aborted) setIsPending(false);
     }
-  }, [matchId, sessionHash]);
+  }, [matchId, sessionHash, userId]);
 
   useEffect(() => {
     void loadSimulation();
@@ -121,8 +132,37 @@ export default function MatchBroadcast() {
     });
   }, [simulation]);
 
-  const playback = useGameFrames(courtFrames);
+  const playback = useGameFrames(courtFrames, initialFrameIndex);
   const currentSimulationFrame = simulation?.frames[playback.frameIndex] ?? null;
+
+  useEffect(() => {
+    if (!sessionHash || !userId || !simulation || !currentSimulationFrame) return;
+
+    saveMatchPlaybackProgress(
+      { sessionHash, userId, matchId },
+      {
+        frameIndex: playback.frameIndex,
+        iteration: currentSimulationFrame.iteration,
+        isComplete: playback.isComplete,
+      },
+    );
+  }, [currentSimulationFrame, matchId, playback.frameIndex, playback.isComplete, sessionHash, simulation, userId]);
+
+  function restartPlayback() {
+    playback.restart();
+    const firstFrame = simulation?.frames[0];
+    if (!sessionHash || !userId || !firstFrame) return;
+
+    saveMatchPlaybackProgress(
+      { sessionHash, userId, matchId },
+      {
+        frameIndex: 0,
+        iteration: firstFrame.iteration,
+        isComplete: simulation.frames.length === 1,
+      },
+    );
+  }
+
   const currentBasketEvent = simulation?.events.find(
     (event) => event.type === 'shot_made' && event.iteration === currentSimulationFrame?.iteration,
   );
@@ -134,7 +174,7 @@ export default function MatchBroadcast() {
 
   return (
     <main className={styles.page}>
-      {!sessionHash ? (
+      {!sessionHash || !userId ? (
         <div className={styles.statusMessage} role="status">
           {t('match_broadcast.simulation.no_active_session')}
         </div>
@@ -164,7 +204,7 @@ export default function MatchBroadcast() {
             isPaused={playback.isPaused}
             isComplete={playback.isComplete}
             onTogglePause={playback.isPaused ? playback.resume : playback.pause}
-            onRestart={playback.restart}
+            onRestart={restartPlayback}
           />
           <section className={styles.broadcastMainGrid}>
             <div className={styles.centerColumn}>
@@ -181,7 +221,13 @@ export default function MatchBroadcast() {
                 basketSequence={currentBasketEvent?.sequence}
                 madeBasketSide={basketSide}
               />
-              <SimulationProgress currentFrame={playback.frameIndex + 1} totalFrames={simulation.frames.length} />
+              <SimulationProgress
+                currentFrame={playback.frameIndex + 1}
+                totalFrames={simulation.frames.length}
+                onSeek={playback.seek}
+                onSeekStart={playback.beginSeeking}
+                onSeekEnd={playback.endSeeking}
+              />
             </div>
             <SimulationEvents
               events={simulation.events}

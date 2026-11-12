@@ -1,5 +1,12 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '../../../../components/Button';
 import { Card } from '../../../../components/Card';
+import { useTranslation } from '../../../../lib/i18n/i18n';
+import {
+  clearMatchPlaybackProgress,
+  type MatchPlaybackContext,
+  type MatchPlaybackProgress,
+} from '../../../../lib/storage/matchPlaybackProgress';
 import styles from './MatchCard.module.css';
 
 interface MatchTeam {
@@ -11,6 +18,9 @@ interface MatchCardProps {
   matchNumber: string;
   matchId: string | null;
   userTeamId: string | null;
+  status: string | null;
+  playbackContext: MatchPlaybackContext | null;
+  playbackProgress: MatchPlaybackProgress | null;
   homeScore: number | null;
   awayScore: number | null;
   teams: readonly [MatchTeam | null, MatchTeam | null];
@@ -21,13 +31,27 @@ export function MatchCard({
   matchNumber,
   matchId,
   userTeamId,
+  status,
+  playbackContext,
+  playbackProgress,
   homeScore,
   awayScore,
   teams,
   tbdLabel,
 }: MatchCardProps) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const scores = matchId ? [homeScore ?? null, awayScore ?? null] : [null, null];
-  const isClickable = Boolean(matchId);
+  const hasBothTeams = Boolean(teams[0] && teams[1]);
+  const canPlay = Boolean(matchId && hasBothTeams && (status === 'ready' || status === 'finished'));
+  const action =
+    playbackProgress && !playbackProgress.isComplete
+      ? 'resume'
+      : status === 'finished' || playbackProgress?.isComplete
+        ? 'replay'
+        : status === 'ready'
+          ? 'watch'
+          : null;
   const inner = (
     <>
       <span className={styles.matchNumber}>{matchNumber}</span>
@@ -37,7 +61,9 @@ export function MatchCard({
           const score = scores[index];
           return (
             <div key={team?.id ?? index} className={styles.team}>
-              <span className={team?.name ? (isUserTeam ? styles.teamNameHighlight : styles.teamName) : styles.emptyTeam}>
+              <span
+                className={team?.name ? (isUserTeam ? styles.teamNameHighlight : styles.teamName) : styles.emptyTeam}
+              >
                 {isUserTeam ? `${team?.name} ★` : (team?.name ?? tbdLabel)}
               </span>
               {score != null ? <span className={styles.score}>{score}</span> : null}
@@ -49,14 +75,22 @@ export function MatchCard({
   );
 
   return (
-    <Card className={`${styles.card} ${isClickable ? styles.clickable : ''}`}>
-      {matchId ? (
-        <Link to={`/matches/${matchId}`} className={styles.link} aria-label={matchNumber}>
-          {inner}
-        </Link>
-      ) : (
-        inner
-      )}
+    <Card className={styles.card}>
+      {inner}
+      {canPlay && matchId && action ? (
+        <Button
+          variant="outline"
+          fullWidth
+          onClick={() => {
+            if (action === 'replay') {
+              if (playbackContext) clearMatchPlaybackProgress(playbackContext);
+            }
+            navigate(`/matches/${matchId}`);
+          }}
+        >
+          {t(`bracket_tree.actions.${action}`)}
+        </Button>
+      ) : null}
     </Card>
   );
 }

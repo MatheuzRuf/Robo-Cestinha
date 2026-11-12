@@ -110,19 +110,23 @@
 }
 
 .progressTrack {
-  height: 5px;
-  background: var(--color-border);
-  border-radius: 99px;
-  overflow: hidden;
+  position: relative;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  height: var(--space-6);
 }
 
 .progressBar {
   appearance: none;
-  display: block;
+  position: absolute;
+  inset-block-start: 50%;
   width: 100%;
-  height: 100%;
+  height: var(--space-1);
   border: 0;
+  border-radius: 99px;
   background: var(--color-border);
+  transform: translateY(-50%);
 }
 
 .progressBar::-webkit-progress-bar {
@@ -134,6 +138,50 @@
 }
 
 .progressBar::-moz-progress-bar {
+  background: var(--color-primary);
+}
+
+.seekSlider {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.seekSlider:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: var(--space-1);
+}
+
+.seekSlider::-webkit-slider-runnable-track {
+  height: var(--space-1);
+  background: transparent;
+}
+
+.seekSlider::-moz-range-track {
+  height: var(--space-1);
+  background: transparent;
+}
+
+.seekSlider::-webkit-slider-thumb {
+  width: var(--space-3);
+  height: var(--space-3);
+  margin-top: calc(-1 * var(--space-1));
+  appearance: none;
+  border: 2px solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+.seekSlider::-moz-range-thumb {
+  width: var(--space-3);
+  height: var(--space-3);
+  border: 2px solid var(--color-surface);
+  border-radius: 50%;
   background: var(--color-primary);
 }
 

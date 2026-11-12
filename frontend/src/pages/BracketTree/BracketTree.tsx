@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Button } from '../../components/Button';
 import { useTranslation } from '../../lib/i18n/i18n';
+import { getMatchPlaybackProgress } from '../../lib/storage/matchPlaybackProgress';
 import { useBracketStore } from '../../stores/bracketStore';
 import { useSessionStore } from '../../stores/sessionStore';
 import { RoundColumn } from './components/RoundColumn/RoundColumn';
@@ -38,6 +39,22 @@ export default function BracketTree() {
       matchId: match.match_id,
       userTeamId: activeSession?.teamId ?? null,
       status: match.status ?? null,
+      playbackContext:
+        activeSession && match.match_id
+          ? {
+              sessionHash: activeSession.sessionHash,
+              userId: activeSession.userId,
+              matchId: match.match_id,
+            }
+          : null,
+      playbackProgress:
+        activeSession && match.match_id
+          ? getMatchPlaybackProgress({
+              sessionHash: activeSession.sessionHash,
+              userId: activeSession.userId,
+              matchId: match.match_id,
+            })
+          : null,
       homeScore: match.home_score ?? null,
       awayScore: match.away_score ?? null,
       teams: [match.home_team, match.away_team] as const,
