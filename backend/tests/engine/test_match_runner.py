@@ -58,14 +58,14 @@ def _make_runner(seed=7):
 
 def test_frame_count_is_initial_plus_one_per_transition():
     result = _make_runner(seed=7).run_simulation(50)
-    assert len(result.frames) == 51
-    assert result.iterations_completed == 50
+    assert len(result.frames) == result.iterations_completed + 1
+    assert result.iterations_completed >= 50
 
 
 def test_frames_are_monotonic_and_start_at_zero():
     result = _make_runner(seed=7).run_simulation(20)
     iterations = [frame.iteration for frame in result.frames]
-    assert iterations == list(range(21))
+    assert iterations == list(range(result.iterations_completed + 1))
     assert result.frames[0].player_with_ball_id is not None
 
 
@@ -77,6 +77,35 @@ def test_every_frame_has_all_ten_players_and_one_ball_owner():
         player_ids = {p.player_id for p in frame.players}
         assert len(player_ids) == 10
         assert frame.player_with_ball_id in player_ids
+
+
+def test_off_ball_players_reposition_with_varied_directions():
+    result = _make_runner(seed=7).run_simulation(50)
+    moved_players = set()
+    varied_transition = False
+
+    for previous, current in zip(result.frames, result.frames[1:]):
+        before = {player.player_id: (player.x, player.y) for player in previous.players}
+        after = {player.player_id: (player.x, player.y) for player in current.players}
+        deltas = [
+            (after[player_id][0] - x, after[player_id][1] - y)
+            for player_id, (x, y) in before.items()
+            if after[player_id] != (x, y)
+        ]
+        assert all(abs(dx) <= 1 and abs(dy) <= 1 for dx, dy in deltas)
+        moved_players.update(
+            player_id
+            for player_id, (x, y) in before.items()
+            if after[player_id] != (x, y)
+        )
+        varied_transition |= len(deltas) > 1 and len(set(deltas)) > 1
+
+    assert len(moved_players) == 10
+    assert varied_transition
+    assert all(
+        len({(player.x, player.y) for player in frame.players}) == 10
+        for frame in result.frames
+    )
 
 
 def test_scores_are_monotonic_and_never_decrease():

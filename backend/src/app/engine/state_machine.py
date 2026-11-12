@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 import random
+
 from app.engine.entities import GameState
 from app.engine.grid import get_target_rim
 from app.engine.heuristics import (
     decide_handler_action,
-    resolve_pass_teammate,
-    resolve_pass_outcome,
     decide_move_direction,
     resolve_move_outcome,
+    resolve_pass_outcome,
+    resolve_pass_teammate,
     resolve_shot,
 )
+from app.engine.movement import reposition_players
 from app.engine.schemas import (
     ActionLog,
     BallTrajectory,
@@ -69,9 +71,7 @@ class StateMachine:
                     state.flip_possession(new_handler_id=stealer.player_id)
 
             elif action_type == "MOVE":
-                direction = decide_move_direction(
-                    handler.court_pos, state.is_attacking_team_home(), self.rng
-                )
+                direction = decide_move_direction(state, handler, self.rng)
                 outcome_type, intercepter = resolve_move_outcome(
                     handler, state.defending_team, direction, self.rng
                 )
@@ -122,6 +122,7 @@ class StateMachine:
                 outcome = "turnover"
                 state.flip_possession(rng=self.rng)
 
+            reposition_players(state, self.rng)
             actions.append(action_log)
             if state.clock.is_quarter_ended():
                 outcome = "quarter_end"
@@ -190,9 +191,7 @@ class StateMachine:
                 outcome = "turnover"
                 possession_intact = False
         elif action_type == "MOVE":
-            direction = decide_move_direction(
-                handler.court_pos, state.is_attacking_team_home(), self.rng
-            )
+            direction = decide_move_direction(state, handler, self.rng)
             outcome_type, intercepter = resolve_move_outcome(
                 handler, state.defending_team, direction, self.rng
             )
@@ -232,10 +231,12 @@ class StateMachine:
             state.flip_possession(rng=self.rng)
             possession_intact = False
 
-        elapsed, violation = state.clock.tick(duration_s)
+        _, violation = state.clock.tick(duration_s)
         if violation and possession_intact:
             state.flip_possession(rng=self.rng)
             outcome = "turnover"
+
+        reposition_players(state, self.rng)
 
         return TransitionResult(
             action_type=action_type.lower(),

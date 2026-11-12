@@ -8,10 +8,15 @@ distância e espaçamento mais detalhadas.
 from __future__ import annotations
 
 import random
-from typing import Tuple
 
 from app.engine.entities import GameState, LivePlayer, LiveTeam
-from app.engine.grid import CourtPosition, Direction, is_three_pointer
+from app.engine.grid import (
+    DIRECTION_VECTORS,
+    CourtPosition,
+    Direction,
+    get_target_rim,
+    is_three_pointer,
+)
 
 
 def decide_handler_action(state: GameState, rng: random.Random) -> str:
@@ -59,7 +64,7 @@ def resolve_pass_outcome(
     receiver: LivePlayer,
     defending_team: LiveTeam,
     rng: random.Random,
-) -> Tuple[bool, LivePlayer | None]:
+) -> tuple[bool, LivePlayer | None]:
     """Resolve o passe e retorna sucesso ou o defensor que interceptou."""
     avg_steal = (
         sum(p.attributes.steal_rate for p in defending_team.get_on_court_players())
@@ -80,33 +85,29 @@ def resolve_pass_outcome(
 
 
 def decide_move_direction(
-    handler_pos: CourtPosition, is_team_a: bool, rng: random.Random
+    state: GameState, handler: LivePlayer, rng: random.Random
 ) -> Direction:
-    """Escolhe uma das oito direções ou ``IDLE``.
-
-    O peso maior aponta para a cesta adversária.
-    """
-    directions = [
-        Direction.N,
-        Direction.NE,
-        Direction.E,
-        Direction.SE,
-        Direction.S,
-        Direction.SW,
-        Direction.W,
-        Direction.NW,
-        Direction.IDLE,
+    """Choose a dribble step that reduces distance to the attacking rim."""
+    rim = get_target_rim(state.is_attacking_team_home())
+    distance = handler.court_pos.distance_to(rim)
+    occupied = {
+        player.court_pos
+        for team in (state.home_team, state.away_team)
+        for player in team.get_on_court_players()
+        if player.player_id != handler.player_id
+    }
+    options = [
+        direction
+        for direction, (dx, dy) in DIRECTION_VECTORS.items()
+        if direction != Direction.IDLE
+        and CourtPosition(handler.court_pos.x + dx, handler.court_pos.y + dy)
+        not in occupied
+        and CourtPosition(
+            handler.court_pos.x + dx, handler.court_pos.y + dy
+        ).distance_to(rim)
+        < distance
     ]
-
-    # O time A avança para X=9; o time B avança para X=0.
-    if is_team_a:
-        # Favor NE, E, SE
-        weights = [1.0, 2.0, 3.0, 2.0, 1.0, 0.5, 0.2, 0.5, 1.2]
-    else:
-        # Favor NW, W, SW
-        weights = [1.0, 0.5, 0.2, 0.5, 1.0, 2.0, 3.0, 2.0, 1.2]
-
-    return rng.choices(directions, weights=weights, k=1)[0]
+    return rng.choice(options) if options else Direction.IDLE
 
 
 def resolve_move_outcome(
@@ -114,8 +115,10 @@ def resolve_move_outcome(
     defending_team: LiveTeam,
     direction: Direction,
     rng: random.Random,
-) -> Tuple[str, LivePlayer | None]:
-    """Resolve o movimento: ``SUCCESS``, ``STRIPPED``, ``FOUL_DRAWN`` ou ``HOLDS_BALL``."""
+) -> tuple[str, LivePlayer | None]:
+    """Resolve o movimento: ``SUCCESS``, ``STRIPPED``, ``FOUL_DRAWN`` ou
+    ``HOLDS_BALL``.
+    """
     if direction == Direction.IDLE:
         # Parado, o jogador pode sofrer falta, ser desarmado ou manter a bola.
         roll = rng.random()
@@ -152,7 +155,7 @@ def resolve_shot(
     is_team_a: bool,
     game_state: GameState,
     rng: random.Random,
-) -> Tuple[bool, bool, int]:
+) -> tuple[bool, bool, int]:
     """Resolve um arremesso aplicando distância, fadiga e clutch.
 
     Retorna ``(convertido, e_de_tres, pontos_conquistados)``.
@@ -182,7 +185,7 @@ def resolve_shot(
 
 def resolve_rebound(
     game_state: GameState, rng: random.Random
-) -> Tuple[LivePlayer, bool]:
+) -> tuple[LivePlayer, bool]:
     """Sorteia o rebote entre os dez jogadores em quadra.
 
     Retorna ``(rebotador, e_rebote_ofensivo)``.
