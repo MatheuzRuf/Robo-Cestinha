@@ -17,3 +17,4 @@ until docker compose exec -T db pg_isready -U app -d app >/dev/null 2>&1; do
   sleep 1
 done
 uv run alembic upgrade head
+uv run python -m app.db.seed
