@@ -7,6 +7,7 @@ import styles from './AppShell.module.css';
 
 interface AppShellProps {
   activeNavItem: 'home' | 'teamLocker' | 'bracketTree' | 'liveBroadcast';
+  isMatchBroadcast?: boolean;
   onlineCount?: { current: number; total: number };
   currentUserName?: string;
   sessionName?: string;
@@ -17,6 +18,7 @@ interface AppShellProps {
 
 export function AppShell({
   activeNavItem,
+  isMatchBroadcast = false,
   onlineCount,
   currentUserName,
   sessionName,
@@ -65,7 +67,10 @@ export function AppShell({
   ];
 
   return (
-    <div className={styles.shell} data-active-nav-item={activeNavItem}>
+    <div
+      className={`${styles.shell} ${isMatchBroadcast ? styles.matchShell : ''}`}
+      data-active-nav-item={activeNavItem}
+    >
       <header className={styles.header}>
         <div className={styles.brandBlock}>
           <div className={styles.brandTitle}>{t('shell.brand_title')}</div>

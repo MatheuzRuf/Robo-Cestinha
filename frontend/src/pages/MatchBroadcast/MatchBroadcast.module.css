@@ -11,6 +11,14 @@
   gap: var(--space-4);
 }
 
+.matchPage {
+  flex: 1 1 0%;
+  min-height: 0;
+  align-content: stretch;
+  padding-top: var(--space-2);
+  overflow: hidden;
+}
+
 .scoreboard {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -19,7 +27,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-1) var(--space-4);
 }
 
 .teamSummary {
@@ -42,8 +50,8 @@
 }
 
 .teamLogo {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: clamp(var(--space-6), 4vh, var(--space-8));
+  height: clamp(var(--space-6), 4vh, var(--space-8));
   border-radius: var(--radius-sm);
   background: transparent;
 }
@@ -102,19 +110,28 @@
 
 .score {
   color: var(--color-primary);
-  font: 700 3.5rem/1 var(--font-mono);
+  font: 700 clamp(2rem, 4vh, 2.5rem)/1 var(--font-mono);
 }
 
 .clockPanel {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-4);
+  gap: var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface-raised);
-  padding: var(--space-2) var(--space-3);
+  padding: 0 var(--space-2);
   text-align: center;
+}
+
+.clockPanel > div {
+  gap: var(--space-1);
+}
+
+.clockPanel button {
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.8rem;
 }
 
 .frameLabel,
@@ -237,15 +254,17 @@
 .broadcastMainGrid {
   min-width: 0;
   min-height: 0;
+  height: 100%;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
-  align-items: start;
+  align-items: stretch;
   gap: var(--space-4);
 }
 
 .centerColumn {
   min-width: 0;
   min-height: 0;
+  height: 100%;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   align-content: start;
@@ -264,6 +283,7 @@
 }
 
 .page:fullscreen .broadcastMainGrid {
+  height: 100%;
   grid-template-columns: minmax(0, 1fr);
   align-items: stretch;
 }
@@ -293,17 +313,24 @@
 
   .broadcastMainGrid {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 0.5fr);
+  }
+
+  .centerColumn {
+    height: auto;
   }
 }
 
 @media (max-width: 560px) {
   .scoreboard {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
   }
 
   .clockPanel {
-    grid-column: 1;
+    grid-column: 1 / -1;
     grid-row: 1;
+    flex-wrap: wrap;
   }
 
   .awaySummary {
@@ -328,6 +355,24 @@
     justify-content: flex-start;
   }
 
+  .teamSummary {
+    gap: var(--space-1);
+    padding-inline-start: var(--space-1);
+  }
+
+  .teamLogo {
+    width: var(--space-6);
+    height: var(--space-6);
+  }
+
+  .teamCopy strong {
+    font-size: 0.85rem;
+  }
+
+  .score {
+    font-size: 2rem;
+  }
+
   .progress {
     grid-template-columns: auto minmax(0, 1fr);
     gap: var(--space-2);
@@ -335,5 +380,31 @@
 
   .progressTrack {
     grid-column: 1 / -1;
+  }
+}
+
+@media (max-height: 700px) {
+  .matchPage {
+    gap: var(--space-2);
+    padding-block: var(--space-2);
+  }
+
+  .scoreboard {
+    gap: var(--space-2);
+    padding-block: var(--space-1);
+  }
+
+  .clockPanel {
+    gap: var(--space-2);
+  }
+
+  .centerColumn,
+  .broadcastMainGrid {
+    gap: var(--space-2);
+  }
+
+  .progress {
+    gap: var(--space-2);
+    padding-block: var(--space-2);
   }
 }

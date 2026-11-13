@@ -1,6 +1,7 @@
 .panel {
   min-width: 0;
-  max-height: min(76svh, 760px);
+  min-height: 0;
+  height: 100%;
   overflow: auto;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -64,6 +65,6 @@
 
 @media (max-width: 900px) {
   .panel {
-    max-height: 320px;
+    max-height: none;
   }
 }

@@ -16,10 +16,12 @@ export default function AppLayout() {
         : pathname === '/match-demo' || pathname.startsWith('/matches/')
           ? 'liveBroadcast'
           : 'home';
+  const isMatchBroadcast = pathname.startsWith('/matches/');
 
   return (
     <AppShell
       activeNavItem={activeNavItem}
+      isMatchBroadcast={isMatchBroadcast}
       currentUserName={activeSession?.userName}
       sessionName={activeSession?.sessionName}
       sessionCode={activeSession?.sessionHash}

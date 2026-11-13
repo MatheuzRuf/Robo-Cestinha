@@ -197,7 +197,7 @@ export default function MatchBroadcast() {
     : undefined;
 
   return (
-    <main className={styles.page} ref={pageRef}>
+    <main className={`${styles.page} ${styles.matchPage}`} ref={pageRef}>
       {!sessionHash || !userId ? (
         <div className={styles.statusMessage} role="status">
           {t('match_broadcast.simulation.no_active_session')}

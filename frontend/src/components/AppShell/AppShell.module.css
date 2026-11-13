@@ -6,6 +6,16 @@
   color: var(--color-text);
 }
 
+.matchShell {
+  height: 100svh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.matchShell > .header {
+  flex: 0 0 auto;
+}
+
 .header {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
