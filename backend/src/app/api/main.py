@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import bracket, health, matches, sessions, teams
+from app.api.routers import bracket, commentary, health, matches, sessions, teams
 from app.core.config import settings
 
 app = FastAPI(title="Robô Cestinha API")
@@ -26,3 +26,4 @@ app.include_router(sessions.router, prefix="/sessions", tags=["sessions"])
 app.include_router(bracket.router, prefix="/bracket", tags=["bracket"])
 app.include_router(teams.router, prefix="/team", tags=["teams"])
 app.include_router(matches.router, prefix="/matches", tags=["matches"])
+app.include_router(commentary.router, prefix="/commentary", tags=["commentary"])

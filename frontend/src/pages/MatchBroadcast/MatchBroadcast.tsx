@@ -12,6 +12,12 @@ import { CourtStage } from './components/CourtStage/CourtStage';
 import { Scoreboard } from './components/Scoreboard/Scoreboard';
 import { SimulationEvents } from './components/SimulationEvents/SimulationEvents';
 import { SimulationProgress } from './components/SimulationProgress/SimulationProgress';
+import { CommentaryChat } from './components/CommentaryChat/CommentaryChat';
+import { generateCommentaryBatch, type CommentaryFrameResult } from '../../services/commentaryService';
+import {
+  buildMatchCommentarySnapshots,
+  FALLBACK_COMMENTARY_LINES,
+} from './commentarySnapshot';
 import styles from './MatchBroadcast.module.css';
 
 const DEFAULT_ITERATIONS_LIMIT = 1000;
@@ -32,6 +38,8 @@ export default function MatchBroadcast() {
   const [isFullMode, setIsFullMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(true);
+  const [isPreparingCommentary, setIsPreparingCommentary] = useState(false);
+  const [commentaryByFrame, setCommentaryByFrame] = useState<Map<number, string>>(new Map());
 
   useEffect(() => {
     const syncFullMode = () => setIsFullMode(document.fullscreenElement === pageRef.current);
@@ -66,7 +74,9 @@ export default function MatchBroadcast() {
     const controller = new AbortController();
     requestController.current = controller;
     setIsPending(true);
+    setIsPreparingCommentary(false);
     setError(null);
+    setCommentaryByFrame(new Map());
 
     try {
       const stored = await simulationService.getSimulation({
@@ -83,11 +93,37 @@ export default function MatchBroadcast() {
           signal: controller.signal,
         }));
       if (controller.signal.aborted) return;
+      const commentarySnapshots = buildMatchCommentarySnapshots(data);
+      setIsPreparingCommentary(commentarySnapshots.length > 0);
+      let generatedCommentary: CommentaryFrameResult[] = [];
+      try {
+        generatedCommentary = await generateCommentaryBatch(commentarySnapshots, controller.signal);
+      } catch {
+        if (controller.signal.aborted) return;
+      }
+      if (controller.signal.aborted) return;
+
+      const commentary = new Map<number, string>();
+      const resultByFrame = new Map(generatedCommentary.map((result) => [result.f, result.c]));
+      const totalFrames = Math.max(1, data.frames.length - 1);
+      for (const snapshot of commentarySnapshots) {
+        const generated = resultByFrame.get(snapshot.f)?.trim();
+        if (generated) {
+          commentary.set(snapshot.f, generated);
+        } else if (snapshot.f >= Math.ceil(totalFrames * 0.9)) {
+          commentary.set(
+            snapshot.f,
+            FALLBACK_COMMENTARY_LINES[Math.floor(Math.random() * FALLBACK_COMMENTARY_LINES.length)],
+          );
+        }
+      }
+
       const progress = getMatchPlaybackProgress({ sessionHash, userId, matchId });
       const savedIterationIndex = progress
         ? data.frames.findIndex((frame) => frame.iteration === progress.iteration)
         : -1;
       const restoredFrameIndex = savedIterationIndex >= 0 ? savedIterationIndex : (progress?.frameIndex ?? 0);
+      setCommentaryByFrame(commentary);
       setInitialFrameIndex(Math.min(Math.max(0, restoredFrameIndex), data.frames.length - 1));
       setSimulation(data);
     } catch (cause) {
@@ -95,7 +131,10 @@ export default function MatchBroadcast() {
       setSimulation(null);
       setError(cause instanceof Error ? cause.message : 'Simulation request failed');
     } finally {
-      if (!controller.signal.aborted) setIsPending(false);
+      if (!controller.signal.aborted) {
+        setIsPreparingCommentary(false);
+        setIsPending(false);
+      }
     }
   }, [matchId, sessionHash, userId]);
 
@@ -158,6 +197,11 @@ export default function MatchBroadcast() {
 
   const playback = useGameFrames(courtFrames, initialFrameIndex);
   const currentSimulationFrame = simulation?.frames[playback.frameIndex] ?? null;
+  const visibleCommentary = currentSimulationFrame
+    ? [...commentaryByFrame.entries()]
+        .filter(([frame]) => frame <= currentSimulationFrame.iteration)
+        .map(([frame, text]) => ({ frame, text }))
+    : [];
 
   useEffect(() => {
     if (!sessionHash || !userId || !simulation || !currentSimulationFrame) return;
@@ -204,7 +248,11 @@ export default function MatchBroadcast() {
         </div>
       ) : isPending ? (
         <div className={styles.statusMessage} role="status">
-          {t('match_broadcast.simulation.loading')}
+          {t(
+            isPreparingCommentary
+              ? 'match_broadcast.simulation.preparing_commentary'
+              : 'match_broadcast.simulation.loading',
+          )}
         </div>
       ) : error || !simulation || !currentSimulationFrame || !playback.frame ? (
         <div className={styles.errorState} role="alert">
@@ -257,11 +305,18 @@ export default function MatchBroadcast() {
               />
             </div>
             {isFullMode ? null : (
-              <SimulationEvents
-                events={simulation.events}
-                players={simulation.players}
-                currentIteration={currentSimulationFrame.iteration}
-              />
+              <aside className={styles.broadcastSidebar}>
+                <SimulationEvents
+                  events={simulation.events}
+                  players={simulation.players}
+                  currentIteration={currentSimulationFrame.iteration}
+                />
+                <CommentaryChat
+                  messages={visibleCommentary}
+                  currentFrame={currentSimulationFrame.iteration}
+                  isTyping={false}
+                />
+              </aside>
             )}
           </section>
         </>
