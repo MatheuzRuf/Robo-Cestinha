@@ -11,13 +11,17 @@ interface PlaybackState {
   frames: Frame[];
   frameIndex: number;
   isPaused: boolean;
+  hasCompletedPlayback: boolean;
+  hasSkippedFrames: boolean;
 }
 
-export function useGameFrames(frames: Frame[], initialFrameIndex = 0) {
+export function useGameFrames(frames: Frame[], initialFrameIndex = 0, initialHasSkippedFrames = false) {
   const [playbackState, setPlaybackState] = useState<PlaybackState>(() => ({
     frames,
     frameIndex: clampFrameIndex(initialFrameIndex, frames.length),
     isPaused: false,
+    hasCompletedPlayback: false,
+    hasSkippedFrames: initialHasSkippedFrames,
   }));
   const [speed, setSpeed] = useState<1 | 1.5 | 2>(1);
   const isSeeking = useRef(false);
@@ -31,30 +35,56 @@ export function useGameFrames(frames: Frame[], initialFrameIndex = 0) {
 
     const timeoutId = window.setTimeout(() => {
       setPlaybackState((currentState) => {
-        const currentIndex =
-          currentState.frames === frames ? currentState.frameIndex : clampFrameIndex(initialFrameIndex, frames.length);
-        const currentPaused = currentState.frames === frames && currentState.isPaused;
+        const isCurrentSequence = currentState.frames === frames;
+        const currentIndex = isCurrentSequence
+          ? currentState.frameIndex
+          : clampFrameIndex(initialFrameIndex, frames.length);
+        const currentPaused = isCurrentSequence && currentState.isPaused;
+        const currentHasSkippedFrames = isCurrentSequence ? currentState.hasSkippedFrames : initialHasSkippedFrames;
+        const nextFrameIndex = Math.min(currentIndex + 1, frames.length - 1);
         return {
           frames,
-          frameIndex: Math.min(currentIndex + 1, frames.length - 1),
+          frameIndex: nextFrameIndex,
           isPaused: currentPaused,
+          hasCompletedPlayback:
+            (isCurrentSequence && currentState.hasCompletedPlayback) ||
+            (!currentHasSkippedFrames && nextFrameIndex === frames.length - 1),
+          hasSkippedFrames: currentHasSkippedFrames,
         };
       });
     }, TRANSITION_DURATION_MS / speed);
 
     return () => window.clearTimeout(timeoutId);
-  }, [frameIndex, frames, initialFrameIndex, isPaused, speed]);
+  }, [frameIndex, frames, initialFrameIndex, initialHasSkippedFrames, isPaused, speed]);
 
   function pause() {
-    setPlaybackState({ frames, frameIndex, isPaused: true });
+    setPlaybackState({
+      frames,
+      frameIndex,
+      isPaused: true,
+      hasCompletedPlayback: playbackState.frames === frames && playbackState.hasCompletedPlayback,
+      hasSkippedFrames: playbackState.frames === frames && playbackState.hasSkippedFrames,
+    });
   }
 
   function resume() {
-    setPlaybackState({ frames, frameIndex, isPaused: false });
+    setPlaybackState({
+      frames,
+      frameIndex,
+      isPaused: false,
+      hasCompletedPlayback: playbackState.frames === frames && playbackState.hasCompletedPlayback,
+      hasSkippedFrames: playbackState.frames === frames ? playbackState.hasSkippedFrames : initialHasSkippedFrames,
+    });
   }
 
   function restart() {
-    setPlaybackState({ frames, frameIndex: 0, isPaused: false });
+    setPlaybackState({
+      frames,
+      frameIndex: 0,
+      isPaused: false,
+      hasCompletedPlayback: false,
+      hasSkippedFrames: false,
+    });
   }
 
   function seek(nextFrameIndex: number) {
@@ -62,6 +92,8 @@ export function useGameFrames(frames: Frame[], initialFrameIndex = 0) {
       frames,
       frameIndex: clampFrameIndex(nextFrameIndex, frames.length),
       isPaused: true,
+      hasCompletedPlayback: playbackState.frames === frames && playbackState.hasCompletedPlayback,
+      hasSkippedFrames: true,
     });
   }
 
@@ -85,6 +117,8 @@ export function useGameFrames(frames: Frame[], initialFrameIndex = 0) {
     frame: frames[currentFrameIndex] ?? null,
     frameIndex: currentFrameIndex,
     isComplete: frames.length > 0 && currentFrameIndex === frames.length - 1,
+    hasCompletedPlayback: isCurrentSequence && playbackState.hasCompletedPlayback,
+    hasSkippedFrames: isCurrentSequence ? playbackState.hasSkippedFrames : initialHasSkippedFrames,
     transitionDurationMs: TRANSITION_DURATION_MS / speed,
     speed,
     setSpeed,

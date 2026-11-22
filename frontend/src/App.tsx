@@ -3,8 +3,8 @@ import AppLayout from './app/AppLayout';
 import { ToastProvider } from './components/Toast/Toast';
 import BracketTree from './pages/BracketTree/BracketTree';
 import Home from './pages/Home/Home';
-import LiveMatchEntry from './pages/MatchBroadcast/LiveMatchEntry';
 import MatchBroadcast from './pages/MatchBroadcast/MatchBroadcast';
+import MatchStats from './pages/MatchStats/MatchStats';
 import TeamLocker from './pages/TeamLocker/TeamLocker';
 
 export default function App() {
@@ -16,8 +16,8 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="team-locker" element={<TeamLocker />} />
             <Route path="bracket-tree" element={<BracketTree />} />
-            <Route path="match-demo" element={<LiveMatchEntry />} />
             <Route path="matches/:matchId" element={<MatchBroadcast />} />
+            <Route path="matches/:matchId/stats" element={<MatchStats />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

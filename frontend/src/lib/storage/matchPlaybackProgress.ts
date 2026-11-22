@@ -2,6 +2,8 @@ export interface MatchPlaybackProgress {
   frameIndex: number;
   iteration: number;
   isComplete: boolean;
+  hasWatched: boolean;
+  hasSkippedFrames: boolean;
 }
 
 export interface MatchPlaybackContext {
@@ -35,6 +37,8 @@ export function getMatchPlaybackProgress(context: MatchPlaybackContext): MatchPl
       frameIndex: progress.frameIndex as number,
       iteration: progress.iteration as number,
       isComplete: progress.isComplete,
+      hasWatched: typeof progress.hasWatched === 'boolean' ? progress.hasWatched : progress.isComplete,
+      hasSkippedFrames: typeof progress.hasSkippedFrames === 'boolean' ? progress.hasSkippedFrames : false,
     };
   } catch {
     return null;
@@ -55,4 +59,15 @@ export function clearMatchPlaybackProgress(context: MatchPlaybackContext) {
   } catch {
     return;
   }
+}
+
+export function resetMatchPlaybackPosition(context: MatchPlaybackContext) {
+  const progress = getMatchPlaybackProgress(context);
+  saveMatchPlaybackProgress(context, {
+    frameIndex: 0,
+    iteration: 0,
+    isComplete: false,
+    hasWatched: progress?.hasWatched ?? false,
+    hasSkippedFrames: false,
+  });
 }

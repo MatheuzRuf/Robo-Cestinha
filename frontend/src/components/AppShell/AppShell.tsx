@@ -6,8 +6,9 @@ import { useTheme } from '../../lib/theme/useTheme';
 import styles from './AppShell.module.css';
 
 interface AppShellProps {
-  activeNavItem: 'home' | 'teamLocker' | 'bracketTree' | 'liveBroadcast';
-  isMatchBroadcast?: boolean;
+  activeNavItem: 'home' | 'teamLocker' | 'bracketTree';
+  isMatchRoute?: boolean;
+  isMatchPlayback?: boolean;
   onlineCount?: { current: number; total: number };
   currentUserName?: string;
   sessionName?: string;
@@ -18,7 +19,8 @@ interface AppShellProps {
 
 export function AppShell({
   activeNavItem,
-  isMatchBroadcast = false,
+  isMatchRoute = false,
+  isMatchPlayback = false,
   onlineCount,
   currentUserName,
   sessionName,
@@ -62,15 +64,15 @@ export function AppShell({
   }[] = [
     { id: 'home', label: t('shell.nav_home'), path: '/' },
     { id: 'teamLocker', label: t('shell.nav_team_locker'), path: '/team-locker' },
-    { id: 'bracketTree', label: t('shell.nav_bracket_tree'), path: '/bracket-tree' },
-    { id: 'liveBroadcast', label: t('shell.nav_live_broadcast'), path: '/match-demo' },
+    {
+      id: 'bracketTree',
+      label: t(isMatchRoute ? 'shell.nav_back_to_bracket' : 'shell.nav_bracket_tree'),
+      path: '/bracket-tree',
+    },
   ];
 
   return (
-    <div
-      className={`${styles.shell} ${isMatchBroadcast ? styles.matchShell : ''}`}
-      data-active-nav-item={activeNavItem}
-    >
+    <div className={`${styles.shell} ${isMatchPlayback ? styles.matchShell : ''}`} data-active-nav-item={activeNavItem}>
       <header className={styles.header}>
         <div className={styles.brandBlock}>
           <div className={styles.brandTitle}>{t('shell.brand_title')}</div>
@@ -85,7 +87,9 @@ export function AppShell({
                 end={item.id === 'home'}
                 className={styles.navItem}
                 data-active={activeNavItem === item.id}
-                aria-current={activeNavItem === item.id ? 'page' : undefined}
+                aria-current={
+                  activeNavItem === item.id && !(isMatchRoute && item.id === 'bracketTree') ? 'page' : undefined
+                }
               >
                 {item.label}
               </NavLink>

@@ -4,7 +4,7 @@ import { Card } from '../../../../components/Card';
 import { NbaImage } from '../../../../components/NbaImage';
 import { useTranslation } from '../../../../lib/i18n/i18n';
 import {
-  clearMatchPlaybackProgress,
+  resetMatchPlaybackPosition,
   type MatchPlaybackContext,
   type MatchPlaybackProgress,
 } from '../../../../lib/storage/matchPlaybackProgress';
@@ -47,14 +47,20 @@ export function MatchCard({
   const scores = matchId ? [homeScore ?? null, awayScore ?? null] : [null, null];
   const hasBothTeams = Boolean(teams[0] && teams[1]);
   const canPlay = Boolean(matchId && hasBothTeams && (status === 'ready' || status === 'finished'));
+  const hasWatched = playbackProgress?.hasWatched ?? false;
   const action =
-    playbackProgress && !playbackProgress.isComplete
+    playbackProgress &&
+    ((!playbackProgress.isComplete && (!playbackProgress.hasSkippedFrames || hasWatched)) || !hasWatched)
       ? 'resume'
-      : status === 'finished' || playbackProgress?.isComplete
-        ? 'replay'
-        : status === 'ready'
-          ? 'watch'
-          : null;
+      : status === 'finished'
+        ? hasWatched
+          ? 'replay'
+          : 'watch'
+        : hasWatched
+          ? 'replay'
+          : status === 'ready'
+            ? 'watch'
+            : null;
   const inner = (
     <>
       <span className={styles.matchNumber}>{matchNumber}</span>
@@ -92,18 +98,34 @@ export function MatchCard({
     <Card className={styles.card}>
       {inner}
       {canPlay && matchId && action ? (
-        <Button
-          variant="outline"
-          fullWidth
-          onClick={() => {
-            if (action === 'replay') {
-              if (playbackContext) clearMatchPlaybackProgress(playbackContext);
-            }
-            navigate(`/matches/${matchId}`);
-          }}
-        >
-          {t(`bracket_tree.actions.${action}`)}
-        </Button>
+        <div className={styles.actions}>
+          {status === 'finished' ? (
+            <Button variant="primary" fullWidth onClick={() => navigate(`/matches/${matchId}/stats`)}>
+              {t('bracket_tree.actions.stats')}
+            </Button>
+          ) : null}
+          <Button
+            variant="outline"
+            fullWidth
+            onClick={() => {
+              if (
+                playbackContext &&
+                action === 'resume' &&
+                playbackProgress &&
+                !hasWatched &&
+                (playbackProgress.hasSkippedFrames || playbackProgress.isComplete)
+              ) {
+                resetMatchPlaybackPosition(playbackContext);
+              }
+              if (playbackContext && (action === 'replay' || action === 'watch')) {
+                resetMatchPlaybackPosition(playbackContext);
+              }
+              navigate(`/matches/${matchId}`);
+            }}
+          >
+            {t(`bracket_tree.actions.${action}`)}
+          </Button>
+        </div>
       ) : null}
     </Card>
   );

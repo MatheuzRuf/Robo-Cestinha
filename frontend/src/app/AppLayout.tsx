@@ -8,20 +8,16 @@ export default function AppLayout() {
     (state) => state.recentSessions.find((session) => session.sessionHash === state.activeSessionHash) ?? null,
   );
 
+  const isMatchRoute = pathname.startsWith('/matches/');
+  const isMatchPlayback = /^\/matches\/[^/]+$/.test(pathname);
   const activeNavItem =
-    pathname === '/team-locker'
-      ? 'teamLocker'
-      : pathname === '/bracket-tree'
-        ? 'bracketTree'
-        : pathname === '/match-demo' || pathname.startsWith('/matches/')
-          ? 'liveBroadcast'
-          : 'home';
-  const isMatchBroadcast = pathname.startsWith('/matches/');
+    pathname === '/team-locker' ? 'teamLocker' : pathname === '/bracket-tree' || isMatchRoute ? 'bracketTree' : 'home';
 
   return (
     <AppShell
       activeNavItem={activeNavItem}
-      isMatchBroadcast={isMatchBroadcast}
+      isMatchRoute={isMatchRoute}
+      isMatchPlayback={isMatchPlayback}
       currentUserName={activeSession?.userName}
       sessionName={activeSession?.sessionName}
       sessionCode={activeSession?.sessionHash}

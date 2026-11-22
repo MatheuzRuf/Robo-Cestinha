@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { simulationService } from '../../services/simulationService';
 import { useSessionStore } from '../../stores/sessionStore';
@@ -14,17 +14,15 @@ import { SimulationEvents } from './components/SimulationEvents/SimulationEvents
 import { SimulationProgress } from './components/SimulationProgress/SimulationProgress';
 import { CommentaryChat } from './components/CommentaryChat/CommentaryChat';
 import { generateCommentaryBatch, type CommentaryFrameResult } from '../../services/commentaryService';
-import {
-  buildMatchCommentarySnapshots,
-  FALLBACK_COMMENTARY_LINES,
-} from './commentarySnapshot';
+import { buildMatchCommentarySnapshots, FALLBACK_COMMENTARY_LINES } from './commentarySnapshot';
 import styles from './MatchBroadcast.module.css';
 
 const DEFAULT_ITERATIONS_LIMIT = 1000;
 
 export default function MatchBroadcast() {
   const { matchId: routeMatchId } = useParams();
-  const matchId = routeMatchId ?? 'demo';
+  const navigate = useNavigate();
+  const matchId = routeMatchId ?? '';
   const activeSession = useSessionStore(
     (state) => state.recentSessions.find((session) => session.sessionHash === state.activeSessionHash) ?? null,
   );
@@ -74,6 +72,8 @@ export default function MatchBroadcast() {
     const controller = new AbortController();
     requestController.current = controller;
     setIsPending(true);
+    setSimulation(null);
+    setInitialFrameIndex(0);
     setIsPreparingCommentary(false);
     setError(null);
     setCommentaryByFrame(new Map());
@@ -195,8 +195,12 @@ export default function MatchBroadcast() {
     });
   }, [simulation]);
 
-  const playback = useGameFrames(courtFrames, initialFrameIndex);
+  const storedPlaybackProgress =
+    sessionHash && userId ? getMatchPlaybackProgress({ sessionHash, userId, matchId }) : null;
+  const playback = useGameFrames(courtFrames, initialFrameIndex, storedPlaybackProgress?.hasSkippedFrames ?? false);
   const currentSimulationFrame = simulation?.frames[playback.frameIndex] ?? null;
+  const hasWatchedMatch = storedPlaybackProgress?.hasWatched ?? false;
+  const hasWatchedThroughEnd = hasWatchedMatch || playback.hasCompletedPlayback;
   const visibleCommentary = currentSimulationFrame
     ? [...commentaryByFrame.entries()]
         .filter(([frame]) => frame <= currentSimulationFrame.iteration)
@@ -212,9 +216,22 @@ export default function MatchBroadcast() {
         frameIndex: playback.frameIndex,
         iteration: currentSimulationFrame.iteration,
         isComplete: playback.isComplete,
+        hasWatched: hasWatchedThroughEnd,
+        hasSkippedFrames: playback.hasSkippedFrames,
       },
     );
-  }, [currentSimulationFrame, matchId, playback.frameIndex, playback.isComplete, sessionHash, simulation, userId]);
+  }, [
+    currentSimulationFrame,
+    hasWatchedThroughEnd,
+    matchId,
+    playback.frameIndex,
+    playback.hasCompletedPlayback,
+    playback.hasSkippedFrames,
+    playback.isComplete,
+    sessionHash,
+    simulation,
+    userId,
+  ]);
 
   function restartPlayback() {
     playback.restart();
@@ -226,7 +243,9 @@ export default function MatchBroadcast() {
       {
         frameIndex: 0,
         iteration: firstFrame.iteration,
-        isComplete: simulation.frames.length === 1,
+        isComplete: false,
+        hasWatched: hasWatchedThroughEnd,
+        hasSkippedFrames: false,
       },
     );
   }
@@ -303,6 +322,13 @@ export default function MatchBroadcast() {
                 onTogglePause={playback.isPaused ? playback.resume : playback.pause}
                 onRestart={restartPlayback}
               />
+              {playback.isComplete && hasWatchedThroughEnd ? (
+                <div className={styles.matchStatsAction}>
+                  <Button variant="primary" onClick={() => navigate(`/matches/${matchId}/stats`)}>
+                    {t('match_broadcast.simulation.view_stats')}
+                  </Button>
+                </div>
+              ) : null}
             </div>
             {isFullMode ? null : (
               <aside className={styles.broadcastSidebar}>

@@ -278,9 +278,14 @@
   min-height: 0;
   height: 100%;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto auto;
   align-content: start;
   gap: var(--space-4);
+}
+
+.matchStatsAction {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .page:fullscreen {

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useId, type ReactNode } from 'react';
 import styles from './Modal.module.css';
 
 interface ModalProps {
@@ -10,13 +10,32 @@ interface ModalProps {
 }
 
 export function Modal({ title, children, open, onClose, closeLabel = 'Close' }: ModalProps) {
+  const titleId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') onClose();
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, open]);
+
   if (!open) return null;
   return (
-    <div className={styles.backdrop} onClick={onClose}>
-      <div className={styles.dialog} onClick={(event) => event.stopPropagation()}>
+    <div className={styles.backdrop} onMouseDown={onClose}>
+      <div
+        aria-labelledby={titleId}
+        aria-modal="true"
+        className={styles.dialog}
+        role="dialog"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
         <div className={styles.titleRow}>
-          <h2>{title}</h2>
-          <button type="button" onClick={onClose}>
+          <h2 id={titleId}>{title}</h2>
+          <button className={styles.closeButton} type="button" onClick={onClose}>
             {closeLabel}
           </button>
         </div>

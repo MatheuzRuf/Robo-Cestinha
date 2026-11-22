@@ -138,11 +138,11 @@ Open <http://localhost:5173>:
 
 | Route | Page | What it shows |
 |---|---|---|
-| `/` | Home | host/join session UI (mock), display-name prompt (saved to localStorage), recent sessions |
-| `/match-demo` | Match Broadcast | live court animation, scoreboard with speed/pause, play-by-play, commentary, timeline scrubber |
-
-Both pages run entirely on mock data (`src/mock/mockEngine.ts`,
-`src/pages/MatchBroadcast/data/mockMatchData.ts`) — no backend needed.
+| `/` | Home | Create or join a tournament session |
+| `/team-locker` | Team Locker | Choose a team for the active session |
+| `/bracket-tree` | Bracket | View the tournament and open a specific match |
+| `/matches/:matchId` | Match playback | Watch or replay that match's court animation and commentary |
+| `/matches/:matchId/stats` | Match stats | View post-match stats after watching the match through |
 
 ### Makefile targets
 
@@ -161,23 +161,19 @@ Stack: **React 19 + TypeScript + Vite**, CSS Modules (`*.module.css`, no inline
 styles, colors always via `var(--…)` tokens in `src/styles/tokens.css`),
 **Framer Motion** for animation, a small custom **i18n** layer (en-US/pt-BR).
 
-- **Routing** — there is no router library yet: `App.tsx` checks
-  `window.location.pathname` and renders `<MatchBroadcast />` for
-  `/match-demo`, `<Home />` otherwise. Adding routes later on top is trivial.
-- **Pages are thin** — `pages/Home/Home.tsx` and
-  `pages/MatchBroadcast/MatchBroadcast.tsx` compose shared components from
+- **Routing** — React Router routes are declared in `src/App.tsx`. The
+  match-playback route is opened from a bracket match card; the stats route is
+  a separate, scrollable page. Match pages replace the bracket nav label with
+  a compact “Back to Bracket” action instead of adding another toolbar row.
+- **Pages are thin** — pages such as `Home`, `BracketTree`, `MatchBroadcast`,
+  and `MatchStats` compose shared components from
   `src/components/` (`AppShell`, `Button`, `Card`, `Modal`, `SegmentedControl`,
-  `TextInput`, `StatusBadge`, `Chip`, `CheckboxRow`, …). AppShell wraps every
-  page (top nav + online/session pills).
-- **Match Broadcast data flow** — `useGameFrames` (hook) calls
-  `startMockEngine` (`src/mock/mockEngine.ts`), which emits a `Frame`
-  (`src/types/game.ts`: players + ball position + optional pass/shot
-  trajectory) every 800 ms. Frames queue up (max 5) and play at a
-  transition duration controlled by speed (1×/1.5×/2×) and pause. The
-  `CourtStage`/`Court`/`Player`/`Ball` components render each frame as an SVG
-  court (real NBA dimensions in `src/config/court.ts`, 1 ft = 10 SVG units),
-  and framer-motion animates positions between frames. Scoreboard, play-by-play
-  and commentary columns append mock entries on an interval.
+  `TextInput`, `StatusBadge`, `Chip`, `CheckboxRow`, …). The global nav contains
+  Home, Team Locker, and Bracket; match playback is not a top-level “live” page.
+- **Match playback and stats** — playback loads a persisted simulation (or runs
+  it if needed), animates its frames on the court, and records viewer progress.
+  Stats are derived from the stored match events and frames; player lists only
+  include players present on court in those frames.
 - **i18n** — `src/lib/i18n/` has a tiny context provider: `t('home.hero.title')`
   resolves dot-paths against the active locale (`detectLocale()` reads
   localStorage then `navigator.language`). Every user-facing string must be
