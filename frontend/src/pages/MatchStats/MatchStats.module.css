@@ -1,6 +1,6 @@
 .page {
   display: flex;
-  width: min(1440px, calc(100% - var(--space-8)));
+  width: min(1800px, calc(100% - var(--space-8)));
   flex-direction: column;
   gap: var(--space-4);
   margin: 0 auto;
@@ -9,8 +9,8 @@
 
 .dashboardGrid {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
   gap: var(--space-4);
 }
 
@@ -483,9 +483,154 @@
   background: var(--color-team-red);
 }
 
+.chartPlot {
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.scoreChartPlot {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.marginChartPlot {
+  position: relative;
+}
+
+.chartYLabel {
+  align-self: center;
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+  font: 0.65rem var(--font-mono);
+  text-align: center;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
 .scoreChart {
-  width: 100%;
+  display: block;
+  width: 0;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
   overflow: visible;
+}
+
+.frameHoverCard {
+  position: absolute;
+  z-index: 2;
+  width: min(17rem, calc(100% - var(--space-12)));
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  pointer-events: none;
+}
+
+.frameHoverCard[data-anchor='top-left'] {
+  inset-block-start: var(--space-2);
+  inset-inline-start: var(--space-8);
+}
+
+.frameHoverCard[data-anchor='top-right'] {
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-2);
+}
+
+.frameHoverCard[data-anchor='bottom-left'] {
+  inset-block-end: var(--space-2);
+  inset-inline-start: var(--space-8);
+}
+
+.frameHoverCard[data-anchor='bottom-right'] {
+  inset-block-end: var(--space-2);
+  inset-inline-end: var(--space-2);
+}
+
+.frameHoverStep {
+  margin: 0;
+  color: var(--color-text-muted);
+  font: 700 0.68rem var(--font-mono);
+}
+
+.frameHoverScores {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.frameHoverTeam {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.frameHoverTeam strong {
+  font: 700 1.1rem var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.frameHoverTeam small {
+  grid-column: 1 / -1;
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+}
+
+.frameHoverMeta {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.frameHoverMeta span {
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+}
+
+.frameHoverMeta strong {
+  overflow-wrap: anywhere;
+  font-size: 0.75rem;
+}
+
+.chartHoverLine {
+  stroke: var(--color-text-muted);
+  stroke-dasharray: 4 5;
+  stroke-width: 2;
+  opacity: 0.8;
+}
+
+.homeScoreMarker,
+.awayScoreMarker {
+  stroke: var(--color-surface);
+  stroke-width: 3;
+}
+
+.homeScoreMarker {
+  fill: var(--color-team-blue);
+}
+
+.awayScoreMarker {
+  fill: var(--color-team-red);
+}
+
+.marginHoverMarker {
+  fill: var(--color-primary);
+  stroke: var(--color-surface);
+  stroke-width: 3;
 }
 
 .chartGridline {
@@ -508,14 +653,22 @@
 
 .chartAxis {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   color: var(--color-text-muted);
   font: 0.7rem var(--font-mono);
 }
 
+.chartXAxisTitle {
+  flex: 1;
+  text-align: center;
+}
+
 .marginChart {
   display: block;
   width: 100%;
+  min-width: 0;
+  flex: 1 1 0%;
   overflow: visible;
 }
 
@@ -593,6 +746,99 @@
   overflow: visible;
 }
 
+.networkChart {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+}
+
+.networkHoverCard {
+  position: absolute;
+  z-index: 2;
+  width: min(17rem, calc(100% - var(--space-8)));
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  pointer-events: none;
+}
+
+.networkHoverCard[data-anchor='top-left'] {
+  inset-block-start: var(--space-2);
+  inset-inline-start: var(--space-2);
+}
+
+.networkHoverCard[data-anchor='top-right'] {
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-2);
+}
+
+.networkHoverCard[data-anchor='bottom-left'] {
+  inset-block-end: var(--space-2);
+  inset-inline-start: var(--space-2);
+}
+
+.networkHoverCard[data-anchor='bottom-right'] {
+  inset-block-end: var(--space-2);
+  inset-inline-end: var(--space-2);
+}
+
+.networkHoverTitle {
+  font-size: 0.82rem;
+}
+
+.networkHoverCard > span {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+}
+
+.networkHoverStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.networkHoverStat {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.networkHoverStat strong {
+  font: 700 0.9rem var(--font-mono);
+}
+
+.networkHoverStat span {
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+}
+
+.passLinkHitArea {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 18;
+  stroke-linecap: round;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.passLinkHitArea:focus-visible {
+  stroke: var(--color-primary);
+  stroke-width: 6;
+}
+
+.passingNetwork g:focus-visible circle {
+  stroke: var(--color-primary);
+  stroke-width: 4;
+}
+
 .passLink,
 .mediumPassLink,
 .strongPassLink {
@@ -615,6 +861,13 @@
   opacity: 0.76;
 }
 
+.activeNetworkLink .passLink,
+.activeNetworkLink .mediumPassLink,
+.activeNetworkLink .strongPassLink {
+  stroke-width: 5;
+  opacity: 1;
+}
+
 .homePassLink {
   stroke: var(--color-team-blue);
 }
@@ -635,9 +888,18 @@
   stroke-width: 3;
 }
 
+.hoveredNetworkNode circle {
+  stroke: var(--color-primary);
+  stroke-width: 4;
+}
+
 .networkPlayerLabel {
   fill: var(--color-text);
   font: 600 12px var(--font-body);
+}
+
+.networkPortrait {
+  pointer-events: none;
 }
 
 .emptyNetwork {
