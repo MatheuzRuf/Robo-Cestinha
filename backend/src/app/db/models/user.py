@@ -1,10 +1,15 @@
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.db.models.session import Session
+    from app.db.models.team import Team
 
 
 class User(Base):
@@ -15,6 +20,7 @@ class User(Base):
         UniqueConstraint(
             "session_id", "join_sequence", name="uq_users_session_join_sequence"
         ),
+        UniqueConstraint("session_id", "team_id", name="uq_users_session_team"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(

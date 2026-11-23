@@ -17,7 +17,7 @@ paths:
                 $ref: '#/components/schemas/HealthCheckResponse'
   /sessions:
     post:
-      summary: Create a new session
+      summary: Create a session and pre-generate its bracket
       requestBody:
         required: true
         content:
@@ -26,13 +26,172 @@ paths:
               $ref: '#/components/schemas/CreateSessionRequest'
       responses:
         '200':
-          description: Session created successfully.
+          description: Session, owner, and initial match tree created successfully.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreateSessionResponse'
         '422':
           description: Validation error.
+  /sessions/{session_hash}:
+    get:
+      summary: Look up a session by its public code
+      parameters:
+        - name: session_hash
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Session exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionDescriptorResponse'
+        '404':
+          description: Session not found.
+    delete:
+      summary: Delete a session as its owner
+      parameters:
+        - name: session_hash
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Session, participants, matches, and simulation data deleted.
+        '403':
+          description: Requester is not the session owner.
+        '404':
+          description: Session not found.
+  /sessions/{session_hash}/join:
+    post:
+      summary: Join an existing session
+      parameters:
+        - name: session_hash
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JoinSessionRequest'
+      responses:
+        '200':
+          description: Participant joined the session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMembershipResponse'
+        '404':
+          description: Session not found.
+        '422':
+          description: Invalid participant name.
+  /sessions/{session_hash}/participants:
+    get:
+      summary: List persisted participants in join order
+      parameters:
+        - name: session_hash
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Participants ordered by join sequence.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SessionParticipantResponse'
+        '404':
+          description: Session not found.
+  /sessions/{session_hash}/participants/{user_id}:
+    delete:
+      summary: Leave a session as a non-owner participant
+      parameters:
+        - name: session_hash
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Participant removed and their team claim released.
+        '404':
+          description: Session or participant not found.
+        '409':
+          description: The session owner must delete the session instead.
+  /team/{session_hash}/team-locker:
+    get:
+      summary: Get persisted teams and claim state for a session
+      parameters:
+        - name: session_hash
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Session team roster and claim state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamLockerResponse'
+        '404':
+          description: Session or participant not found.
+        '409':
+          description: The session bracket has not been generated.
+  /team/{session_hash}/team-locker/claim:
+    post:
+      summary: Claim an available bracket team
+      parameters:
+        - name: session_hash
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamClaimRequest'
+      responses:
+        '200':
+          description: Updated team locker after a successful claim.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamLockerResponse'
+        '404':
+          description: Session, participant, or bracket team not found.
+        '409':
+          description: Bracket missing, participant already claimed, or team unavailable.
   /bracket/{session_hash}:
     get:
       summary: Get a session bracket or its empty skeleton
@@ -105,11 +264,20 @@ components:
           type: string
           description: Display name for the session owner.
           example: Alice
+        session_name:
+          type: string
+          description: Tournament name.
+          minLength: 1
+          maxLength: 48
+          default: Tournament
     CreateSessionResponse:
       type: object
       required:
         - session_hash
         - owner_user_id
+        - owner_name
+        - session_name
+        - last_visited_at
       properties:
         session_hash:
           type: string
@@ -119,6 +287,231 @@ components:
           type: string
           format: uuid
           description: Database ID of the owner user.
+        owner_name:
+          type: string
+        session_name:
+          type: string
+        team_id:
+          type: string
+          nullable: true
+        last_visited_at:
+          type: string
+    SessionDescriptorResponse:
+      type: object
+      required:
+        - session_hash
+        - session_name
+      properties:
+        session_hash:
+          type: string
+        session_name:
+          type: string
+        owner_user_id:
+          type: string
+          format: uuid
+          nullable: true
+    JoinSessionRequest:
+      type: object
+      anyOf:
+        - required: [user_name]
+        - required: [name]
+      properties:
+        user_name:
+          type: string
+          minLength: 1
+          maxLength: 24
+          description: Legacy field accepted by the current frontend.
+        name:
+          type: string
+          minLength: 1
+          maxLength: 24
+          description: Display name field from the session join contract.
+    SessionMembershipResponse:
+      type: object
+      required:
+        - session_hash
+        - user_id
+        - user_name
+        - session_name
+        - last_visited_at
+      properties:
+        session_hash:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        user_name:
+          type: string
+        session_name:
+          type: string
+        team_id:
+          type: string
+          nullable: true
+        last_visited_at:
+          type: string
+    SessionParticipantResponse:
+      type: object
+      required:
+        - user_id
+        - user_name
+        - join_sequence
+        - is_owner
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        user_name:
+          type: string
+        join_sequence:
+          type: integer
+        is_owner:
+          type: boolean
+    TeamClaimRequest:
+      type: object
+      required:
+        - user_id
+        - team_id
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+    TeamLockerResponse:
+      type: object
+      required:
+        - sessionHash
+        - teams
+        - myTeamId
+        - openTeamCount
+        - totalTeamCount
+      properties:
+        sessionHash:
+          type: string
+        teams:
+          type: array
+          items:
+            $ref: '#/components/schemas/LockerTeamResponse'
+        myTeamId:
+          type: string
+          format: uuid
+          nullable: true
+        openTeamCount:
+          type: integer
+        totalTeamCount:
+          type: integer
+    LockerTeamResponse:
+      type: object
+      required:
+        - id
+        - name
+        - abbreviation
+        - season
+        - statistics
+        - players
+        - claimStatus
+      properties:
+        id:
+          type: string
+          format: uuid
+        nbaTeamId:
+          type: integer
+          nullable: true
+        name:
+          type: string
+        abbreviation:
+          type: string
+        season:
+          type: string
+        statistics:
+          $ref: '#/components/schemas/LockerTeamStatisticsResponse'
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/LockerPlayerResponse'
+        claimStatus:
+          type: string
+          enum: [available, locked_by_you, locked_by_other]
+    LockerTeamStatisticsResponse:
+      type: object
+      required:
+        - pace
+        - offensiveRating
+        - defensiveRating
+      properties:
+        pace:
+          type: number
+        offensiveRating:
+          type: number
+        defensiveRating:
+          type: number
+    LockerPlayerResponse:
+      type: object
+      required:
+        - id
+        - name
+        - position
+        - positionGroup
+        - isStarter
+        - attributes
+      properties:
+        id:
+          type: string
+          format: uuid
+        nbaPlayerId:
+          type: integer
+          nullable: true
+        name:
+          type: string
+        position:
+          type: string
+        positionGroup:
+          type: string
+        isStarter:
+          type: boolean
+        attributes:
+          $ref: '#/components/schemas/LockerPlayerAttributesResponse'
+    LockerPlayerAttributesResponse:
+      type: object
+      required:
+        - twoPointPct
+        - threePointPct
+        - freeThrowPct
+        - turnoverRate
+        - foulRate
+        - reboundRate
+        - assistRate
+        - stealRate
+        - blockRate
+        - stamina
+        - clutchFactor
+        - usageRate
+      properties:
+        twoPointPct:
+          type: number
+        threePointPct:
+          type: number
+        freeThrowPct:
+          type: number
+        turnoverRate:
+          type: number
+        foulRate:
+          type: number
+        reboundRate:
+          type: number
+        assistRate:
+          type: number
+        stealRate:
+          type: number
+        blockRate:
+          type: number
+        stamina:
+          type: number
+        clutchFactor:
+          type: number
+        usageRate:
+          type: number
     GenerateBracketRequest:
       type: object
       required:

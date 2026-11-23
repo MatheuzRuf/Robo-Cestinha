@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Clipboard, Home as HomeIcon, LogIn, UsersRound } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Modal } from '../../components/Modal';
@@ -14,6 +15,7 @@ import { SessionCard } from './components/SessionCard';
 import styles from './Home.module.css';
 
 const MAX_USER_NAME_LENGTH = 24;
+const MAX_SESSION_NAME_LENGTH = 48;
 
 type PendingAction = 'create' | 'join' | null;
 
@@ -42,14 +44,17 @@ function formatLastVisited(value: string, locale: string) {
 export default function Home() {
   const { t, locale } = useTranslation();
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const [sessionCode, setSessionCode] = useState('');
   const [nameDraft, setNameDraft] = useState('');
   const [nameModalOpen, setNameModalOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [joinTarget, setJoinTarget] = useState<SessionDescriptor | null>(null);
+  const [sessionNameDraft, setSessionNameDraft] = useState('');
   const [resumeTarget, setResumeTarget] = useState<SessionMembership | null>(null);
   const [joinError, setJoinError] = useState<string | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
+  const [sessionNameError, setSessionNameError] = useState<string | null>(null);
 
   const recentSessions = useSessionStore((state) => state.recentSessions);
   const activeSessionHash = useSessionStore((state) => state.activeSessionHash);
@@ -78,14 +83,15 @@ export default function Home() {
   });
 
   const createSessionMutation = useMutation({
-    mutationFn: async (userName: string) => {
+    mutationFn: async ({ userName, sessionName }: { userName: string; sessionName: string }) => {
       const previousSessionHash = useSessionStore.getState().activeSessionHash;
-      const membership = await useSessionStore.getState().createSession(userName);
+      const membership = await useSessionStore.getState().createSession(userName, sessionName);
       return { membership, previousSessionHash };
     },
     onSuccess: ({ membership, previousSessionHash }) => {
       closeNameModal();
       notifySessionCreated(previousSessionHash, membership);
+      navigate('/team-locker');
     },
     onError: (error) => setNameError(getErrorKey(error)),
   });
@@ -99,6 +105,7 @@ export default function Home() {
     onSuccess: ({ membership, previousSessionHash }) => {
       closeNameModal();
       notifySessionChanged(previousSessionHash, membership);
+      navigate('/team-locker');
     },
     onError: (error) => setNameError(getErrorKey(error)),
   });
@@ -110,6 +117,7 @@ export default function Home() {
     setPendingAction(null);
     setJoinTarget(null);
     setNameError(null);
+    setSessionNameError(null);
   }
 
   function notifySessionChanged(previousSessionHash: string | null, membership: SessionMembership) {
@@ -125,7 +133,9 @@ export default function Home() {
   const handleCreate = () => {
     setPendingAction('create');
     setNameDraft('');
+    setSessionNameDraft('');
     setNameError(null);
+    setSessionNameError(null);
     setNameModalOpen(true);
   };
 
@@ -144,6 +154,7 @@ export default function Home() {
         const previousSessionHash = store.activeSessionHash;
         const membership = store.resumeSession(normalizedCode);
         notifySessionChanged(previousSessionHash, membership);
+        navigate(membership.teamId ? '/bracket-tree' : '/team-locker');
       } catch (error) {
         setJoinError(getErrorKey(error));
       }
@@ -164,9 +175,20 @@ export default function Home() {
       return;
     }
 
+    const sessionName = sessionNameDraft.trim();
+    if (pendingAction === 'create' && !sessionName) {
+      setSessionNameError('home.errors.session_name_required');
+      return;
+    }
+    if (pendingAction === 'create' && sessionName.length > MAX_SESSION_NAME_LENGTH) {
+      setSessionNameError('home.errors.session_name_too_long');
+      return;
+    }
+
     setNameError(null);
+    setSessionNameError(null);
     if (pendingAction === 'create') {
-      createSessionMutation.mutate(userName);
+      createSessionMutation.mutate({ userName, sessionName });
       return;
     }
 
@@ -184,6 +206,7 @@ export default function Home() {
       const membership = store.resumeSession(resumeTarget.sessionHash);
       setResumeTarget(null);
       notifySessionChanged(previousSessionHash, membership);
+      navigate(membership.teamId ? '/bracket-tree' : '/team-locker');
     } catch (error) {
       setResumeTarget(null);
       setJoinError(getErrorKey(error));
@@ -363,6 +386,25 @@ export default function Home() {
           }}
         >
           <p className={styles.modalDescription}>{t('home.name_modal.description')}</p>
+          {pendingAction === 'create' ? (
+            <>
+              <TextInput
+                label={t('home.name_modal.session_name_label')}
+                placeholder={t('home.name_modal.session_name_placeholder')}
+                maxLength={MAX_SESSION_NAME_LENGTH}
+                value={sessionNameDraft}
+                onChange={(value) => {
+                  setSessionNameDraft(value);
+                  setSessionNameError(null);
+                }}
+              />
+              {sessionNameError ? (
+                <p className={styles.errorMessage} role="alert">
+                  {t(sessionNameError)}
+                </p>
+              ) : null}
+            </>
+          ) : null}
           <TextInput
             label={t('home.name_modal.label')}
             placeholder={t('home.name_modal.placeholder')}

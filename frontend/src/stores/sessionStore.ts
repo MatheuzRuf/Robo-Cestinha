@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { ensureSessionStorageAvailable, sessionStorage } from '../lib/storage/sessionStorage';
 import { sessionService, normalizeSessionCode } from '../services/sessionService';
-import type { SessionDescriptor, SessionIdentity, SessionMembership } from '../types/session';
+import type { SessionDescriptor, SessionIdentity, SessionMembership, SessionValidationResult } from '../types/session';
 
 const RECENT_SESSION_LIMIT = 5;
 
@@ -10,13 +10,15 @@ interface SessionStoreState {
   activeSessionHash: string | null;
   identitiesBySessionHash: Record<string, SessionIdentity>;
   recentSessions: SessionMembership[];
-  createSession: (userName: string) => Promise<SessionMembership>;
+  createSession: (userName: string, sessionName: string) => Promise<SessionMembership>;
   findSession: (codeOrInviteUrl: string) => Promise<SessionDescriptor | null>;
   joinSession: (session: SessionDescriptor, userName: string) => Promise<SessionMembership>;
   resumeSession: (sessionHash: string) => SessionMembership;
   leaveSession: () => void;
   getSavedMembership: (sessionHash: string) => SessionMembership | null;
   setTeamForSession: (sessionHash: string, teamId: string | null) => void;
+  removeSession: (sessionHash: string) => void;
+  reconcileSavedSessions: (checks: SessionValidationResult[]) => void;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -101,9 +103,9 @@ export const useSessionStore = create<SessionStoreState>()(
       identitiesBySessionHash: {},
       recentSessions: [],
 
-      async createSession(userName) {
+      async createSession(userName, sessionName) {
         ensureSessionStorageAvailable();
-        const membership = await sessionService.createSession(userName);
+        const membership = await sessionService.createSession(userName, sessionName);
         set((state) => ({
           activeSessionHash: membership.sessionHash,
           identitiesBySessionHash: pruneIdentities(
@@ -180,6 +182,44 @@ export const useSessionStore = create<SessionStoreState>()(
             session.sessionHash === sessionHash ? { ...session, teamId } : session,
           ),
         }));
+      },
+
+      removeSession(sessionHash) {
+        set((state) => {
+          const recentSessions = state.recentSessions.filter((session) => session.sessionHash !== sessionHash);
+          return {
+            activeSessionHash: state.activeSessionHash === sessionHash ? null : state.activeSessionHash,
+            recentSessions,
+            identitiesBySessionHash: pruneIdentities(state.identitiesBySessionHash, recentSessions),
+          };
+        });
+      },
+
+      reconcileSavedSessions(checks) {
+        set((state) => {
+          const checksByMembership = new Map(
+            checks.map((check) => [`${check.sessionHash}:${check.userId}`, check.descriptor]),
+          );
+          const recentSessions = state.recentSessions.flatMap((session) => {
+            const key = `${session.sessionHash}:${session.userId}`;
+            if (!checksByMembership.has(key)) return [session];
+            const descriptor = checksByMembership.get(key);
+            if (!descriptor) return [];
+            return [
+              {
+                ...session,
+                ...(descriptor.sessionName ? { sessionName: descriptor.sessionName } : {}),
+              },
+            ];
+          });
+          return {
+            activeSessionHash: recentSessions.some((session) => session.sessionHash === state.activeSessionHash)
+              ? state.activeSessionHash
+              : null,
+            recentSessions,
+            identitiesBySessionHash: pruneIdentities(state.identitiesBySessionHash, recentSessions),
+          };
+        });
       },
     }),
     {

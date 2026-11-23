@@ -9,9 +9,9 @@ integrations.
 
 **Current status:** data ingestion prepares an offline catalog; the seed script
 loads eight selected teams and their players into the database; the API manages
-sessions and brackets; the bracket page reads and generates brackets through
-the API; the team locker and match broadcast still use mock behavior; and the
-engine runs an independent headless simulation.
+sessions, brackets, participants, and persisted team claims; the bracket page
+reads and generates brackets through the API; match broadcast still uses mock
+behavior; and the engine runs an independent headless simulation.
 
 ## System overview
 
@@ -23,12 +23,12 @@ flowchart LR
     Seed[Catalog seed]
     DB[(PostgreSQL)]
     Engine[Headless engine<br/>independent execution]
-    API[FastAPI<br/>sessions · bracket · matches]
-    Domain[SessionService]
-    Repo[SessionRepository]
+    API[FastAPI<br/>sessions · participants · bracket · teams · matches]
+    Domain[Session and team services]
+    Repo[Session and team repositories]
     FE[React frontend]
     BracketStore[Zustand bracket store]
-    Mock[Team locker and broadcast mocks]
+    Mock[Match broadcast mock]
     Bracket[BracketService]
     BracketRepo[BracketRepository]
     MatchSvc[MatchService and coordinator<br/>planned]
@@ -62,7 +62,7 @@ flowchart TB
     Locker[TeamLocker]
     Shared[Shared components]
     Hook[useGameFrames]
-    Mock[Mock team locker and match data]
+    Mock[Mock match data]
     Store[Zustand bracket store]
     API[FastAPI]
 
@@ -74,15 +74,15 @@ flowchart TB
     Broadcast --> Shared
     Broadcast --> Hook --> Mock
     BracketTree --> Store --> API
-    Locker --> API --> Mock
+    Locker --> API
     Home --> API
 ```
 
 - The frontend uses React, TypeScript, Vite, and React Router.
 - `Home` uses the session endpoints. `BracketTree` reads bracket state and
   generation actions from a Zustand store, which calls the bracket API.
-- The Team Locker endpoint still builds its response from processed JSON and
-  keeps claims in memory. Match broadcast still uses mock match data.
+- The Team Locker reads catalog, bracket, and claim data from the database.
+  Match broadcast still uses mock match data.
 - `useGameFrames` queues locally generated frames to animate the court. It
   does not consume SSE or replay persisted frames.
 - Shared components handle presentation. Session memberships and identities
@@ -104,17 +104,27 @@ flowchart TB
     subgraph HTTP[Implemented FastAPI endpoints]
         Health[GET /health]
         Sessions[Session endpoints]
+        Participants[GET /sessions/{session_hash}/participants]
         GetBracket[GET /bracket/{session_hash}]
         GenerateBracket[POST /bracket/{session_hash}]
+        GetLocker[GET /team/{session_hash}/team-locker]
+        ClaimTeam[POST /team/{session_hash}/team-locker/claim]
     end
 
     SessionService[SessionService]
     SessionRepo[SessionRepository]
+    TeamService[TeamLockerService]
+    TeamRepo[TeamRepository]
     BracketService[BracketService]
     BracketRepo[BracketRepository]
     Database[(PostgreSQL)]
 
     Factory --> Sessions --> SessionService --> SessionRepo --> Database
+    Factory --> Participants --> SessionService
+    Factory --> GetLocker --> TeamService
+    Factory --> ClaimTeam --> TeamService
+    TeamService --> TeamRepo --> Database
+    TeamService --> SessionService
     Factory --> GetBracket --> BracketService
     Factory --> GenerateBracket --> BracketService
     BracketService --> SessionService
@@ -122,8 +132,11 @@ flowchart TB
     Health --> DBSession --> Database
 ```
 
-- `POST /sessions` creates a session and its owner. Bracket generation is a
-  separate owner action through `POST /bracket/{session_hash}`.
+- `POST /sessions` creates a named session and its owner, then pre-generates the
+  bracket in the same database transaction. `POST /bracket/{session_hash}`
+  remains available for sessions created before that setup flow. Owners can
+  delete their session; non-owner participants can leave and release a team
+  claim.
 - `GET /bracket/{session_hash}` returns either an empty eight-team bracket
   skeleton or the saved bracket. The bracket service looks sessions up through
   `SessionService`; the session service does not depend on bracket creation.
@@ -155,6 +168,7 @@ erDiagram
         string catalog_id UK
         string name
         string abbreviation
+        string season
         json team_stats
     }
     PLAYER {
@@ -170,6 +184,7 @@ erDiagram
     SESSION {
         uuid id PK
         string hash
+        string name
         uuid owner_id FK
     }
     USER {
@@ -178,6 +193,7 @@ erDiagram
         int join_sequence
         string name
         uuid team_id FK
+        unique session_id team_id
     }
     MATCH {
         uuid id PK
@@ -196,10 +212,10 @@ persistence, and replay remain planned.
 
 ## Patterns and responsibilities
 
-- **Repository:** `SessionRepository` and `BracketRepository` encapsulate data
-  access and share operations through `BaseRepository`.
-- **Service Layer:** `SessionService` and `BracketService` coordinate domain
-  workflows without directly receiving an `AsyncSession`.
+- **Repository:** `SessionRepository`, `BracketRepository`, and `TeamRepository`
+  encapsulate data access and share operations through `BaseRepository`.
+- **Service Layer:** `SessionService`, `BracketService`, and `TeamLockerService`
+  coordinate domain workflows without directly receiving an `AsyncSession`.
 - **Factory and Dependency Injection:** `ServiceFactory`, constructed by
   FastAPI per request, composes services and repositories with the database
   session.

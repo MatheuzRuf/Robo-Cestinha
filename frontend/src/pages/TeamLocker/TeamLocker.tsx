@@ -29,6 +29,7 @@ export default function TeamLocker() {
   const selectTeam = useTeamStore((state) => state.selectTeam);
   const lockSelectedTeam = useTeamStore((state) => state.lockSelectedTeam);
   const reset = useTeamStore((state) => state.reset);
+  const setTeamForSession = useSessionStore((state) => state.setTeamForSession);
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,6 +39,13 @@ export default function TeamLocker() {
     }
     reset();
   }, [context, loadLocker, reset]);
+
+  useEffect(() => {
+    if (!context || !activeSession || snapshot?.sessionHash !== context.sessionHash) return;
+    if (snapshot.myTeamId !== activeSession.teamId) {
+      setTeamForSession(context.sessionHash, snapshot.myTeamId);
+    }
+  }, [activeSession, context, setTeamForSession, snapshot]);
 
   const selectedTeam = snapshot?.teams.find((team) => team.id === selectedTeamId) ?? null;
   const myTeam = snapshot?.teams.find((team) => team.id === snapshot.myTeamId) ?? null;
@@ -51,6 +59,7 @@ export default function TeamLocker() {
       if (context) {
         useSessionStore.getState().setTeamForSession(context.sessionHash, updatedSnapshot.myTeamId);
       }
+      if (updatedSnapshot.myTeamId) navigate('/bracket-tree');
     },
   });
 

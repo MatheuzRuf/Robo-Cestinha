@@ -12,6 +12,9 @@ from app.domain.matches.repository import MatchRepository
 from app.domain.matches.service import MatchService
 from app.domain.sessions.repository import SessionRepository
 from app.domain.sessions.service import SessionService
+from app.domain.sessions.setup_service import SessionSetupService
+from app.domain.teams.repository import TeamRepository
+from app.domain.teams.service import TeamLockerService
 
 
 class ServiceFactory:
@@ -49,6 +52,20 @@ class ServiceFactory:
             repository=SessionRepository(self._db),
         )
 
+    def session_setup_service(self) -> SessionSetupService:
+        """Build a session creation workflow with its initial bracket.
+
+        Returns:
+            A setup service backed by the current database session.
+        """
+
+        session_service = self.session_service()
+        bracket_service = BracketService(
+            repository=BracketRepository(self._db),
+            session_service=session_service,
+        )
+        return SessionSetupService(session_service, bracket_service)
+
     def match_service(self) -> MatchService:
         """Build a match service for the current request.
 
@@ -60,4 +77,16 @@ class ServiceFactory:
             repository=MatchRepository(self._db),
             engine_adapter=MatchEngineAdapter(),
             max_iterations=settings.max_simulation_iterations,
+        )
+
+    def team_locker_service(self) -> TeamLockerService:
+        """Build a team locker service for the current request.
+
+        Returns:
+            A team locker service backed by the current database session.
+        """
+
+        return TeamLockerService(
+            repository=TeamRepository(self._db),
+            session_service=self.session_service(),
         )

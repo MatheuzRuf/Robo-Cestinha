@@ -7,25 +7,29 @@ import styles from './AppShell.module.css';
 
 interface AppShellProps {
   activeNavItem: 'home' | 'teamLocker' | 'bracketTree';
+  hasLockedTeam: boolean;
   isMatchRoute?: boolean;
   isMatchPlayback?: boolean;
   onlineCount?: { current: number; total: number };
   currentUserName?: string;
   sessionName?: string;
   sessionCode?: string;
-  onLeaveSession?: () => void;
+  sessionActionLabel?: string;
+  onSessionAction?: () => void;
   children: ReactNode;
 }
 
 export function AppShell({
   activeNavItem,
+  hasLockedTeam,
   isMatchRoute = false,
   isMatchPlayback = false,
   onlineCount,
   currentUserName,
   sessionName,
   sessionCode,
-  onLeaveSession,
+  sessionActionLabel,
+  onSessionAction,
   children,
 }: AppShellProps) {
   const { t } = useTranslation();
@@ -80,20 +84,27 @@ export function AppShell({
         </div>
         <div className={styles.navBar}>
           <nav className={styles.nav}>
-            {navItems.map((item) => (
-              <NavLink
-                key={item.id}
-                to={item.path}
-                end={item.id === 'home'}
-                className={styles.navItem}
-                data-active={activeNavItem === item.id}
-                aria-current={
-                  activeNavItem === item.id && !(isMatchRoute && item.id === 'bracketTree') ? 'page' : undefined
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            {navItems.map((item) => {
+              const isDisabled = item.id === 'bracketTree' && !hasLockedTeam;
+              return (
+                <NavLink
+                  key={item.id}
+                  to={item.path}
+                  end={item.id === 'home'}
+                  className={styles.navItem}
+                  data-active={activeNavItem === item.id}
+                  aria-disabled={isDisabled}
+                  aria-current={
+                    activeNavItem === item.id && !(isMatchRoute && item.id === 'bracketTree') ? 'page' : undefined
+                  }
+                  onClick={(event) => {
+                    if (isDisabled) event.preventDefault();
+                  }}
+                >
+                  {item.label}
+                </NavLink>
+              );
+            })}
           </nav>
           <div className={styles.utilityRow}>
             {!currentUserName && onlineCount ? (
@@ -108,30 +119,35 @@ export function AppShell({
                 <span className={styles.sessionCode}>{t('shell.session_code', { code: sessionCode })}</span>
               </div>
             ) : null}
-            {currentUserName && onLeaveSession ? (
+            {currentUserName ? (
               <div className={styles.userMenu} ref={userMenuRef}>
                 <button
                   type="button"
                   className={styles.userMenuTrigger}
+                  disabled={!onSessionAction}
                   aria-expanded={isUserMenuOpen}
                   aria-controls={isUserMenuOpen ? 'session-user-menu' : undefined}
-                  onClick={() => setIsUserMenuOpen((open) => !open)}
+                  onClick={() => {
+                    if (onSessionAction) setIsUserMenuOpen((open) => !open);
+                  }}
                 >
                   {t('shell.hello_user', { name: currentUserName })}
                   <ChevronDown size={14} aria-hidden="true" />
                 </button>
-                {isUserMenuOpen ? (
+                {isUserMenuOpen && onSessionAction ? (
                   <div className={styles.userMenuPopover} id="session-user-menu">
-                    <button
-                      type="button"
-                      className={styles.userMenuItem}
-                      onClick={() => {
-                        setIsUserMenuOpen(false);
-                        onLeaveSession();
-                      }}
-                    >
-                      {t('shell.leave_session')}
-                    </button>
+                    {onSessionAction ? (
+                      <button
+                        type="button"
+                        className={styles.userMenuItem}
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          onSessionAction();
+                        }}
+                      >
+                        {sessionActionLabel ?? t('shell.leave_session')}
+                      </button>
+                    ) : null}
                   </div>
                 ) : null}
               </div>

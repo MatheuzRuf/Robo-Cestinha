@@ -23,6 +23,7 @@ class Team(Base):
     catalog_id: Mapped[str | None] = mapped_column(String, nullable=True, unique=True)
     abbreviation: Mapped[str | None] = mapped_column(String, nullable=True)
     nba_team_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    season: Mapped[str] = mapped_column(String, nullable=False)
     team_stats: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     players: Mapped[list["Player"]] = relationship(back_populates="team")

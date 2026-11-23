@@ -52,6 +52,7 @@ def build_catalog_records(
                 name=team.name,
                 abbreviation=team.abbreviation,
                 nba_team_id=team.nba_team_id,
+                season=team.season,
                 team_stats=team.team_stats.model_dump(),
             )
         )
@@ -92,6 +93,7 @@ async def seed_catalog() -> None:
                 source = seeded_teams.get(team.catalog_id)
                 if source is not None:
                     team.nba_team_id = source.nba_team_id
+                    team.season = source.season
             for player in existing_players:
                 source = seeded_players.get(player.catalog_id)
                 if source is not None:
