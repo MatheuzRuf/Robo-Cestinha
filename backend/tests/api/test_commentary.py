@@ -12,7 +12,7 @@ def test_commentary_route_rejects_more_than_forty_events():
                 "ev": [{"f": frame, "ty": "Score"} for frame in range(41)],
                 "st": {"sc": {"h": 0, "a": 0}, "tf": {}, "pp": {}},
             }
-        ]
+        ],
     }
 
     with TestClient(app) as client:
@@ -22,8 +22,9 @@ def test_commentary_route_rejects_more_than_forty_events():
 
 
 def test_commentary_batch_route_accepts_forty_event_window(monkeypatch):
-    async def generate_batch(self, snapshots):
+    async def generate_batch(self, snapshots, recent_commentary):
         assert len(snapshots[0]["ev"]) == 40
+        assert recent_commentary == []
         return [{"f": snapshots[0]["f"], "c": "What a wild run!"}]
 
     monkeypatch.setattr(CommentaryService, "generate_batch", generate_batch)
@@ -35,7 +36,7 @@ def test_commentary_batch_route_accepts_forty_event_window(monkeypatch):
                 "ev": [{"f": frame, "ty": "Pass"} for frame in range(40)],
                 "st": {"sc": {"h": 0, "a": 0}, "tf": {}, "pp": {}},
             }
-        ]
+        ],
     }
 
     with TestClient(app) as client:
@@ -45,8 +46,12 @@ def test_commentary_batch_route_accepts_forty_event_window(monkeypatch):
 
 
 def test_commentary_batch_route_preserves_frame_associations(monkeypatch):
-    async def generate_batch(self, snapshots):
+    async def generate_batch(self, snapshots, recent_commentary):
         assert [snapshot["f"] for snapshot in snapshots] == [10, 20]
+        assert recent_commentary == ["Jordan scored on the prior possession!"]
+        assert snapshots[0]["fx"] == [
+            {"k": "hot", "t": "Jordan: 8 pts in last 10 frames"}
+        ]
         return [{"f": 10, "c": "Jordan scores!"}, {"f": 20, "c": None}]
 
     monkeypatch.setattr(CommentaryService, "generate_batch", generate_batch)
@@ -57,9 +62,15 @@ def test_commentary_batch_route_preserves_frame_associations(monkeypatch):
                 "tf": 1000,
                 "ev": [{"f": frame, "ty": "Score", "p": "Jordan", "tm": "HOME", "pts": 2}],
                 "st": {"sc": {"h": frame, "a": 0}, "tf": {}, "pp": {"Jordan": frame}},
+                **(
+                    {"fx": [{"k": "hot", "t": "Jordan: 8 pts in last 10 frames"}]}
+                    if frame == 10
+                    else {}
+                ),
             }
             for frame in (10, 20)
-        ]
+        ],
+        "recent_commentary": ["Jordan scored on the prior possession!"],
     }
 
     with TestClient(app) as client:

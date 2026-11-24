@@ -28,7 +28,9 @@ async def generate_commentary_batch(
     snapshots = [
         snapshot.model_dump(exclude_none=True) for snapshot in payload.snapshots
     ]
-    commentary = await CommentaryService().generate_batch(snapshots)
+    commentary = await CommentaryService().generate_batch(
+        snapshots, payload.recent_commentary
+    )
     return GenerateCommentaryBatchResponse(
         commentaries=[
             CommentaryFrameResponse(f=result["f"], c=result["c"])

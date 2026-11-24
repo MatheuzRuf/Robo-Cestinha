@@ -5,6 +5,8 @@ import type {
   SimulationResponse,
   SimulationTeam,
 } from '../../types/matchBroadcast';
+import { sampleCommentaryFrames } from './commentaryFrameSampling';
+import { FactExtractor, type CommentaryFact, type GameStats } from './factExtractor';
 
 export interface CommentaryEventSnapshot {
   f: number;
@@ -23,7 +25,10 @@ export interface CommentarySnapshot {
     sc: { h: number; a: number };
     tf: Record<string, number>;
     pp: Record<string, number>;
+    pf: Record<string, number>;
   };
+  facts: readonly CommentaryFact[];
+  topFact: CommentaryFact | null;
 }
 
 const eventTypeLabels: Record<string, string> = {
@@ -51,7 +56,7 @@ export const SIGNIFICANT_COMMENTARY_EVENTS = new Set([
 ]);
 
 const RECENT_EVENT_WINDOW_SIZE = 40;
-const COMMENTARY_EVENT_INTERVAL = 5;
+const factExtractor = new FactExtractor();
 
 export const FALLBACK_COMMENTARY_LINES = [
   'The crowd is on its feet!',
@@ -102,11 +107,21 @@ export function buildCommentarySnapshot({
     [teams.away.abbreviation]: 0,
   };
   const playerPoints: Record<string, number> = {};
+  const playerFouls: Record<string, number> = {};
+  const teamFoulsById: Record<string, number> = {};
+  const playerPointsById: Record<string, number> = {};
+  const playerFoulsById: Record<string, number> = {};
 
   for (const event of currentEvents) {
     const teamName = teamNameById.get(event.teamId ?? '');
+    const teamId = event.teamId ?? '';
+    const playerId = event.playerId ?? '';
     if (event.type === 'foul' && teamName) {
       teamFouls[teamName] = (teamFouls[teamName] ?? 0) + 1;
+      teamFoulsById[teamId] = (teamFoulsById[teamId] ?? 0) + 1;
+      if (playerId) playerFoulsById[playerId] = (playerFoulsById[playerId] ?? 0) + 1;
+      const playerName = playerNameById.get(playerId);
+      if (playerName) playerFouls[playerName] = (playerFouls[playerName] ?? 0) + 1;
     }
 
     if (event.type === 'shot_made' && event.playerId) {
@@ -114,10 +129,22 @@ export function buildCommentarySnapshot({
       const points = getNumericData(event.data, 'pointsScored');
       if (playerName && points !== undefined) {
         playerPoints[playerName] = (playerPoints[playerName] ?? 0) + points;
+        playerPointsById[playerId] = (playerPointsById[playerId] ?? 0) + points;
       }
     }
   }
 
+  const statsNow: GameStats = {
+    score: { home: frame.score.home, away: frame.score.away },
+    teamIds: { home: teams.home.teamId, away: teams.away.teamId },
+    teamNames: Object.fromEntries(teamNameById),
+    teamFouls: teamFoulsById,
+    playerNames: Object.fromEntries(playerNameById),
+    playerTeamIds: Object.fromEntries(players.map((player) => [player.playerId, player.teamId])),
+    playerPoints: playerPointsById,
+    playerFouls: playerFoulsById,
+  };
+  const facts: readonly CommentaryFact[] = factExtractor.extract(events, frame.iteration, totalFrames, statsNow);
   return {
     f: frame.iteration,
     tf: totalFrames,
@@ -126,7 +153,10 @@ export function buildCommentarySnapshot({
       sc: { h: frame.score.home, a: frame.score.away },
       tf: teamFouls,
       pp: playerPoints,
+      pf: playerFouls,
     },
+    facts,
+    topFact: facts[0] ?? null,
   };
 }
 
@@ -139,10 +169,7 @@ export function buildMatchCommentarySnapshots(simulation: SimulationResponse): C
         .map((event) => event.iteration),
     ),
   ].sort((first, second) => first - second);
-  const eventFrames = significantFrames.filter(
-    (_, index) =>
-      (index + 1) % COMMENTARY_EVENT_INTERVAL === 0 || index === significantFrames.length - 1,
-  );
+  const eventFrames = sampleCommentaryFrames(significantFrames);
 
   return eventFrames.flatMap((iteration) => {
     const frame = framesByIteration.get(iteration);
