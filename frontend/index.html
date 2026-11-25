@@ -2,9 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="color-scheme" content="dark light" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>robo-cestinha</title>
+    <script>
+      (function () {
+        var theme = 'dark';
+        try {
+          var stored = window.localStorage.getItem('robo-cestinha-theme');
+          if (stored === 'light') theme = 'light';
+        } catch (error) {
+          theme = 'dark';
+        }
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

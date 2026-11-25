@@ -1,31 +1,62 @@
 :root {
-  --color-bg: #14100d;
-  --color-surface: #1f1913;
-  --color-surface-raised: #2a221a;
-  --color-border: #3a2f24;
-  --color-border-input: #3a2f24;
+  color-scheme: dark;
 
-  --color-text: #f0e6d2;
-  --color-text-muted: #a69a87;
-  --color-text-inverse: #14100d;
+  --color-bg: #120e0b;
+  --color-surface: #1d1712;
+  --color-surface-raised: #2b221a;
+  --color-border: #4a3b2e;
+  --color-border-input: #635040;
 
-  --color-primary: #e2661a;
-  --color-primary-hover: #f0791f;
-  --color-cream-button: #ede3d0;
-  --color-cream-button-text: #14100d;
+  --color-text: #f7efe1;
+  --color-text-muted: #bfb19d;
+  --color-text-inverse: #120e0b;
 
-  --color-header-background: rgba(20, 16, 13, 0.96);
-  --color-modal-backdrop: rgba(20, 16, 13, 0.8);
+  --color-primary: #f0711f;
+  --color-primary-hover: #ff8533;
+  --color-cream-button: #f2e8d7;
+  --color-cream-button-text: #120e0b;
 
-  --color-live: #c1272d;
-  --color-warning: #f2b705;
+  --color-header-background: rgba(18, 14, 11, 0.94);
+  --color-modal-backdrop: rgba(10, 8, 6, 0.8);
+
+  --color-live: #f87171;
+  --color-warning: #facc15;
   --color-trajectory-opponent: #22d3ee;
-  --color-success: #4c9a6a;
-  --color-team-blue: #1d4ed8;
-  --color-team-red: #dc2626;
+  --color-success: #4ade80;
+  --color-team-blue: #4f86f7;
+  --color-team-red: #f05252;
 
   /* Keep the in-game court accent independent from UI warning text colors. */
-  --color-court-warning: #f2b705;
+  --color-court-warning: #facc15;
+  --color-court-wood: #8d4d24;
+  --color-court-wood-grain: #a45f32;
+  --color-court-wood-seam: #683516;
+  --color-court-border: #3d1d0b;
+  --color-court-line: #faf0e0;
+  --color-court-key-fill: rgba(240, 113, 31, 0.14);
+  --color-court-hoop: #ff8c00;
+  --color-court-hoop-stroke: #1c1410;
+
+  --color-player-stroke: #faf0e0;
+  --color-player-label-bg: #18120e;
+  --color-player-label-text: #faf3e8;
+
+  --color-stamina-track: rgba(255, 255, 255, 0.22);
+  --color-stamina-high: #22c55e;
+  --color-stamina-mid: #f59e0b;
+  --color-stamina-low: #ef4444;
+
+  --color-effect-score-2pt: #fb923c;
+  --color-effect-score-3pt: #facc15;
+  --color-effect-rebound-def: #22d3ee;
+  --color-effect-rebound-off: #fbbf24;
+
+  --color-trophy-gold: #f59e0b;
+  --color-trophy-silver: #cbd5e1;
+  --color-trophy-bronze: #d97706;
+
+  --color-overlay-scrim: rgba(14, 10, 7, 0.86);
+  --color-overlay-text: #ffffff;
 
   --font-display: system-ui, sans-serif;
   --font-body: system-ui, sans-serif;
@@ -47,24 +78,59 @@
 :root[data-theme='light'] {
   color-scheme: light;
 
-  --color-bg: #f4ede0;
-  --color-surface: #fffaf2;
-  --color-surface-raised: #f0e8da;
-  --color-border: #d9ccb6;
-  --color-border-input: #8f806e;
+  --color-bg: #f4ede2;
+  --color-surface: #fffcf7;
+  --color-surface-raised: #ebe1d2;
+  --color-border: #cbbba4;
+  --color-border-input: #8a7965;
 
-  --color-text: #241a13;
-  --color-text-muted: #62564b;
+  --color-text: #1f1610;
+  --color-text-muted: #594b3e;
   --color-text-inverse: #ffffff;
 
-  --color-primary: #b44a0b;
-  --color-primary-hover: #953a08;
-  --color-cream-button: #e7dac5;
-  --color-cream-button-text: #332416;
+  --color-primary: #b84706;
+  --color-primary-hover: #963804;
+  --color-cream-button: #e6d8c3;
+  --color-cream-button-text: #1f1610;
 
-  --color-header-background: rgba(244, 237, 224, 0.96);
-  --color-modal-backdrop: rgba(35, 26, 19, 0.48);
+  --color-header-background: rgba(244, 237, 226, 0.95);
+  --color-modal-backdrop: rgba(31, 22, 16, 0.52);
 
-  --color-warning: #705000;
-  --color-success: #276b3f;
+  --color-live: #b91c1c;
+  --color-warning: #92400e;
+  --color-trajectory-opponent: #0891b2;
+  --color-success: #15803d;
+  --color-team-blue: #1d4ed8;
+  --color-team-red: #c81e1e;
+
+  --color-court-warning: #fbbf24;
+  --color-court-wood: #9a5a2c;
+  --color-court-wood-grain: #b06c3a;
+  --color-court-wood-seam: #79431d;
+  --color-court-border: #5a3114;
+  --color-court-line: #fff8ec;
+  --color-court-key-fill: rgba(184, 71, 6, 0.16);
+  --color-court-hoop: #ea580c;
+  --color-court-hoop-stroke: #1f1610;
+
+  --color-player-stroke: #fff8ec;
+  --color-player-label-bg: #231912;
+  --color-player-label-text: #fffaf2;
+
+  --color-stamina-track: rgba(255, 255, 255, 0.25);
+  --color-stamina-high: #16a34a;
+  --color-stamina-mid: #d97706;
+  --color-stamina-low: #dc2626;
+
+  --color-effect-score-2pt: #f97316;
+  --color-effect-score-3pt: #facc15;
+  --color-effect-rebound-def: #06b6d4;
+  --color-effect-rebound-off: #f59e0b;
+
+  --color-trophy-gold: #b45309;
+  --color-trophy-silver: #475569;
+  --color-trophy-bronze: #9a3412;
+
+  --color-overlay-scrim: rgba(24, 17, 12, 0.84);
+  --color-overlay-text: #ffffff;
 }
