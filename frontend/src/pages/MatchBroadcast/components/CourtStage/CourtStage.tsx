@@ -1,6 +1,7 @@
 import type { BallTrajectory, Frame } from '../../../../types/game';
+import { renderedBallPosition } from '../../hooks/useGameFrames';
 import styles from './CourtStage.module.css';
-import { Ball } from './Ball';
+import { Ball, shotArcPeakFt } from './Ball';
 import { Court } from './Court';
 import { Player, STAMINA_LEGEND_TIERS } from './Player';
 import { CourtEffectBanner, CourtEffectsSvg, type FrameEffect } from './CourtEffects';
@@ -65,6 +66,8 @@ export function CourtStage({ frame, transitionDurationMs, madeBasketSide, effect
   }, []);
 
   const hasStamina = frame?.players.some((player) => player.stamina !== undefined && player.stamina !== null) ?? false;
+  const renderedBall = frame ? renderedBallPosition(frame) : null;
+  const arcPeakFt = frame?.trajectory?.type === 'shot' ? shotArcPeakFt(frame.trajectory.from, frame.trajectory.to) : 0;
 
   const trajectory = visibleTrajectory;
   const start = trajectory ? gameToSvg(trajectory.from.x, trajectory.from.y) : null;
@@ -96,8 +99,13 @@ export function CourtStage({ frame, transitionDurationMs, madeBasketSide, effect
         {frame?.players.map((player) => (
           <Player key={player.id} player={player} transitionDuration={transitionDuration} />
         ))}
-        {frame ? (
-          <Ball ball={frame.ball} transitionDuration={transitionDuration} isHeld={frame.ball.isHeld ?? false} />
+        {frame && renderedBall ? (
+          <Ball
+            ball={{ ...frame.ball, x: renderedBall.x, y: renderedBall.y }}
+            transitionDuration={transitionDuration}
+            isHeld={frame.ball.isHeld ?? false}
+            arcPeakFt={arcPeakFt}
+          />
         ) : null}
         {effects && effects.length ? <CourtEffectsSvg effects={effects} /> : null}
       </svg>
