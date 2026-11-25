@@ -176,6 +176,7 @@ class MatchEngineAdapter:
             "possessionTeamId": _map_optional_id(
                 frame.possession_team_id, id_map.team_id_by_engine
             ),
+            "phase": frame.phase,
         }
 
     @staticmethod

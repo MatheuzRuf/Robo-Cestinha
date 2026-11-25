@@ -94,8 +94,12 @@ class MatchRunner:
         events: list[SimulationEvent] = []
         sequence = 0
 
-        def capture(iteration: int, trajectory: BallTrajectory | None = None) -> None:
-            frames.append(self._capture_frame(iteration, trajectory))
+        def capture(
+            iteration: int,
+            trajectory: BallTrajectory | None = None,
+            phase: str | None = None,
+        ) -> None:
+            frames.append(self._capture_frame(iteration, trajectory, phase))
 
         def emit(
             iteration: int,
@@ -125,10 +129,11 @@ class MatchRunner:
         completed = 0
         overtime_iterations = 0
         for _ in range(max_iterations):
-            self._refill_clock()
+            if self._refill_clock():
+                self._reset_for_new_period(completed + 1, emit)
             transition = self.fsm.resolve_next_transition(self.state)
             completed += 1
-            capture(completed, transition.trajectory)
+            capture(completed, transition.trajectory, transition.phase)
             self._append_transition_events(transition, completed, emit)
 
         termination_reason = "iteration_limit"
@@ -136,11 +141,12 @@ class MatchRunner:
             termination_reason = "overtime_score"
             emit(completed, "overtime_started", None, None, None, {})
             while self.state.home_team.score == self.state.away_team.score:
-                self._refill_clock()
+                if self._refill_clock():
+                    self._reset_for_new_period(completed + 1, emit)
                 transition = self.fsm.resolve_next_transition(self.state)
                 completed += 1
                 overtime_iterations += 1
-                capture(completed, transition.trajectory)
+                capture(completed, transition.trajectory, transition.phase)
                 self._append_transition_events(transition, completed, emit)
 
         winner_team_id = (
@@ -168,13 +174,48 @@ class MatchRunner:
             termination_reason=termination_reason,
         )
 
-    def _refill_clock(self) -> None:
-        """Keep game time plentiful so only the shot clock drives turnovers."""
+    def _refill_clock(self) -> bool:
+        """Keep game time plentiful so only the shot clock drives turnovers.
+
+        Returns:
+            True when a new period was started (players should be reset).
+        """
         if self.state.clock.game_clock_remaining < 60.0:
             self.state.clock.start_next_period(is_overtime=False)
+            return True
+        return False
+
+    def _reset_for_new_period(self, iteration: int, emit) -> None:
+        """Reposition both teams at the tip-off slots for a fresh period.
+
+        Mirrors the tip-off setup (D1b): possession is kept and a fresh handler
+        is selected for the team in possession; no inbound pass is needed.
+        """
+        state = self.state
+        if state.pending_kickoff or state.awaiting_inbound:
+            return
+        state.home_team.setup_court_positions(is_team_a=True)
+        state.away_team.setup_court_positions(is_team_a=False)
+        state.active_handler_id = state.attacking_team.select_ball_handler(self.rng)
+        state.last_passer_id = None
+        state.clock.reset_for_new_possession(is_offensive_rebound=False)
+        emit(
+            iteration,
+            "kickoff",
+            state.possession_team_id,
+            state.active_handler_id,
+            None,
+            {
+                "reason": "quarter_start",
+                "hoopSide": "left" if state.is_attacking_team_home() else "right",
+            },
+        )
 
     def _capture_frame(
-        self, iteration: int, trajectory: BallTrajectory | None = None
+        self,
+        iteration: int,
+        trajectory: BallTrajectory | None = None,
+        phase: str | None = None,
     ) -> SimulationFrame:
         """Build a dense frame snapshot for the current game state."""
         state = self.state
@@ -206,14 +247,57 @@ class MatchRunner:
             ball=BallState(x=ball_position.x, y=ball_position.y, trajectory=trajectory),
             score=ScoreSnapshot(home=state.home_team.score, away=state.away_team.score),
             possession_team_id=state.possession_team_id,
+            phase=phase,
         )
 
-    @staticmethod
     def _append_transition_events(
-        transition: TransitionResult, iteration: int, emit
+        self, transition: TransitionResult, iteration: int, emit
     ) -> None:
         """Emit semantic events for one resolved transition."""
         action_type = transition.action_type
+        hoop_side = (
+            "left"
+            if transition.possession_team_id == self.state.home_team.team_id
+            else "right"
+        )
+        if action_type == "kickoff":
+            emit(
+                iteration,
+                "kickoff",
+                transition.possession_team_id,
+                transition.player_id,
+                None,
+                {"reason": "score", "hoopSide": hoop_side},
+            )
+            return
+        if action_type == "inbound":
+            if transition.outcome == "turnover":
+                emit(
+                    iteration,
+                    "turnover",
+                    transition.acting_team_id,
+                    transition.player_id,
+                    transition.defender_id,
+                    {},
+                )
+                emit(
+                    iteration,
+                    "possession_changed",
+                    transition.possession_team_id,
+                    None,
+                    None,
+                    {"previousTeamId": transition.acting_team_id},
+                )
+            else:
+                emit(
+                    iteration,
+                    "inbound_pass",
+                    transition.acting_team_id,
+                    transition.player_id,
+                    transition.target_player_id,
+                    {},
+                )
+            return
         if transition.outcome == "turnover":
             emit(
                 iteration,
