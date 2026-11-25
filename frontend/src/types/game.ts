@@ -9,6 +9,7 @@ export interface PlayerState {
   nbaPlayerId?: number | null;
   number?: number;
   position: string;
+  stamina?: number;
 }
 
 export interface BallState {

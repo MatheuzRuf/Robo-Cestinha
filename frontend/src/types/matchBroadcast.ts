@@ -21,6 +21,8 @@ export interface SimulationFramePosition {
   playerId: string;
   x: number;
   y: number;
+  /** Remaining stamina in 0..1; missing on simulations stored before stamina tracking. */
+  stamina?: number | null;
 }
 
 export interface SimulationFrame {

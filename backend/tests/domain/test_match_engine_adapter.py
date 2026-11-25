@@ -125,3 +125,24 @@ def test_adapter_preserves_player_attributes_unchanged():
     engine = MatchEngineAdapter().run(context, iterations=10, seed=1)
     assert engine.iterations_completed >= 10
     assert len(engine.frames) == engine.iterations_completed + 1
+
+
+def test_adapter_exposes_stamina_and_trajectory_team_ids():
+    context = _make_context()
+    adapter = MatchEngineAdapter()
+    engine = adapter.run(context, iterations=40, seed=3)
+    result = adapter.to_domain_result(engine, context, iterations=40)
+
+    team_ids = {context.home_team.id, context.away_team.id}
+    seen_trajectory = False
+    for frame in result.frames:
+        for position in frame["players"]:
+            assert position["stamina"] is not None
+            assert 0.0 <= position["stamina"] <= 1.0
+        trajectory = frame["ball"]["trajectory"]
+        if trajectory is None:
+            continue
+        seen_trajectory = True
+        assert trajectory["fromTeamId"] in team_ids
+        assert trajectory["toTeamId"] in team_ids
+    assert seen_trajectory

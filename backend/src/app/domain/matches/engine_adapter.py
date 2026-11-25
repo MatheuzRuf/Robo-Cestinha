@@ -101,11 +101,14 @@ class MatchEngineAdapter:
             _engine_id(context.away_team): context.away_team.id,
         }
         player_map = {}
+        player_team_map = {}
         for player in context.home_players + context.away_players:
             player_map[_engine_id(player)] = player.id
+            player_team_map[_engine_id(player)] = player.team_id
         return EngineIdMap(
             team_id_by_engine=team_map,
             player_id_by_engine=player_map,
+            player_team_id_by_engine=player_team_map,
         )
 
     def _build_ignition_teams(
@@ -155,6 +158,7 @@ class MatchEngineAdapter:
                     "playerId": id_map.player_id_by_engine[position.player_id],
                     "x": _map_x(position.x),
                     "y": _map_y(position.y),
+                    "stamina": position.stamina,
                 }
                 for position in frame.players
             ],
@@ -162,7 +166,11 @@ class MatchEngineAdapter:
                 "x": _map_x(frame.ball.x),
                 "y": _map_y(frame.ball.y),
                 "height": 0.0,
-                "trajectory": _map_trajectory(frame.ball.trajectory, id_map),
+                "trajectory": _map_trajectory(
+                    frame.ball.trajectory,
+                    id_map,
+                    frame.possession_team_id,
+                ),
             },
             "score": {"home": frame.score.home, "away": frame.score.away},
             "possessionTeamId": _map_optional_id(
@@ -226,9 +234,15 @@ def _map_y(value: int) -> int:
     return round(value * COURT_HEIGHT / GRID_HEIGHT)
 
 
-def _map_trajectory(trajectory, id_map):
+def _map_trajectory(trajectory, id_map, fallback_team_engine_id=None):
     if trajectory is None:
         return None
+    from_team_id = id_map.player_team_id_by_engine.get(trajectory.from_player_id)
+    if from_team_id is None and fallback_team_engine_id is not None:
+        from_team_id = id_map.team_id_by_engine.get(fallback_team_engine_id)
+    to_team_id = id_map.player_team_id_by_engine.get(trajectory.to_player_id)
+    if to_team_id is None:
+        to_team_id = from_team_id
     return {
         "type": trajectory.type,
         "fromPosition": {
@@ -245,7 +259,7 @@ def _map_trajectory(trajectory, id_map):
         "toPlayerId": _map_optional_id(
             trajectory.to_player_id, id_map.player_id_by_engine
         ),
-        "fromTeamId": None,
-        "toTeamId": None,
+        "fromTeamId": from_team_id,
+        "toTeamId": to_team_id,
         "progress": 1.0,
     }
