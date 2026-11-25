@@ -208,6 +208,13 @@ export const enUS = {
       frame_message: 'Frame {frame}: {message}',
       typing: 'Commentator is typing',
     },
+    stamina: {
+      label: 'STAMINA',
+      high: 'Fresh',
+      mid: 'Tired',
+      low: 'Low',
+      player_tooltip: '{player} — {percent}% stamina',
+    },
     simulation: {
       no_active_session: 'Create or join a session before watching a match.',
       no_match: 'No match is ready yet. Generate the bracket to start your first game.',

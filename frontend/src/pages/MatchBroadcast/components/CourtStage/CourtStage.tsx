@@ -2,7 +2,7 @@ import type { BallTrajectory, Frame } from '../../../../types/game';
 import styles from './CourtStage.module.css';
 import { Ball } from './Ball';
 import { Court } from './Court';
-import { Player } from './Player';
+import { Player, STAMINA_LEGEND_TIERS } from './Player';
 import { gameToSvg } from '../../../../config/court';
 import trajectoryStyles from './Ball.module.css';
 import { startTransition, useEffect, useRef, useState } from 'react';
@@ -46,6 +46,8 @@ export function CourtStage({
     };
   }, []);
 
+  const hasStamina = frame?.players.some((player) => player.stamina !== undefined && player.stamina !== null) ?? false;
+
   const trajectory = visibleTrajectory;
   const start = trajectory ? gameToSvg(trajectory.from.x, trajectory.from.y) : null;
   const end = trajectory ? gameToSvg(trajectory.to.x, trajectory.to.y) : null;
@@ -80,6 +82,17 @@ export function CourtStage({
           <Ball ball={frame.ball} transitionDuration={transitionDuration} isHeld={frame.ball.isHeld ?? false} />
         ) : null}
       </svg>
+      {hasStamina ? (
+        <div className={styles.staminaLegend} aria-label={t('match_broadcast.stamina.label')}>
+          <span className={styles.staminaLegendTitle}>{t('match_broadcast.stamina.label')}</span>
+          {STAMINA_LEGEND_TIERS.map((tier) => (
+            <span key={tier.tier} className={styles.staminaLegendItem}>
+              <span className={styles.staminaLegendDot} style={{ background: tier.color }} />
+              {t(`match_broadcast.stamina.${tier.tier}`)}
+            </span>
+          ))}
+        </div>
+      ) : null}
       {basketMessage ? (
         <div className={styles.basketMessage} key={basketSequence} role="status">
           {basketMessage}

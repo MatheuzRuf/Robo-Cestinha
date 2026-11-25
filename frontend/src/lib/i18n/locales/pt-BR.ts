@@ -208,6 +208,13 @@ export const ptBR = {
       frame_message: 'Quadro {frame}: {message}',
       typing: 'Comentarista está digitando',
     },
+    stamina: {
+      label: 'ENERGIA',
+      high: 'Inteiro',
+      mid: 'Cansado',
+      low: 'Exausto',
+      player_tooltip: '{player} — {percent}% de energia',
+    },
     simulation: {
       no_active_session: 'Crie ou entre em uma sessão antes de assistir a uma partida.',
       no_match: 'Nenhuma partida pronta ainda. Gere a chave para iniciar o primeiro jogo.',

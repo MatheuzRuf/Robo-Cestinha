@@ -173,6 +173,7 @@ export default function MatchBroadcast() {
               nbaPlayerId: player.nbaPlayerId,
               number: player.number ?? undefined,
               position: player.position,
+              stamina: position.stamina ?? undefined,
             },
           ];
         }),

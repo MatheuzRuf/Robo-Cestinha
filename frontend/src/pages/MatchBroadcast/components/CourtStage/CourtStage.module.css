@@ -54,6 +54,42 @@
   }
 }
 
+.staminaLegend {
+  position: absolute;
+  z-index: 1;
+  left: var(--space-3);
+  bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-header-background);
+  backdrop-filter: blur(6px);
+  color: var(--color-text-muted);
+  font: 700 0.65rem var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.staminaLegendTitle {
+  color: var(--color-text);
+}
+
+.staminaLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.staminaLegendDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
 .stage svg {
   display: block;
   width: 100%;
