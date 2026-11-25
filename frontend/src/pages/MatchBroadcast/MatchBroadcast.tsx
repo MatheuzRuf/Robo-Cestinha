@@ -15,6 +15,8 @@ import { SimulationEvents } from './components/SimulationEvents/SimulationEvents
 import { SimulationProgress } from './components/SimulationProgress/SimulationProgress';
 import { CommentaryChat } from './components/CommentaryChat/CommentaryChat';
 import { VictoryOverlay } from './components/VictoryOverlay/VictoryOverlay';
+import { TrophyShowcase } from '../../components/TrophyShowcase';
+import { deriveMatchStats, deriveMatchTrophies } from '../MatchStats/stats';
 import { generateCommentaryBatch, type CommentaryFrameResult } from '../../services/commentaryService';
 import { buildMatchCommentarySnapshots, FALLBACK_COMMENTARY_LINES } from './commentarySnapshot';
 import styles from './MatchBroadcast.module.css';
@@ -324,6 +326,12 @@ export default function MatchBroadcast() {
 
   const madeBasketSide = frameEffects.find((effect) => effect.kind === 'score')?.hoopSide;
 
+  const matchStats = useMemo(() => (simulation ? deriveMatchStats(simulation) : null), [simulation]);
+  const matchTrophies = useMemo(
+    () => (simulation && matchStats ? deriveMatchTrophies(simulation, matchStats) : []),
+    [simulation, matchStats],
+  );
+
   return (
     <main className={`${styles.page} ${styles.matchPage}`} ref={pageRef}>
       {!sessionHash || !userId ? (
@@ -378,6 +386,11 @@ export default function MatchBroadcast() {
                     awayScore={simulation.summary.awayScore}
                     winnerTeamId={simulation.summary.winnerTeamId}
                     isOvertime={simulation.simulation.overtimeIterations > 0}
+                    trophiesSlot={
+                      matchTrophies.length ? (
+                        <TrophyShowcase trophies={matchTrophies.slice(0, 4)} variant="compact" />
+                      ) : null
+                    }
                     onViewStats={() => navigate(`/matches/${matchId}/stats`)}
                     onReplay={restartPlayback}
                     onBackToBracket={() => navigate('/bracket-tree')}
@@ -416,6 +429,7 @@ export default function MatchBroadcast() {
                 <SimulationEvents
                   events={simulation.events}
                   players={simulation.players}
+                  teams={simulation.teams}
                   currentIteration={currentSimulationFrame.iteration}
                 />
                 <CommentaryChat
