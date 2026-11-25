@@ -256,6 +256,16 @@ export const enUS = {
       event_game_finished: 'Final buzzer — {team} wins!',
       event_other: 'Play recorded.',
     },
+    victory: {
+      eyebrow: 'FINAL',
+      eyebrow_ot: 'FINAL · OT',
+      winner_headline: '{team} WINS!',
+      dismiss: 'Dismiss match summary',
+      show_summary: 'SHOW SUMMARY',
+      view_stats: 'VIEW MATCH STATS',
+      replay: 'REPLAY MATCH',
+      back_to_bracket: 'BACK TO BRACKET',
+    },
     effects: {
       score_2pt: 'BASKET! +2 · {player}',
       score_3pt: '3-POINTER! +3 · {player}',

@@ -256,6 +256,16 @@ export const ptBR = {
       event_game_finished: 'Buzina final — {team} vence!',
       event_other: 'Jogada registrada.',
     },
+    victory: {
+      eyebrow: 'FINAL',
+      eyebrow_ot: 'FINAL · PRORROGAÇÃO',
+      winner_headline: '{team} VENCE!',
+      dismiss: 'Fechar resumo da partida',
+      show_summary: 'MOSTRAR RESUMO',
+      view_stats: 'VER ESTATÍSTICAS',
+      replay: 'REPETIR PARTIDA',
+      back_to_bracket: 'VOLTAR À CHAVE',
+    },
     effects: {
       score_2pt: 'CESTA! +2 · {player}',
       score_3pt: 'CESTA DE 3! +3 · {player}',

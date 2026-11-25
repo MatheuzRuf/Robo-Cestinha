@@ -14,6 +14,7 @@ import { Scoreboard } from './components/Scoreboard/Scoreboard';
 import { SimulationEvents } from './components/SimulationEvents/SimulationEvents';
 import { SimulationProgress } from './components/SimulationProgress/SimulationProgress';
 import { CommentaryChat } from './components/CommentaryChat/CommentaryChat';
+import { VictoryOverlay } from './components/VictoryOverlay/VictoryOverlay';
 import { generateCommentaryBatch, type CommentaryFrameResult } from '../../services/commentaryService';
 import { buildMatchCommentarySnapshots, FALLBACK_COMMENTARY_LINES } from './commentarySnapshot';
 import styles from './MatchBroadcast.module.css';
@@ -35,6 +36,7 @@ export default function MatchBroadcast() {
   const [simulation, setSimulation] = useState<SimulationResponse | null>(null);
   const [initialFrameIndex, setInitialFrameIndex] = useState(0);
   const [isFullMode, setIsFullMode] = useState(false);
+  const [isVictoryDismissed, setIsVictoryDismissed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(true);
   const [isPreparingCommentary, setIsPreparingCommentary] = useState(false);
@@ -211,6 +213,10 @@ export default function MatchBroadcast() {
     : [];
 
   useEffect(() => {
+    if (playback.isComplete) setIsVictoryDismissed(false);
+  }, [playback.isComplete]);
+
+  useEffect(() => {
     if (!sessionHash || !userId || !simulation || !currentSimulationFrame) return;
 
     saveMatchPlaybackProgress(
@@ -237,6 +243,7 @@ export default function MatchBroadcast() {
   ]);
 
   function restartPlayback() {
+    setIsVictoryDismissed(false);
     playback.restart();
     const firstFrame = simulation?.frames[0];
     if (!sessionHash || !userId || !firstFrame) return;
@@ -356,12 +363,28 @@ export default function MatchBroadcast() {
           />
           <section className={styles.broadcastMainGrid}>
             <div className={styles.centerColumn}>
-              <CourtStage
-                frame={playback.frame}
-                transitionDurationMs={playback.transitionDurationMs}
-                madeBasketSide={madeBasketSide}
-                effects={frameEffects}
-              />
+              <div className={styles.courtStageWrap}>
+                <CourtStage
+                  frame={playback.frame}
+                  transitionDurationMs={playback.transitionDurationMs}
+                  madeBasketSide={madeBasketSide}
+                  effects={frameEffects}
+                />
+                {playback.isComplete && !isVictoryDismissed && simulation.summary.winnerTeamId ? (
+                  <VictoryOverlay
+                    homeTeam={simulation.teams.home}
+                    awayTeam={simulation.teams.away}
+                    homeScore={simulation.summary.homeScore}
+                    awayScore={simulation.summary.awayScore}
+                    winnerTeamId={simulation.summary.winnerTeamId}
+                    isOvertime={simulation.simulation.overtimeIterations > 0}
+                    onViewStats={() => navigate(`/matches/${matchId}/stats`)}
+                    onReplay={restartPlayback}
+                    onBackToBracket={() => navigate('/bracket-tree')}
+                    onDismiss={() => setIsVictoryDismissed(true)}
+                  />
+                ) : null}
+              </div>
               <SimulationProgress
                 currentFrame={playback.frameIndex + 1}
                 totalFrames={simulation.frames.length}
@@ -373,11 +396,18 @@ export default function MatchBroadcast() {
                 onTogglePause={playback.isPaused ? playback.resume : playback.pause}
                 onRestart={restartPlayback}
               />
-              {playback.isComplete && hasWatchedThroughEnd ? (
+              {playback.isComplete ? (
                 <div className={styles.matchStatsAction}>
-                  <Button variant="primary" onClick={() => navigate(`/matches/${matchId}/stats`)}>
-                    {t('match_broadcast.simulation.view_stats')}
-                  </Button>
+                  {isVictoryDismissed ? (
+                    <Button variant="outline" onClick={() => setIsVictoryDismissed(false)}>
+                      {t('match_broadcast.victory.show_summary')}
+                    </Button>
+                  ) : null}
+                  {hasWatchedThroughEnd ? (
+                    <Button variant="primary" onClick={() => navigate(`/matches/${matchId}/stats`)}>
+                      {t('match_broadcast.simulation.view_stats')}
+                    </Button>
+                  ) : null}
                 </div>
               ) : null}
             </div>

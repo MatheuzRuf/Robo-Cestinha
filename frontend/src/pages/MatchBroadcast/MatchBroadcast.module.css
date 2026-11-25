@@ -351,9 +351,28 @@
   gap: var(--space-4);
 }
 
+.courtStageWrap {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.courtStageWrap > * {
+  min-width: 0;
+  min-height: 0;
+}
+
+.courtStageWrap > :first-child {
+  height: 100%;
+}
+
 .matchStatsAction {
   display: flex;
   justify-content: flex-end;
+  gap: var(--space-2);
 }
 
 .page:fullscreen {
