@@ -34,9 +34,14 @@ export function Court({ madeBasketSide }: { madeBasketSide?: 'left' | 'right' })
     <g>
       <defs>
         <pattern id="court-wood" width="120" height="24" patternUnits="userSpaceOnUse">
-          <rect width="120" height="24" fill="var(--color-court-wood)" />
-          <path d="M0 1H120M0 23H120" stroke="var(--color-court-wood-grain)" strokeWidth="1" opacity=".7" />
-          <path d="M40 0V24M80 0V24" stroke="var(--color-court-wood-seam)" strokeWidth="1" opacity=".55" />
+          <rect width="120" height="24" style={{ fill: 'var(--color-court-wood)' }} />
+          <path
+            d="M0 1H120M0 23H120"
+            style={{ stroke: 'var(--color-court-wood-grain)' }}
+            strokeWidth="1"
+            opacity=".7"
+          />
+          <path d="M40 0V24M80 0V24" style={{ stroke: 'var(--color-court-wood-seam)' }} strokeWidth="1" opacity=".55" />
         </pattern>
       </defs>
       <rect x={0} y={0} width={w} height={h} className={styles.court} />

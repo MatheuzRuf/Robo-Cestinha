@@ -73,7 +73,7 @@ export function Player({ player, transitionDuration }: { player: PlayerState; tr
             patternUnits="objectBoundingBox"
             patternContentUnits="objectBoundingBox"
           >
-            <rect width="1" height="1" fill={TEAM_COLORS[player.team]} />
+            <rect width="1" height="1" style={{ fill: TEAM_COLORS[player.team] }} />
             <image
               href={imageUrl}
               width="1"
@@ -151,7 +151,7 @@ export function Player({ player, transitionDuration }: { player: PlayerState; tr
               width={staminaWidth}
               height={3.5}
               rx={1.75}
-              fill={stamina.color}
+              style={{ fill: stamina.color }}
               animate={{ x: cx - STAMINA_BAR_WIDTH / 2, y: barTop, width: staminaWidth }}
               transition={{ duration: transitionDuration, ease: 'linear' }}
             />
