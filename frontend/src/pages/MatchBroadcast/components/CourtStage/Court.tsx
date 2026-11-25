@@ -34,14 +34,23 @@ export function Court({ madeBasketSide }: { madeBasketSide?: 'left' | 'right' })
     <g>
       <defs>
         <pattern id="court-wood" width="120" height="24" patternUnits="userSpaceOnUse">
-          <rect width="120" height="24" fill="#713713" />
-          <path d="M0 1H120M0 23H120" stroke="#9a4d1b" strokeWidth="1" opacity=".7" />
-          <path d="M40 0V24M80 0V24" stroke="#4f250f" strokeWidth="1" opacity=".55" />
+          <rect width="120" height="24" fill="var(--color-court-wood)" />
+          <path d="M0 1H120M0 23H120" stroke="var(--color-court-wood-grain)" strokeWidth="1" opacity=".7" />
+          <path d="M40 0V24M80 0V24" stroke="var(--color-court-wood-seam)" strokeWidth="1" opacity=".55" />
         </pattern>
       </defs>
       <rect x={0} y={0} width={w} height={h} className={styles.court} />
       <rect x={0} y={0} width={w} height={h} fill="url(#court-wood)" opacity=".9" />
       <rect x={0} y={0} width={w} height={h} className={styles.boundary} />
+      <rect x={0} y={midY - keyHalfWidth} width={keyLength} height={keyHalfWidth * 2} className={styles.keyPaint} />
+      <rect
+        x={w - keyLength}
+        y={midY - keyHalfWidth}
+        width={keyLength}
+        height={keyHalfWidth * 2}
+        className={styles.keyPaint}
+      />
+      <circle cx={w / 2} cy={midY} r={centerR} className={styles.centerCircleFill} />
       <line x1={w / 2} y1={0} x2={w / 2} y2={h} className={styles.line} />
       <circle cx={w / 2} cy={midY} r={centerR} className={styles.line} />
       <rect x={0} y={midY - keyHalfWidth} width={keyLength} height={keyHalfWidth * 2} className={styles.line} />

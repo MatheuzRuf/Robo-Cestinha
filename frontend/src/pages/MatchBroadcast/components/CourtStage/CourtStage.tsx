@@ -58,7 +58,7 @@ export function CourtStage({
   return (
     <div className={styles.stage}>
       <svg
-        viewBox="-40 -36 1020 572"
+        viewBox="-52 -46 1044 612"
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label={t('match_broadcast.simulation.court_label')}
@@ -76,7 +76,9 @@ export function CourtStage({
         {frame?.players.map((player) => (
           <Player key={player.id} player={player} transitionDuration={transitionDuration} />
         ))}
-        {frame ? <Ball ball={frame.ball} transitionDuration={transitionDuration} /> : null}
+        {frame ? (
+          <Ball ball={frame.ball} transitionDuration={transitionDuration} isHeld={frame.ball.isHeld ?? false} />
+        ) : null}
       </svg>
       {basketMessage ? (
         <div className={styles.basketMessage} key={basketSequence} role="status">

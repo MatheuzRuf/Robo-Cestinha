@@ -180,6 +180,7 @@ export default function MatchBroadcast() {
           x: holderPosition?.x ?? simulationFrame.ball.x,
           y: holderPosition?.y ?? simulationFrame.ball.y,
           height: simulationFrame.ball.height ?? 0,
+          isHeld: Boolean(simulationFrame.playerWithBallId && !sourceTrajectory),
         },
         trajectory: sourceTrajectory
           ? {

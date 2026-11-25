@@ -1,6 +1,10 @@
+.playerGroup {
+  --team-color: var(--color-text-muted);
+}
+
 .player {
   fill: var(--team-color);
-  stroke: #f8ead7;
+  stroke: var(--color-player-stroke);
   stroke-width: 2;
 }
 
@@ -13,7 +17,7 @@
 
 .number,
 .labelText {
-  fill: #fff7e9;
+  fill: var(--color-player-label-text);
   font-family: var(--font-mono);
   font-size: 8px;
   font-weight: 700;
@@ -22,8 +26,8 @@
 }
 
 .labelBackground {
-  fill: #171311;
+  fill: var(--color-player-label-bg);
   stroke: var(--team-color);
-  stroke-width: 1;
+  stroke-width: 1.5;
   opacity: 0.94;
 }

@@ -1,8 +1,8 @@
 import type { Team } from '../types/game';
 
 export const TEAM_COLORS: Record<Team, string> = {
-  home: '#1d4ed8',
-  away: '#dc2626',
+  home: 'var(--color-team-blue)',
+  away: 'var(--color-team-red)',
 };
 
 export const BALL_COLOR = '#f97316';

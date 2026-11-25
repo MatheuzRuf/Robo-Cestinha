@@ -15,10 +15,8 @@ export function Player({ player, transitionDuration }: { player: PlayerState; tr
   const [imageFailed, setImageFailed] = useState(false);
   const hasImage = imageUrl !== null && !imageFailed;
   const patternId = `player-headshot-${useId().replace(/:/g, '')}`;
-  const style = {
-    '--team-color': TEAM_COLORS[player.team],
-    ...(hasImage ? { fill: `url(#${patternId})` } : {}),
-  } as CSSProperties;
+  const groupStyle = { '--team-color': TEAM_COLORS[player.team] } as CSSProperties;
+  const headshotStyle = hasImage ? ({ fill: `url(#${patternId})` } as CSSProperties) : undefined;
 
   return (
     <>
@@ -42,45 +40,47 @@ export function Player({ player, transitionDuration }: { player: PlayerState; tr
           </pattern>
         </defs>
       ) : null}
-      <motion.circle
-        r={PLAYER_RADIUS}
-        className={styles.player}
-        style={style}
-        animate={{ cx, cy }}
-        transition={{ duration: transitionDuration, ease: 'linear' }}
-      />
-      {!hasImage ? (
+      <g className={styles.playerGroup} style={groupStyle}>
+        <motion.circle
+          r={PLAYER_RADIUS}
+          className={styles.player}
+          style={headshotStyle}
+          animate={{ cx, cy }}
+          transition={{ duration: transitionDuration, ease: 'linear' }}
+        />
+        {!hasImage ? (
+          <motion.text
+            textAnchor="middle"
+            className={styles.number}
+            animate={{ x: cx, y: cy + 4 }}
+            transition={{ duration: transitionDuration, ease: 'linear' }}
+          >
+            {player.number ?? player.position}
+          </motion.text>
+        ) : null}
+        <motion.circle
+          r={PLAYER_RADIUS + 3}
+          className={styles.playerRing}
+          animate={{ cx, cy }}
+          transition={{ duration: transitionDuration, ease: 'linear' }}
+        />
+        <motion.rect
+          className={styles.labelBackground}
+          width={78}
+          height={18}
+          rx={4}
+          animate={{ x: cx - 39, y: cy + PLAYER_RADIUS + 7 }}
+          transition={{ duration: transitionDuration, ease: 'linear' }}
+        />
         <motion.text
           textAnchor="middle"
-          className={styles.number}
-          animate={{ x: cx, y: cy + 4 }}
+          className={styles.labelText}
+          animate={{ x: cx, y: cy + PLAYER_RADIUS + 18 }}
           transition={{ duration: transitionDuration, ease: 'linear' }}
         >
-          {player.number ?? player.position}
+          {shortName.toUpperCase()}
         </motion.text>
-      ) : null}
-      <motion.circle
-        r={PLAYER_RADIUS + 3}
-        className={styles.playerRing}
-        animate={{ cx, cy }}
-        transition={{ duration: transitionDuration, ease: 'linear' }}
-      />
-      <motion.rect
-        className={styles.labelBackground}
-        width={68}
-        height={15}
-        rx={3}
-        animate={{ x: cx - 34, y: cy + PLAYER_RADIUS + 7 }}
-        transition={{ duration: transitionDuration, ease: 'linear' }}
-      />
-      <motion.text
-        textAnchor="middle"
-        className={styles.labelText}
-        animate={{ x: cx, y: cy + PLAYER_RADIUS + 18 }}
-        transition={{ duration: transitionDuration, ease: 'linear' }}
-      >
-        {shortName.toUpperCase()}
-      </motion.text>
+      </g>
     </>
   );
 }

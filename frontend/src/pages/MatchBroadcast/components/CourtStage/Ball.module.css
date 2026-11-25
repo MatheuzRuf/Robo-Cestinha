@@ -4,6 +4,11 @@
   stroke-width: 2;
 }
 
+.held {
+  stroke-width: 1.75;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+}
+
 .trajectory {
   stroke-width: 2.25;
   stroke-dasharray: 7 6;
