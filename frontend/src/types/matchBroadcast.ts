@@ -37,10 +37,12 @@ export interface SimulationFrame {
   };
   score: { home: number; away: number };
   possessionTeamId: string | null;
+  /** "kickoff" during the inbound reset/pass; missing on stored replays. */
+  phase?: string | null;
 }
 
 export interface SimulationTrajectory {
-  type: 'pass' | 'shot';
+  type: 'pass' | 'shot' | 'inbound';
   fromPosition: { x: number; y: number };
   toPosition: { x: number; y: number };
   fromPlayerId: string | null;

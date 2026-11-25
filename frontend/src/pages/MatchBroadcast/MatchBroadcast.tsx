@@ -198,6 +198,7 @@ export default function MatchBroadcast() {
               progress: sourceTrajectory.progress,
             }
           : undefined,
+        phase: simulationFrame.phase ?? undefined,
       };
     });
   }, [simulation]);

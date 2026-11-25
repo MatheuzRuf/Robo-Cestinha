@@ -21,7 +21,7 @@ export interface BallState {
 }
 
 export interface BallTrajectory {
-  type: 'pass' | 'shot';
+  type: 'pass' | 'shot' | 'inbound';
   from: BallState;
   to: BallState;
   fromTeam: Team;
@@ -33,4 +33,6 @@ export interface Frame {
   players: PlayerState[];
   ball: BallState;
   trajectory?: BallTrajectory;
+  /** "kickoff" during the inbound reset/pass; missing on stored replays. */
+  phase?: string;
 }
