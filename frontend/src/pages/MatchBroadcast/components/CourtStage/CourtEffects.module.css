@@ -1,0 +1,229 @@
+.effectLayer {
+  --effect-color: var(--color-effect-score-2pt);
+  pointer-events: none;
+}
+
+.shockwave {
+  fill: none;
+  stroke: var(--effect-color);
+  stroke-width: 3;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: shockwave 620ms ease-out both;
+}
+
+.shockwaveInner {
+  stroke-width: 2;
+  animation-delay: 90ms;
+}
+
+.spark {
+  stroke: var(--effect-color);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: 0;
+  animation: spark 520ms ease-out both;
+}
+
+.scorerHalo {
+  fill: none;
+  stroke: var(--effect-color);
+  stroke-width: 2;
+  opacity: 0;
+  animation: scorerHalo 720ms ease-out both;
+}
+
+.reboundArc {
+  fill: none;
+  stroke: var(--effect-color);
+  stroke-width: 2.5;
+  stroke-dasharray: 8 6;
+  stroke-linecap: round;
+  opacity: 0;
+  animation: reboundArc 700ms ease-out both;
+}
+
+.missFlash {
+  fill: none;
+  stroke: var(--color-stamina-low);
+  stroke-width: 2.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: missFlash 380ms ease-out both;
+}
+
+.calloutText {
+  fill: var(--effect-color);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  paint-order: stroke;
+  stroke: rgba(10, 8, 6, 0.65);
+  stroke-width: 3;
+  animation: calloutText 700ms ease-out both;
+}
+
+@keyframes shockwave {
+  0% {
+    opacity: 0.95;
+    transform: scale(0.6);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+@keyframes spark {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  25% {
+    opacity: 0.95;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes scorerHalo {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.85);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes reboundArc {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 48;
+  }
+
+  25% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes missFlash {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.8);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+@keyframes calloutText {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  25%,
+  75% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shockwave,
+  .shockwaveInner,
+  .spark,
+  .scorerHalo,
+  .reboundArc,
+  .missFlash,
+  .calloutText {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+}
+
+.banner {
+  --banner-accent: var(--color-primary);
+  position: absolute;
+  z-index: 2;
+  top: var(--space-4);
+  left: 50%;
+  max-width: calc(100% - var(--space-8));
+  padding: var(--space-2) var(--space-4);
+  transform: translateX(-50%);
+  border: 1px solid var(--banner-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: 700 1.05rem var(--font-mono);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--banner-accent) 22%, transparent);
+  animation: effectBanner var(--banner-duration, 900ms) ease-out both;
+}
+
+.bannerScore {
+  --banner-accent: var(--color-effect-score-2pt);
+}
+
+.bannerThree {
+  --banner-accent: var(--color-effect-score-3pt);
+}
+
+.bannerOreb {
+  --banner-accent: var(--color-effect-rebound-off);
+}
+
+.bannerDreb {
+  --banner-accent: var(--color-effect-rebound-def);
+}
+
+.bannerMiss {
+  --banner-accent: var(--color-border);
+  font-size: 0.9rem;
+}
+
+@keyframes effectBanner {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -8px) scale(0.92);
+  }
+
+  12%,
+  80% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -4px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .banner {
+    animation-duration: 1ms;
+  }
+}

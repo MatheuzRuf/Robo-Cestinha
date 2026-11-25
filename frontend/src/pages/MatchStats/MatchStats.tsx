@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { NbaImage } from '../../components/NbaImage';
+import { TrophyShowcase } from '../../components/TrophyShowcase';
 import { useTranslation } from '../../lib/i18n/i18n';
 import { getNbaPlayerHeadshotUrl } from '../../lib/nbaImages';
 import { simulationService } from '../../services/simulationService';
@@ -15,6 +16,7 @@ import {
   buildPlayerHeatmap,
   buildScorePath,
   deriveMatchStats,
+  deriveMatchTrophies,
   type PassingLink,
   type PlayerMatchStats,
 } from './stats';
@@ -736,6 +738,10 @@ export default function MatchStats() {
   });
   const simulation = query.data;
   const stats = useMemo(() => (simulation ? deriveMatchStats(simulation) : null), [simulation]);
+  const trophies = useMemo(
+    () => (simulation && stats ? deriveMatchTrophies(simulation, stats) : []),
+    [simulation, stats],
+  );
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'players' | 'heatmaps'>('overview');
   const [showHeatmap, setShowHeatmap] = useState(false);
@@ -868,6 +874,17 @@ export default function MatchStats() {
         tabIndex={activeTab === 'overview' ? 0 : -1}
         hidden={activeTab !== 'overview'}
       >
+        {activeTab === 'overview' && trophies.length ? (
+          <section className={styles.awardsSection} aria-label={t('trophies.section_title')}>
+            <div className={styles.sectionHeading}>
+              <div>
+                <h2>{t('trophies.section_title')}</h2>
+                <p>{t('trophies.section_subtitle')}</p>
+              </div>
+            </div>
+            <TrophyShowcase trophies={trophies} variant="full" />
+          </section>
+        ) : null}
         {activeTab === 'overview' ? (
           <div className={styles.dashboardGrid}>
             <Card className={styles.section}>
@@ -924,6 +941,9 @@ export default function MatchStats() {
                   <th scope="col">{t('match_stats.points')}</th>
                   <th scope="col">{t('match_stats.field_goals')}</th>
                   <th scope="col">{t('match_stats.three_pointers')}</th>
+                  <th scope="col">{t('match_stats.rebounds')}</th>
+                  <th scope="col">{t('match_stats.assists')}</th>
+                  <th scope="col">{t('match_stats.steals')}</th>
                   <th scope="col">{t('match_stats.passes_completed')}</th>
                   <th scope="col">{t('match_stats.turnovers')}</th>
                   <th scope="col">{t('match_stats.fouls')}</th>
@@ -943,6 +963,9 @@ export default function MatchStats() {
                     <td data-label={t('match_stats.three_pointers')}>
                       {fieldGoalLine(row.threePointersMade, row.threePointersAttempted, locale)}
                     </td>
+                    <td data-label={t('match_stats.rebounds')}>{row.rebounds}</td>
+                    <td data-label={t('match_stats.assists')}>{row.assists}</td>
+                    <td data-label={t('match_stats.steals')}>{row.steals}</td>
                     <td data-label={t('match_stats.passes_completed')}>{row.passesCompleted}</td>
                     <td data-label={t('match_stats.turnovers')}>{row.turnovers}</td>
                     <td data-label={t('match_stats.fouls')}>{row.fouls}</td>
@@ -1010,6 +1033,18 @@ export default function MatchStats() {
                         )}
                       </strong>
                       <span>{t('match_stats.field_goals')}</span>
+                    </div>
+                    <div>
+                      <strong>{selectedPlayerStats.rebounds}</strong>
+                      <span>{t('match_stats.rebounds')}</span>
+                    </div>
+                    <div>
+                      <strong>{selectedPlayerStats.assists}</strong>
+                      <span>{t('match_stats.assists')}</span>
+                    </div>
+                    <div>
+                      <strong>{selectedPlayerStats.steals}</strong>
+                      <span>{t('match_stats.steals')}</span>
                     </div>
                     <div>
                       <strong>{selectedPlayerStats.passesCompleted}</strong>

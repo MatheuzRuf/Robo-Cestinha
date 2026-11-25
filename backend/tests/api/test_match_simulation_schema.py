@@ -132,3 +132,34 @@ def test_player_position_enforces_court_bounds():
         PlayerPositionSchema(playerId=_make_player_id(), x=95, y=25)
     with pytest.raises(ValidationError):
         PlayerPositionSchema(playerId=_make_player_id(), x=40, y=51)
+
+
+def test_response_accepts_frames_with_stamina():
+    payload = _valid_payload()
+    player_ids = [uuid.UUID(player["playerId"]) for player in payload["players"]]
+    for frame in payload["frames"]:
+        frame["players"] = [
+            {"playerId": str(pid), "x": 40, "y": 25, "stamina": 0.72}
+            for pid in player_ids
+        ]
+    response = MatchSimulationResponse.model_validate(payload)
+    assert response.frames[0].players[0].stamina == 0.72
+
+
+def test_response_accepts_frames_without_stamina():
+    payload = _valid_payload()
+    response = MatchSimulationResponse.model_validate(payload)
+    assert response.frames[0].players[0].stamina is None
+
+
+@pytest.mark.parametrize("value", [-0.1, 1.1])
+def test_response_rejects_out_of_range_stamina(value):
+    payload = _valid_payload()
+    payload["frames"][0]["players"][0]["stamina"] = value
+    with pytest.raises(ValidationError):
+        MatchSimulationResponse.model_validate(payload)
+
+
+def test_player_position_schema_defaults_stamina_to_none():
+    position = PlayerPositionSchema(playerId=_make_player_id(), x=10, y=10)
+    assert position.stamina is None

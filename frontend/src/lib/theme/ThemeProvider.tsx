@@ -19,6 +19,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useLayoutEffect(() => {
     document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
 
     try {
       window.localStorage.setItem(THEME_STORAGE_KEY, theme);

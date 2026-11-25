@@ -44,11 +44,21 @@ class LivePlayer:
             current_stamina=player.attributes.stamina,
         )
 
-    def record_minutes(self, duration_s: float) -> None:
-        """Acumula tempo de quadra e reduz a stamina proporcionalmente."""
+    def record_minutes(
+        self, duration_s: float, exertion_multiplier: float = 1.0
+    ) -> None:
+        """Acumula tempo de quadra e reduz a stamina proporcionalmente.
+
+        Args:
+            duration_s: Seconds of game time elapsed.
+            exertion_multiplier: Extra decay factor; the player holding the ball
+                exerts more and therefore tires faster than off-ball players.
+        """
         self.box_score.seconds_played += duration_s
         # Fatigue decay: roughly 0.0005 per second on court
-        self.current_stamina = max(0.20, self.current_stamina - 0.0005 * duration_s)
+        self.current_stamina = max(
+            0.20, self.current_stamina - 0.0005 * duration_s * exertion_multiplier
+        )
 
 
 @dataclass
@@ -125,6 +135,7 @@ class LiveTeam:
 @dataclass
 class GameState:
     """Estado global necessário para resolver a próxima posse."""
+
     home_team: LiveTeam
     away_team: LiveTeam
     clock: GameClock = field(default_factory=GameClock)
@@ -168,9 +179,20 @@ class GameState:
         elif rng:
             self.active_handler_id = self.attacking_team.select_ball_handler(rng)
 
-    def tick_players_on_court(self, duration_s: float) -> None:
-        """Registra a duração da posse para os dez jogadores em quadra."""
-        for p in self.home_team.get_on_court_players():
-            p.record_minutes(duration_s)
-        for p in self.away_team.get_on_court_players():
-            p.record_minutes(duration_s)
+    def tick_players_on_court(
+        self,
+        duration_s: float,
+        active_player_id: Optional[str] = None,
+        active_multiplier: float = 1.35,
+    ) -> None:
+        """Registra a duração da posse para os dez jogadores em quadra.
+
+        The acting ball handler drains stamina faster than off-ball players so
+        high-usage players visibly tire over the course of a match.
+        """
+        for p in (
+            self.home_team.get_on_court_players()
+            + self.away_team.get_on_court_players()
+        ):
+            multiplier = active_multiplier if p.player_id == active_player_id else 1.0
+            p.record_minutes(duration_s, exertion_multiplier=multiplier)

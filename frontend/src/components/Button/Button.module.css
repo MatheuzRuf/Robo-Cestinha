@@ -10,10 +10,20 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
 }
 
 .button:hover {
   border-color: var(--color-primary-hover);
+  background: var(--color-border);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .button:disabled {
@@ -28,6 +38,11 @@
 .primary {
   background: var(--color-primary);
   color: var(--color-text-inverse);
+}
+
+.primary:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
 }
 
 .secondary {

@@ -52,6 +52,26 @@
   color: var(--color-text);
 }
 
+.eventScore,
+.eventRebound,
+.eventTurnover {
+  border-inline-start: 3px solid transparent;
+  padding-inline-start: var(--space-2);
+  color: var(--color-text);
+}
+
+.eventScore {
+  border-inline-start-color: var(--color-effect-score-2pt);
+}
+
+.eventRebound {
+  border-inline-start-color: var(--color-effect-rebound-def);
+}
+
+.eventTurnover {
+  border-inline-start-color: var(--color-stamina-low);
+}
+
 .sequence {
   color: var(--color-primary);
   font: 700 0.75rem var(--font-mono);

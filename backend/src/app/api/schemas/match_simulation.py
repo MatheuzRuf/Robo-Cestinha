@@ -67,6 +67,7 @@ class PlayerPositionSchema(BaseModel):
     playerId: uuid.UUID
     x: int = Field(ge=0, le=94)
     y: int = Field(ge=0, le=50)
+    stamina: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class TrajectorySchema(BaseModel):

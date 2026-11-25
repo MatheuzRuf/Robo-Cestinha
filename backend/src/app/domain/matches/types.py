@@ -69,3 +69,4 @@ class EngineIdMap:
 
     team_id_by_engine: dict[str, uuid.UUID]
     player_id_by_engine: dict[str, uuid.UUID]
+    player_team_id_by_engine: dict[str, uuid.UUID] = field(default_factory=dict)

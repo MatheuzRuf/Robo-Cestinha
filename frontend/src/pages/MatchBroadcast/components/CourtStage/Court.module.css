@@ -1,26 +1,36 @@
 .court {
-  fill: #713713;
-  stroke: #351708;
+  fill: var(--color-court-wood);
+  stroke: var(--color-court-border);
   stroke-width: 2;
 }
 
 .boundary {
   fill: none;
-  stroke: #f7ead8;
+  stroke: var(--color-court-line);
   stroke-width: 2.5;
 }
 
 .line {
   fill: none;
-  stroke: #f7ead8;
+  stroke: var(--color-court-line);
   stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
+.keyPaint {
+  fill: var(--color-court-key-fill);
+  stroke: none;
+}
+
+.centerCircleFill {
+  fill: var(--color-court-key-fill);
+  stroke: none;
+}
+
 .hoop {
-  fill: #ff8c00;
-  stroke: #1a1a1a;
+  fill: var(--color-court-hoop);
+  stroke: var(--color-court-hoop-stroke);
   stroke-width: 1;
 }
 
@@ -52,6 +62,6 @@
 }
 
 .backboard {
-  stroke: #f7ead8;
+  stroke: var(--color-court-line);
   stroke-width: 3;
 }

@@ -9,12 +9,15 @@ export interface PlayerState {
   nbaPlayerId?: number | null;
   number?: number;
   position: string;
+  stamina?: number;
 }
 
 export interface BallState {
   x: number;
   y: number;
   height?: number;
+  /** True while the ball is held by a player (rendered beside the portrait). */
+  isHeld?: boolean;
 }
 
 export interface BallTrajectory {

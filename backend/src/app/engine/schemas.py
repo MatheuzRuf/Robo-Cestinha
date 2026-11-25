@@ -120,6 +120,7 @@ class PlayerPosition(BaseModel):
     player_id: str
     x: int
     y: int
+    stamina: Optional[float] = None
 
 
 class BallState(BaseModel):
@@ -178,6 +179,11 @@ class TransitionResult(BaseModel):
     score_home: int = 0
     score_away: int = 0
     trajectory: Optional[BallTrajectory] = None
+    rebounder_id: Optional[str] = None
+    is_offensive_rebound: bool = False
+    assist_player_id: Optional[str] = None
+    defender_id: Optional[str] = None
+    duration_s: float = 0.0
 
 
 class EngineSimulationResult(BaseModel):

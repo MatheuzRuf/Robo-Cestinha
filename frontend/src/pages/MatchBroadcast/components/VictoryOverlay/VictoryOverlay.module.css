@@ -1,0 +1,203 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: radial-gradient(circle at 50% 30%, rgba(240, 113, 31, 0.18), transparent 55%), var(--color-overlay-scrim);
+  backdrop-filter: blur(3px);
+}
+
+.confettiLayer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti {
+  position: absolute;
+  top: -8%;
+  border-radius: 1px;
+  opacity: 0;
+  animation-name: confettiFall;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+.dismiss {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 2;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  color: var(--color-overlay-text);
+  cursor: pointer;
+}
+
+.dismiss:hover {
+  border-color: var(--color-primary);
+}
+
+.dismiss:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.crest {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 108px;
+}
+
+.spotlight {
+  position: absolute;
+  inset: -18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.55), transparent 62%);
+  animation: spotlightPulse 2.6s ease-in-out infinite;
+}
+
+.trophyIcon {
+  position: absolute;
+  top: -6px;
+  color: var(--color-trophy-gold);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+
+.winnerLogo {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 2px solid var(--color-trophy-gold);
+  background: var(--color-surface-raised);
+  object-fit: contain;
+  margin-top: 12px;
+}
+
+.eyebrow {
+  color: var(--color-text-muted);
+  font: 700 0.78rem var(--font-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.headline {
+  margin: 0;
+  font-size: clamp(1.15rem, 3.2vh, 1.7rem);
+  letter-spacing: 0.03em;
+}
+
+.finalScore {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-raised);
+}
+
+.finalScore strong {
+  color: var(--color-primary);
+  font: 700 1.4rem var(--font-mono);
+}
+
+.finalScoreTeam {
+  color: var(--color-text-muted);
+  font: 700 0.85rem var(--font-mono);
+}
+
+.trophies {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+@keyframes confettiFall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -10%, 0) rotate(0deg);
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--confetti-drift, 0), 118vh, 0) rotate(var(--confetti-rotation, 360deg));
+  }
+}
+
+@keyframes spotlightPulse {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(0.95);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@media (max-width: 560px) {
+  .card {
+    padding: var(--space-4);
+  }
+
+  .crest {
+    width: 88px;
+    height: 88px;
+  }
+
+  .winnerLogo {
+    width: 62px;
+    height: 62px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti,
+  .spotlight {
+    animation: none;
+  }
+
+  .confetti {
+    opacity: 0;
+  }
+}

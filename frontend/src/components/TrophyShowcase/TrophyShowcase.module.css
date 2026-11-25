@@ -1,0 +1,161 @@
+.fullGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+
+.compactStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-2);
+}
+
+.card {
+  --trophy-accent: var(--color-trophy-bronze);
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-top: 3px solid var(--trophy-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.tierGold {
+  --trophy-accent: var(--color-trophy-gold);
+}
+
+.tierSilver {
+  --trophy-accent: var(--color-trophy-silver);
+}
+
+.tierBronze {
+  --trophy-accent: var(--color-trophy-bronze);
+}
+
+.mvpCard {
+  grid-column: span 2;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--trophy-accent) 16%, var(--color-surface)),
+    var(--color-surface-raised)
+  );
+}
+
+.compactCard {
+  padding: var(--space-2);
+  gap: var(--space-1);
+}
+
+.compactCard.mvpCard {
+  grid-column: span 2;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.iconWrap {
+  display: grid;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--trophy-accent) 22%, transparent);
+  color: var(--trophy-accent);
+}
+
+.cardTitles {
+  min-width: 0;
+}
+
+.cardTitles h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cardTitles p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.portrait {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--trophy-accent);
+  background: var(--color-surface);
+}
+
+.compactCard .portrait {
+  width: 32px;
+  height: 32px;
+}
+
+.playerCopy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.playerCopy strong {
+  overflow: hidden;
+  font-size: 0.85rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.teamBadge {
+  justify-self: start;
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font: 700 0.62rem var(--font-mono);
+  letter-spacing: 0.08em;
+}
+
+.value {
+  display: grid;
+  gap: 2px;
+}
+
+.value strong {
+  color: var(--trophy-accent);
+  font: 700 1.15rem var(--font-mono);
+}
+
+.compactCard .value strong {
+  font-size: 0.95rem;
+}
+
+.value span {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+}
+
+@media (max-width: 720px) {
+  .mvpCard,
+  .compactCard.mvpCard {
+    grid-column: span 1;
+  }
+}

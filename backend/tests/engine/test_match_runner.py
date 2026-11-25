@@ -164,3 +164,84 @@ def test_simulation_is_deterministic_for_a_seed():
     first = _make_runner(seed=11).run_simulation(40)
     second = _make_runner(seed=11).run_simulation(40)
     assert first == second
+
+
+def test_frames_carry_stamina_that_decays_over_the_match():
+    result = _make_runner(seed=7).run_simulation(100)
+
+    for frame in result.frames:
+        for position in frame.players:
+            assert position.stamina is not None
+            assert 0.20 <= position.stamina <= 1.0
+
+    first = {p.player_id: p.stamina for p in result.frames[0].players}
+    last = {p.player_id: p.stamina for p in result.frames[-1].players}
+    assert all(last[player_id] <= first[player_id] for player_id in first)
+    assert all(last[player_id] < first[player_id] for player_id in first)
+
+
+def test_active_player_exerts_more_stamina_than_off_ball_players():
+    runner = _make_runner(seed=3)
+    state = runner.state
+    active_id = state.home_team.on_court[0]
+    before = {
+        p.player_id: p.current_stamina
+        for team in (state.home_team, state.away_team)
+        for p in team.get_on_court_players()
+    }
+
+    state.tick_players_on_court(
+        100.0, active_player_id=active_id, active_multiplier=1.35
+    )
+
+    after = {
+        p.player_id: p.current_stamina
+        for team in (state.home_team, state.away_team)
+        for p in team.get_on_court_players()
+    }
+    active_drop = before[active_id] - after[active_id]
+    for player_id, stamina in before.items():
+        if player_id == active_id:
+            continue
+        assert (stamina - after[player_id]) < active_drop
+
+
+def test_rebound_events_credit_an_on_court_player_and_type():
+    result = _make_runner(seed=7).run_simulation(100)
+    on_court_ids = {p.player_id for frame in result.frames for p in frame.players}
+
+    rebounds = [event for event in result.events if event.type == "rebound"]
+    assert rebounds
+    for event in rebounds:
+        assert event.player_id is not None
+        assert event.player_id in on_court_ids
+        assert event.data["reboundType"] in ("offensive", "defensive")
+
+
+def test_offensive_rebounds_do_not_emit_possession_change():
+    result = _make_runner(seed=7).run_simulation(100)
+    changes_by_iteration = {
+        event.iteration for event in result.events if event.type == "possession_changed"
+    }
+    offensive_rebounds = [
+        event
+        for event in result.events
+        if event.type == "rebound" and event.data["reboundType"] == "offensive"
+    ]
+    assert offensive_rebounds
+    for event in offensive_rebounds:
+        assert event.iteration not in changes_by_iteration
+
+
+def test_transition_frames_attach_a_ball_trajectory():
+    result = _make_runner(seed=7).run_simulation(60)
+    trajectories = [frame.ball.trajectory for frame in result.frames[1:]]
+    assert any(trajectory is not None for trajectory in trajectories)
+    for frame in result.frames[1:]:
+        trajectory = frame.ball.trajectory
+        if trajectory is None:
+            continue
+        assert trajectory.type in ("pass", "shot")
+        assert trajectory.from_position is not None
+        assert trajectory.to_position is not None
+        assert trajectory.from_player_id is not None
