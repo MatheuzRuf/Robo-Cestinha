@@ -147,6 +147,7 @@ class SimulationFrame(BaseModel):
     ball: BallState
     score: ScoreSnapshot
     possession_team_id: Optional[str]
+    phase: Optional[str] = None  # "play" (default) | "kickoff"
 
 
 class SimulationEvent(BaseModel):
@@ -184,6 +185,7 @@ class TransitionResult(BaseModel):
     assist_player_id: Optional[str] = None
     defender_id: Optional[str] = None
     duration_s: float = 0.0
+    phase: Optional[str] = None  # "play" (default) | "kickoff"
 
 
 class EngineSimulationResult(BaseModel):

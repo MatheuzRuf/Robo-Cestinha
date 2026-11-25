@@ -112,3 +112,54 @@ def get_initial_center_positions(is_team_a: bool) -> list[CourtPosition]:
             CourtPosition(6, 3),  # PF (defending interior)
             CourtPosition(6, 1),  # C (defending rim/interior)
         ]
+
+
+def get_inbound_positions(is_team_a: bool) -> list[CourtPosition]:
+    """Return the five slots of the team that must inbound after conceding.
+
+    The inbounder stands on the baseline of the basket the opponent just
+    scored on (Rim A for team A, Rim B for team B) with the four teammates
+    spread ahead to receive the inbound pass. All five slots are unique and
+    disjoint from :func:`get_defensive_reset_positions` for the same side.
+    """
+    if is_team_a:
+        return [
+            CourtPosition(1, 2),  # inbounder on the baseline near Rim A
+            CourtPosition(3, 2),  # free-throw area
+            CourtPosition(4, 1),  # left wing
+            CourtPosition(4, 3),  # right wing
+            CourtPosition(5, 2),  # top of the key
+        ]
+    return [
+        CourtPosition(8, 2),  # inbounder on the baseline near Rim B
+        CourtPosition(6, 2),  # free-throw area
+        CourtPosition(5, 1),  # left wing
+        CourtPosition(5, 3),  # right wing
+        CourtPosition(4, 2),  # top of the key
+    ]
+
+
+def get_defensive_reset_positions(is_team_a: bool) -> list[CourtPosition]:
+    """Return the five defensive slots mirrored against an inbound.
+
+    ``is_team_a`` identifies the inbounding team; the returned slots belong to
+    the defending team and are placed on the far half, with a rim protector
+    under its defended basket. Disjoint from :func:`get_inbound_positions`.
+    """
+    if is_team_a:
+        # Team B defending an inbound by team A near Rim A.
+        return [
+            CourtPosition(8, 2),  # rim protector under Rim B
+            CourtPosition(7, 2),  # free-throw area
+            CourtPosition(6, 1),  # left wing
+            CourtPosition(6, 3),  # right wing
+            CourtPosition(9, 2),  # baseline pressure near the ball
+        ]
+    # Team A defending an inbound by team B near Rim B.
+    return [
+        CourtPosition(1, 2),  # rim protector under Rim A
+        CourtPosition(2, 2),  # free-throw area
+        CourtPosition(3, 1),  # left wing
+        CourtPosition(3, 3),  # right wing
+        CourtPosition(0, 2),  # baseline pressure near the ball
+    ]

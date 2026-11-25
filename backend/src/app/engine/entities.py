@@ -8,7 +8,12 @@ import random
 
 from app.data_ingestion.schemas import Player, PlayerAttributes, Team
 from app.engine.clock import GameClock
-from app.engine.grid import CourtPosition, get_initial_center_positions
+from app.engine.grid import (
+    CourtPosition,
+    get_defensive_reset_positions,
+    get_initial_center_positions,
+    get_inbound_positions,
+)
 from app.engine.schemas import PlayerBoxScore
 
 
@@ -124,12 +129,15 @@ class LiveTeam:
         chosen = rng.choices(active, weights=weights, k=1)[0]
         return chosen.player_id
 
+    def place_on_court(self, coords: list[CourtPosition]) -> None:
+        """Posiciona o quinteto ativo nos slots indicados, em ordem de quadra."""
+        for i, pid in enumerate(self.on_court[:5]):
+            if i < len(coords):
+                self.players[pid].court_pos = coords[i]
+
     def setup_court_positions(self, is_team_a: bool) -> None:
         """Distribui o quinteto ativo nas posições iniciais da quadra."""
-        initial_coords = get_initial_center_positions(is_team_a)
-        for i, pid in enumerate(self.on_court[:5]):
-            if i < len(initial_coords):
-                self.players[pid].court_pos = initial_coords[i]
+        self.place_on_court(get_initial_center_positions(is_team_a))
 
 
 @dataclass
@@ -144,6 +152,8 @@ class GameState:
     active_handler_id: str = ""
     possession_count: int = 0
     last_passer_id: Optional[str] = None  # to credit potential assists
+    pending_kickoff: bool = False  # next transition is the inbound formation reset
+    awaiting_inbound: bool = False  # next transition is the inbound pass
 
     @property
     def attacking_team(self) -> LiveTeam:
@@ -161,13 +171,63 @@ class GameState:
             else self.home_team
         )
 
+    def select_inbounder(self) -> LivePlayer:
+        """Escolhe o repositor de forma determinística: o jogador em quadra de
+        menor ``usage_rate`` (desempate pela ordem no quinteto)."""
+        team = self.attacking_team
+        order = team.on_court
+        return min(
+            team.get_on_court_players(),
+            key=lambda p: (p.attributes.usage_rate, order.index(p.player_id)),
+        )
+
+    def begin_kickoff(self, reason: str = "score") -> LivePlayer:
+        """Reorganiza os dois times na formação de reposição e entrega a bola
+        ao repositor determinístico do time em posse (que deve repor).
+
+        Args:
+            reason: O que disparou a reposição (``"score"`` ou ``"quarter_start"``).
+
+        Returns:
+            O jogador que ficará com a bola na linha de fundo.
+        """
+        inbounding_is_a = self.is_attacking_team_home()
+        if inbounding_is_a:
+            inbound_slots = get_inbound_positions(is_team_a=True)
+            defense_slots = get_defensive_reset_positions(is_team_a=True)
+        else:
+            defense_slots = get_defensive_reset_positions(is_team_a=False)
+            inbound_slots = get_inbound_positions(is_team_a=False)
+        self.home_team.place_on_court(
+            inbound_slots if inbounding_is_a else defense_slots
+        )
+        self.away_team.place_on_court(
+            defense_slots if inbounding_is_a else inbound_slots
+        )
+        inbounder = self.select_inbounder()
+        self.active_handler_id = inbounder.player_id
+        self.last_passer_id = None
+        self.clock.reset_for_new_possession(is_offensive_rebound=False)
+        return inbounder
+
     def is_attacking_team_home(self) -> bool:
         return self.possession_team_id == self.home_team.team_id
 
     def flip_possession(
-        self, new_handler_id: Optional[str] = None, rng: Optional[random.Random] = None
+        self,
+        new_handler_id: Optional[str] = None,
+        rng: Optional[random.Random] = None,
+        pick_handler: bool = True,
     ) -> None:
-        """Troca ataque e defesa, reinicia o relógio e escolhe novo condutor."""
+        """Troca ataque e defesa, reinicia o relógio e escolhe novo condutor.
+
+        Args:
+            new_handler_id: Quando definido, o novo time atacante fica com essa
+                bola (ex.: rebote ou roubo).
+            rng: Gerador usado para sortear o condutor quando nenhum explícito.
+            pick_handler: Quando ``False``, não sorteia condutor nem altera o
+                punho da bola (usado em reposição pós-cesta).
+        """
         prev_attacking = self.possession_team_id
         self.possession_team_id = self.defending_team_id
         self.defending_team_id = prev_attacking
@@ -176,7 +236,7 @@ class GameState:
 
         if new_handler_id:
             self.active_handler_id = new_handler_id
-        elif rng:
+        elif rng and pick_handler:
             self.active_handler_id = self.attacking_team.select_ball_handler(rng)
 
     def tick_players_on_court(

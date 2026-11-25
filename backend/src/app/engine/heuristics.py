@@ -64,8 +64,14 @@ def resolve_pass_outcome(
     receiver: LivePlayer,
     defending_team: LiveTeam,
     rng: random.Random,
+    safety_boost: float = 0.0,
 ) -> tuple[bool, LivePlayer | None]:
-    """Resolve o passe e retorna sucesso ou o defensor que interceptou."""
+    """Resolve o passe e retorna sucesso ou o defensor que interceptou.
+
+    Args:
+        safety_boost: Reduz a chance de interceptação; usada na reposição para
+            garantir no mínimo ~95% de sucesso (erro com piso de 5%).
+    """
     avg_steal = (
         sum(p.attributes.steal_rate for p in defending_team.get_on_court_players())
         / 5.0
@@ -73,6 +79,8 @@ def resolve_pass_outcome(
     p_turnover = min(
         0.35, max(0.04, passer.attributes.turnover_rate * 0.7 + avg_steal * 1.5)
     )
+    if safety_boost:
+        p_turnover = min(0.05, p_turnover * (1.0 - min(1.0, safety_boost)))
 
     if rng.random() < p_turnover:
         # Em uma falha, o defensor é sorteado pela taxa de roubos.
@@ -82,6 +90,30 @@ def resolve_pass_outcome(
         return False, stealer
 
     return True, None
+
+
+def resolve_inbound_receiver(
+    attacking_team: LiveTeam, inbounder_id: str
+) -> LivePlayer:
+    """Escolhe o recebedor da reposição: o companheiro em quadra mais próximo
+    do repositor, desempatando por menor ``usage_rate`` e depois pela ordem no
+    quinteto (mantém o passe curto e legível)."""
+    inbounder = attacking_team.get_player(inbounder_id)
+    order = attacking_team.on_court
+    teammates = [
+        p
+        for p in attacking_team.get_on_court_players()
+        if p.player_id != inbounder_id
+    ]
+
+    def key(player: LivePlayer) -> tuple[float, float, int]:
+        return (
+            inbounder.court_pos.distance_to(player.court_pos),
+            player.attributes.usage_rate,
+            order.index(player.player_id),
+        )
+
+    return min(teammates, key=key)
 
 
 def decide_move_direction(
