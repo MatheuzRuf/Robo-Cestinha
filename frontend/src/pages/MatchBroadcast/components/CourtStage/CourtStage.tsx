@@ -3,6 +3,7 @@ import styles from './CourtStage.module.css';
 import { Ball } from './Ball';
 import { Court } from './Court';
 import { Player, STAMINA_LEGEND_TIERS } from './Player';
+import { CourtEffectBanner, CourtEffectsSvg, type FrameEffect } from './CourtEffects';
 import { gameToSvg } from '../../../../config/court';
 import trajectoryStyles from './Ball.module.css';
 import { startTransition, useEffect, useRef, useState } from 'react';
@@ -11,22 +12,20 @@ import { useTranslation } from '../../../../lib/i18n/i18n';
 interface CourtStageProps {
   frame: Frame | null;
   transitionDurationMs: number;
-  basketMessage?: string;
-  basketSequence?: number;
   madeBasketSide?: 'left' | 'right';
+  effects?: FrameEffect[];
 }
 
-export function CourtStage({
-  frame,
-  transitionDurationMs,
-  basketMessage,
-  basketSequence,
-  madeBasketSide,
-}: CourtStageProps) {
+const TRAJECTORY_HOLD_MIN_MS = 700;
+const BANNER_HOLD_FACTOR = 1.1;
+
+export function CourtStage({ frame, transitionDurationMs, madeBasketSide, effects }: CourtStageProps) {
   const { t } = useTranslation();
   const transitionDuration = transitionDurationMs / 1000;
   const [visibleTrajectory, setVisibleTrajectory] = useState<BallTrajectory | null>(null);
+  const [visibleBanner, setVisibleBanner] = useState<FrameEffect | null>(null);
   const trajectoryTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const bannerTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     if (!frame?.trajectory) return;
@@ -40,9 +39,28 @@ export function CourtStage({
     }, transitionDurationMs);
   }, [frame, transitionDurationMs]);
 
+  const primaryEffect = effects?.[0] ?? null;
+  const primaryEffectKey = primaryEffect ? `${primaryEffect.kind}-${primaryEffect.sequence}` : null;
+  const bannerHoldMs = Math.max(TRAJECTORY_HOLD_MIN_MS, Math.round(transitionDurationMs * BANNER_HOLD_FACTOR));
+
+  useEffect(() => {
+    if (!primaryEffect) return;
+
+    setVisibleBanner(primaryEffect);
+    if (bannerTimeoutRef.current) clearTimeout(bannerTimeoutRef.current);
+
+    bannerTimeoutRef.current = setTimeout(() => {
+      setVisibleBanner(null);
+      bannerTimeoutRef.current = undefined;
+    }, bannerHoldMs);
+    // The banner only depends on which effect became active, not on every re-render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [primaryEffectKey, bannerHoldMs]);
+
   useEffect(() => {
     return () => {
       if (trajectoryTimeoutRef.current) clearTimeout(trajectoryTimeoutRef.current);
+      if (bannerTimeoutRef.current) clearTimeout(bannerTimeoutRef.current);
     };
   }, []);
 
@@ -81,6 +99,7 @@ export function CourtStage({
         {frame ? (
           <Ball ball={frame.ball} transitionDuration={transitionDuration} isHeld={frame.ball.isHeld ?? false} />
         ) : null}
+        {effects && effects.length ? <CourtEffectsSvg effects={effects} /> : null}
       </svg>
       {hasStamina ? (
         <div className={styles.staminaLegend} aria-label={t('match_broadcast.stamina.label')}>
@@ -93,11 +112,7 @@ export function CourtStage({
           ))}
         </div>
       ) : null}
-      {basketMessage ? (
-        <div className={styles.basketMessage} key={basketSequence} role="status">
-          {basketMessage}
-        </div>
-      ) : null}
+      {visibleBanner ? <CourtEffectBanner effect={visibleBanner} durationMs={transitionDurationMs} /> : null}
     </div>
   );
 }

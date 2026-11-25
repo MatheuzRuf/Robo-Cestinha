@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { CircleDot, Maximize, Minimize } from 'lucide-react';
 import { Button } from '../../../../components/Button';
 import { NbaImage } from '../../../../components/NbaImage';
@@ -6,16 +7,21 @@ import { useTranslation } from '../../../../lib/i18n/i18n';
 import type { SimulationTeam, Speed } from '../../../../types/matchBroadcast';
 import styles from '../../MatchBroadcast.module.css';
 
+const SCORE_DELTA_HOLD_MS = 900;
+const MAX_ANIMATED_DELTA = 4;
+
 function TeamSummaryBlock({
   side,
   team,
   score,
   hasPossession,
+  delta,
 }: {
   side: 'home' | 'away';
   team: SimulationTeam;
   score: number;
   hasPossession: boolean;
+  delta: number | null;
 }) {
   return (
     <div className={`${styles.teamSummary} ${side === 'away' ? styles.awaySummary : ''}`}>
@@ -35,7 +41,14 @@ function TeamSummaryBlock({
           </span>
         </div>
       </div>
-      <strong className={styles.score}>{score}</strong>
+      <span className={styles.scoreWrap}>
+        {delta !== null ? (
+          <span className={styles.scoreDelta} key={`${side}-${score}`}>
+            +{delta}
+          </span>
+        ) : null}
+        <strong className={`${styles.score} ${delta !== null ? styles.scorePop : ''}`}>{score}</strong>
+      </span>
     </div>
   );
 }
@@ -70,6 +83,35 @@ export function Scoreboard({
   onToggleFullMode,
 }: ScoreboardProps) {
   const { t } = useTranslation();
+  const previous = useRef({ home: homeScore, away: awayScore, frame: frameNumber });
+  const [deltas, setDeltas] = useState<{ home: number | null; away: number | null }>({
+    home: null,
+    away: null,
+  });
+
+  useEffect(() => {
+    const snapshot = previous.current;
+    const advancedOneFrame = frameNumber === snapshot.frame + 1;
+    const homeDelta = homeScore - snapshot.home;
+    const awayDelta = awayScore - snapshot.away;
+    previous.current = { home: homeScore, away: awayScore, frame: frameNumber };
+
+    const next = advancedOneFrame
+      ? {
+          home: homeDelta > 0 && homeDelta <= MAX_ANIMATED_DELTA ? homeDelta : null,
+          away: awayDelta > 0 && awayDelta <= MAX_ANIMATED_DELTA ? awayDelta : null,
+        }
+      : { home: null, away: null };
+
+    if (next.home === null && next.away === null) {
+      setDeltas((current) => (current.home === null && current.away === null ? current : { home: null, away: null }));
+      return;
+    }
+
+    setDeltas(next);
+    const timeoutId = window.setTimeout(() => setDeltas({ home: null, away: null }), SCORE_DELTA_HOLD_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [awayScore, frameNumber, homeScore]);
 
   return (
     <section className={styles.scoreboard}>
@@ -78,6 +120,7 @@ export function Scoreboard({
         team={homeTeam}
         score={homeScore}
         hasPossession={possessionTeamId === homeTeam.teamId}
+        delta={deltas.home}
       />
       <div className={styles.clockPanel}>
         <span className={styles.frameLabel}>
@@ -108,6 +151,7 @@ export function Scoreboard({
         team={awayTeam}
         score={awayScore}
         hasPossession={possessionTeamId === awayTeam.teamId}
+        delta={deltas.away}
       />
     </section>
   );

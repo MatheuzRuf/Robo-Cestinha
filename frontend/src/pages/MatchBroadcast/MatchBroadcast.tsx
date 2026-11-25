@@ -9,6 +9,7 @@ import type { PlayerState, Team } from '../../types/game';
 import type { SimulationResponse } from '../../types/matchBroadcast';
 import { useGameFrames } from './hooks/useGameFrames';
 import { CourtStage } from './components/CourtStage/CourtStage';
+import type { FrameEffect, HoopSide } from './components/CourtStage/CourtEffects';
 import { Scoreboard } from './components/Scoreboard/Scoreboard';
 import { SimulationEvents } from './components/SimulationEvents/SimulationEvents';
 import { SimulationProgress } from './components/SimulationProgress/SimulationProgress';
@@ -252,14 +253,69 @@ export default function MatchBroadcast() {
     );
   }
 
-  const currentBasketEvent = simulation?.events.find(
-    (event) => event.type === 'shot_made' && event.iteration === currentSimulationFrame?.iteration,
-  );
-  const basketSide = currentBasketEvent
-    ? currentBasketEvent.teamId === simulation?.teams.home.teamId
-      ? 'right'
-      : 'left'
-    : undefined;
+  const frameEffects = useMemo<FrameEffect[]>(() => {
+    if (!simulation || !currentSimulationFrame) return [];
+
+    const iteration = currentSimulationFrame.iteration;
+    const frameEvents = simulation.events.filter((event) => event.iteration === iteration);
+    if (!frameEvents.length) return [];
+
+    const playersById = new Map(simulation.players.map((player) => [player.playerId, player]));
+    const positionsById = new Map(currentSimulationFrame.players.map((position) => [position.playerId, position]));
+    const homeTeamId = simulation.teams.home.teamId;
+    const hoopSideFor = (teamId: string | null): HoopSide => (teamId === homeTeamId ? 'right' : 'left');
+    const teamSideFor = (teamId: string | null): 'home' | 'away' => (teamId === homeTeamId ? 'home' : 'away');
+    const abbreviationFor = (teamId: string | null) =>
+      teamId === homeTeamId ? simulation.teams.home.abbreviation : simulation.teams.away.abbreviation;
+    const shortNameFor = (name: string | undefined) => {
+      const parts = (name ?? '').trim().split(/\s+/);
+      if (!parts[0]) return '';
+      return parts.length > 1 ? `${parts[0].charAt(0)}. ${parts[parts.length - 1]}` : parts[0];
+    };
+
+    const effects: FrameEffect[] = [];
+    for (const event of frameEvents) {
+      if (event.type === 'shot_made') {
+        const shooter = event.playerId ? playersById.get(event.playerId) : undefined;
+        const shooterPosition = event.playerId ? positionsById.get(event.playerId) : undefined;
+        const points = Number(event.data.pointsScored ?? event.data.shotValue ?? 2);
+        effects.push({
+          kind: 'score',
+          sequence: event.sequence,
+          points: points === 3 ? 3 : 2,
+          hoopSide: hoopSideFor(event.teamId),
+          teamSide: teamSideFor(event.teamId),
+          shooterId: shooter?.playerId ?? null,
+          shooterName: shortNameFor(shooter?.name),
+          shooterPos: shooterPosition ? { x: shooterPosition.x, y: shooterPosition.y } : null,
+          teamAbbreviation: abbreviationFor(event.teamId),
+        });
+      } else if (event.type === 'rebound') {
+        const rebounder = event.playerId ? playersById.get(event.playerId) : undefined;
+        const rebounderPosition = event.playerId ? positionsById.get(event.playerId) : undefined;
+        effects.push({
+          kind: 'rebound',
+          sequence: event.sequence,
+          reboundType: event.data.reboundType === 'offensive' ? 'offensive' : 'defensive',
+          teamSide: teamSideFor(event.teamId),
+          playerId: rebounder?.playerId ?? null,
+          playerName: shortNameFor(rebounder?.name),
+          playerPos: rebounderPosition ? { x: rebounderPosition.x, y: rebounderPosition.y } : null,
+          hoopSide: hoopSideFor(event.teamId),
+          teamAbbreviation: abbreviationFor(event.teamId),
+        });
+      } else if (event.type === 'shot_missed') {
+        effects.push({
+          kind: 'miss',
+          sequence: event.sequence,
+          hoopSide: hoopSideFor(event.teamId),
+        });
+      }
+    }
+    return effects;
+  }, [simulation, currentSimulationFrame]);
+
+  const madeBasketSide = frameEffects.find((effect) => effect.kind === 'score')?.hoopSide;
 
   return (
     <main className={`${styles.page} ${styles.matchPage}`} ref={pageRef}>
@@ -303,15 +359,8 @@ export default function MatchBroadcast() {
               <CourtStage
                 frame={playback.frame}
                 transitionDurationMs={playback.transitionDurationMs}
-                basketMessage={
-                  currentBasketEvent
-                    ? t('match_broadcast.simulation.basket_made', {
-                        points: Number(currentBasketEvent.data.pointsScored ?? 2),
-                      })
-                    : undefined
-                }
-                basketSequence={currentBasketEvent?.sequence}
-                madeBasketSide={basketSide}
+                madeBasketSide={madeBasketSide}
+                effects={frameEffects}
               />
               <SimulationProgress
                 currentFrame={playback.frameIndex + 1}
