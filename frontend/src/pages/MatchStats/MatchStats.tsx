@@ -924,6 +924,9 @@ export default function MatchStats() {
                   <th scope="col">{t('match_stats.points')}</th>
                   <th scope="col">{t('match_stats.field_goals')}</th>
                   <th scope="col">{t('match_stats.three_pointers')}</th>
+                  <th scope="col">{t('match_stats.rebounds')}</th>
+                  <th scope="col">{t('match_stats.assists')}</th>
+                  <th scope="col">{t('match_stats.steals')}</th>
                   <th scope="col">{t('match_stats.passes_completed')}</th>
                   <th scope="col">{t('match_stats.turnovers')}</th>
                   <th scope="col">{t('match_stats.fouls')}</th>
@@ -943,6 +946,9 @@ export default function MatchStats() {
                     <td data-label={t('match_stats.three_pointers')}>
                       {fieldGoalLine(row.threePointersMade, row.threePointersAttempted, locale)}
                     </td>
+                    <td data-label={t('match_stats.rebounds')}>{row.rebounds}</td>
+                    <td data-label={t('match_stats.assists')}>{row.assists}</td>
+                    <td data-label={t('match_stats.steals')}>{row.steals}</td>
                     <td data-label={t('match_stats.passes_completed')}>{row.passesCompleted}</td>
                     <td data-label={t('match_stats.turnovers')}>{row.turnovers}</td>
                     <td data-label={t('match_stats.fouls')}>{row.fouls}</td>
@@ -1010,6 +1016,18 @@ export default function MatchStats() {
                         )}
                       </strong>
                       <span>{t('match_stats.field_goals')}</span>
+                    </div>
+                    <div>
+                      <strong>{selectedPlayerStats.rebounds}</strong>
+                      <span>{t('match_stats.rebounds')}</span>
+                    </div>
+                    <div>
+                      <strong>{selectedPlayerStats.assists}</strong>
+                      <span>{t('match_stats.assists')}</span>
+                    </div>
+                    <div>
+                      <strong>{selectedPlayerStats.steals}</strong>
+                      <span>{t('match_stats.steals')}</span>
                     </div>
                     <div>
                       <strong>{selectedPlayerStats.passesCompleted}</strong>

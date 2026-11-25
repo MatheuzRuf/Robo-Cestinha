@@ -313,6 +313,9 @@ export const enUS = {
     stat: 'Stat',
     field_goals: 'Field goals',
     three_pointers: '3-pointers',
+    rebounds: 'Rebounds',
+    assists: 'Assists',
+    steals: 'Steals',
     passes_completed: 'Passes completed',
     turnovers: 'Turnovers',
     fouls: 'Fouls',
@@ -365,6 +368,6 @@ export const enUS = {
     first_step: 'Start',
     last_step: 'End',
     data_note:
-      'Not currently recorded: individual rebounds, assists, steals, blocks, minutes played, and quarter-by-quarter stats. Rebound totals above are team event counts.',
+      'Individual rebounds, assists, and steals are tracked from match events. Still not recorded: blocks, minutes played, and quarter-by-quarter stats.',
   },
 } as const;

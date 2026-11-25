@@ -1,4 +1,4 @@
-import type { SimulationFrame, SimulationPlayer, SimulationResponse } from '../../types/matchBroadcast';
+import type { SimulationFrame, SimulationPlayer, SimulationResponse, SimulationTeam } from '../../types/matchBroadcast';
 
 export interface TeamMatchStats {
   points: number;
@@ -26,6 +26,12 @@ export interface PlayerMatchStats {
   passesIntercepted: number;
   turnovers: number;
   fouls: number;
+  rebounds: number;
+  offensiveRebounds: number;
+  defensiveRebounds: number;
+  assists: number;
+  steals: number;
+  finalStamina: number | null;
 }
 
 export interface MatchStatsSummary {
@@ -43,6 +49,10 @@ interface MutableStatLine {
   turnovers: number;
   fouls: number;
   rebounds: number;
+  offensiveRebounds: number;
+  defensiveRebounds: number;
+  assists: number;
+  steals: number;
   points: number;
 }
 
@@ -57,6 +67,10 @@ function emptyLine(): MutableStatLine {
     turnovers: 0,
     fouls: 0,
     rebounds: 0,
+    offensiveRebounds: 0,
+    defensiveRebounds: 0,
+    assists: 0,
+    steals: 0,
     points: 0,
   };
 }
@@ -71,9 +85,12 @@ export function deriveMatchStats(simulation: SimulationResponse): MatchStatsSumm
   const playerLines = new Map(simulation.players.map((player) => [player.playerId, emptyLine()]));
   const shotValues = new Map<string, number>();
 
+  const creditedSteals = new Set<string>();
+
   for (const event of simulation.events) {
     const teamLine = event.teamId ? teamLines.get(event.teamId) : undefined;
     const playerLine = event.playerId ? playerLines.get(event.playerId) : undefined;
+    const assistedLine = event.targetPlayerId ? playerLines.get(event.targetPlayerId) : undefined;
 
     if (event.type === 'shot_attempted') {
       const shotValue = Number(event.data.shotValue);
@@ -113,6 +130,27 @@ export function deriveMatchStats(simulation: SimulationResponse): MatchStatsSumm
       if (playerLine) playerLine.fouls += 1;
     } else if (event.type === 'rebound' && teamLine) {
       teamLine.rebounds += 1;
+      if (playerLine) {
+        playerLine.rebounds += 1;
+        if (event.data.reboundType === 'offensive') {
+          playerLine.offensiveRebounds += 1;
+        } else {
+          playerLine.defensiveRebounds += 1;
+        }
+      }
+    }
+
+    if (event.type === 'shot_made' && assistedLine && event.targetPlayerId !== event.playerId) {
+      assistedLine.assists += 1;
+    }
+
+    if ((event.type === 'turnover' || event.type === 'pass_intercepted') && event.targetPlayerId) {
+      const stealKey = `${event.iteration}:${event.targetPlayerId}`;
+      if (!creditedSteals.has(stealKey)) {
+        creditedSteals.add(stealKey);
+        const defenderLine = playerLines.get(event.targetPlayerId);
+        if (defenderLine) defenderLine.steals += 1;
+      }
     }
   }
 
@@ -151,6 +189,10 @@ export function deriveMatchStats(simulation: SimulationResponse): MatchStatsSumm
   ) as Record<string, TeamMatchStats>;
 
   const playedPlayerIds = new Set(simulation.frames.flatMap((frame) => frame.players.map((player) => player.playerId)));
+  const finalFrame = simulation.frames.at(-1);
+  const finalStaminaById = new Map(
+    (finalFrame?.players ?? []).map((position) => [position.playerId, position.stamina ?? null]),
+  );
   const players = simulation.players
     .filter((player) => playedPlayerIds.has(player.playerId))
     .map((player) => {
@@ -166,6 +208,12 @@ export function deriveMatchStats(simulation: SimulationResponse): MatchStatsSumm
         passesIntercepted: line.passesIntercepted,
         turnovers: line.turnovers,
         fouls: line.fouls,
+        rebounds: line.rebounds,
+        offensiveRebounds: line.offensiveRebounds,
+        defensiveRebounds: line.defensiveRebounds,
+        assists: line.assists,
+        steals: line.steals,
+        finalStamina: finalStaminaById.get(player.playerId) ?? null,
       };
     })
     .sort((left, right) => right.points - left.points || left.player.name.localeCompare(right.player.name));
@@ -370,4 +418,232 @@ export function buildPassingNetwork(simulation: SimulationResponse, playedPlayer
     players: playedPlayers.filter((player) => involvedPlayerIds.has(player.playerId)),
     links,
   };
+}
+
+export type TrophyId = 'mvp' | 'top_scorer' | 'sharpshooter' | 'playmaker' | 'glass_cleaner' | 'defensive_anchor';
+
+export type TrophyTier = 'gold' | 'silver' | 'bronze';
+
+export interface MatchTrophy {
+  id: TrophyId;
+  tier: TrophyTier;
+  player: SimulationPlayer;
+  team: SimulationTeam;
+  headlineValue: string;
+  supportingStats: string[];
+  score: number;
+}
+
+function fieldGoalPct(row: PlayerMatchStats): number {
+  return row.fieldGoalsAttempted > 0 ? row.fieldGoalsMade / row.fieldGoalsAttempted : 0;
+}
+
+function threePointPct(row: PlayerMatchStats): number {
+  return row.threePointersAttempted > 0 ? row.threePointersMade / row.threePointersAttempted : 0;
+}
+
+function formatPct(value: number): string {
+  return `${(value * 100).toFixed(1)}%`;
+}
+
+function gameScore(row: PlayerMatchStats): number {
+  return (
+    row.points +
+    row.rebounds * 1.2 +
+    row.assists * 1.5 +
+    row.steals * 2 +
+    row.passesCompleted * 0.1 -
+    row.turnovers * 1.5 -
+    (row.fieldGoalsAttempted - row.fieldGoalsMade) * 0.4
+  );
+}
+
+function supportingStats(row: PlayerMatchStats): string[] {
+  const parts = [`${row.rebounds} REB`, `${row.assists} AST`, `${row.steals} STL`];
+  if (row.fieldGoalsAttempted > 0) parts.push(`${formatPct(fieldGoalPct(row))} FG`);
+  return parts;
+}
+
+/**
+ * Compute the deterministic set of post-match awards.
+ *
+ * All awards degrade gracefully on legacy stored simulations that predate
+ * rebounds/assists/steals tracking: an award is simply omitted when no player
+ * qualifies.
+ */
+export function deriveMatchTrophies(simulation: SimulationResponse, stats: MatchStatsSummary): MatchTrophy[] {
+  const winnerTeamId = simulation.summary.winnerTeamId;
+  const teamFor = (player: SimulationPlayer): SimulationTeam =>
+    player.side === 'home' ? simulation.teams.home : simulation.teams.away;
+  const isWinner = (row: PlayerMatchStats) => row.player.teamId === winnerTeamId;
+  const winnerFirst = (a: PlayerMatchStats, b: PlayerMatchStats) => Number(isWinner(b)) - Number(isWinner(a));
+  const byName = (a: PlayerMatchStats, b: PlayerMatchStats) => a.player.name.localeCompare(b.player.name);
+
+  const pick = (
+    candidates: PlayerMatchStats[],
+    compare: (a: PlayerMatchStats, b: PlayerMatchStats) => number,
+  ): PlayerMatchStats | null => {
+    if (!candidates.length) return null;
+    return [...candidates].sort(compare)[0] ?? null;
+  };
+
+  const trophies: MatchTrophy[] = [];
+
+  const mvp = pick(
+    stats.players.filter((row) => row.points > 0 || row.rebounds > 0 || row.assists > 0),
+    (a, b) =>
+      gameScore(b) - gameScore(a) ||
+      winnerFirst(a, b) ||
+      b.points - a.points ||
+      b.fieldGoalsMade - a.fieldGoalsMade ||
+      byName(a, b),
+  );
+  if (mvp) {
+    trophies.push({
+      id: 'mvp',
+      tier: 'gold',
+      player: mvp.player,
+      team: teamFor(mvp.player),
+      headlineValue: `${mvp.points} PTS`,
+      supportingStats: supportingStats(mvp),
+      score: gameScore(mvp),
+    });
+  }
+
+  const topScorer = pick(
+    stats.players.filter((row) => row.points >= 1),
+    (a, b) =>
+      b.points - a.points ||
+      fieldGoalPct(b) - fieldGoalPct(a) ||
+      a.fieldGoalsAttempted - b.fieldGoalsAttempted ||
+      winnerFirst(a, b) ||
+      byName(a, b),
+  );
+  if (topScorer) {
+    trophies.push({
+      id: 'top_scorer',
+      tier: 'silver',
+      player: topScorer.player,
+      team: teamFor(topScorer.player),
+      headlineValue: `${topScorer.points} PTS`,
+      supportingStats: supportingStats(topScorer),
+      score: topScorer.points,
+    });
+  }
+
+  const threePointLeaders = stats.players.filter((row) => row.threePointersMade >= 1);
+  if (threePointLeaders.length) {
+    const sharpshooter = pick(
+      threePointLeaders,
+      (a, b) =>
+        b.threePointersMade - a.threePointersMade ||
+        threePointPct(b) - threePointPct(a) ||
+        b.points - a.points ||
+        byName(a, b),
+    );
+    if (sharpshooter) {
+      trophies.push({
+        id: 'sharpshooter',
+        tier: 'bronze',
+        player: sharpshooter.player,
+        team: teamFor(sharpshooter.player),
+        headlineValue: `${sharpshooter.threePointersMade} 3PM`,
+        supportingStats: [
+          `${formatPct(threePointPct(sharpshooter))} 3PT`,
+          `${sharpshooter.threePointersMade}/${sharpshooter.threePointersAttempted}`,
+          ...supportingStats(sharpshooter).slice(0, 2),
+        ],
+        score: sharpshooter.threePointersMade,
+      });
+    }
+  } else {
+    const fallback = pick(
+      stats.players.filter((row) => row.fieldGoalsAttempted >= 3),
+      (a, b) => fieldGoalPct(b) - fieldGoalPct(a) || b.fieldGoalsMade - a.fieldGoalsMade || byName(a, b),
+    );
+    if (fallback) {
+      trophies.push({
+        id: 'sharpshooter',
+        tier: 'bronze',
+        player: fallback.player,
+        team: teamFor(fallback.player),
+        headlineValue: `${formatPct(fieldGoalPct(fallback))} FG`,
+        supportingStats: [
+          `${fallback.fieldGoalsMade}/${fallback.fieldGoalsAttempted}`,
+          ...supportingStats(fallback).slice(0, 2),
+        ],
+        score: fieldGoalPct(fallback),
+      });
+    }
+  }
+
+  const assistLeaders = stats.players.filter((row) => row.assists >= 1);
+  if (assistLeaders.length) {
+    const playmaker = pick(
+      assistLeaders,
+      (a, b) =>
+        b.assists - a.assists || b.passesCompleted - a.passesCompleted || a.turnovers - b.turnovers || byName(a, b),
+    );
+    if (playmaker) {
+      trophies.push({
+        id: 'playmaker',
+        tier: 'silver',
+        player: playmaker.player,
+        team: teamFor(playmaker.player),
+        headlineValue: `${playmaker.assists} AST`,
+        supportingStats: [`${playmaker.passesCompleted} PASS`, ...supportingStats(playmaker).slice(0, 2)],
+        score: playmaker.assists,
+      });
+    }
+  } else {
+    const fallback = pick(
+      stats.players.filter((row) => row.passesCompleted >= 3),
+      (a, b) => b.passesCompleted - a.passesCompleted || a.turnovers - b.turnovers || byName(a, b),
+    );
+    if (fallback) {
+      trophies.push({
+        id: 'playmaker',
+        tier: 'silver',
+        player: fallback.player,
+        team: teamFor(fallback.player),
+        headlineValue: `${fallback.passesCompleted} PASS`,
+        supportingStats: supportingStats(fallback),
+        score: fallback.passesCompleted,
+      });
+    }
+  }
+
+  const rebounder = pick(
+    stats.players.filter((row) => row.rebounds >= 1),
+    (a, b) => b.rebounds - a.rebounds || b.offensiveRebounds - a.offensiveRebounds || winnerFirst(a, b) || byName(a, b),
+  );
+  if (rebounder) {
+    trophies.push({
+      id: 'glass_cleaner',
+      tier: 'bronze',
+      player: rebounder.player,
+      team: teamFor(rebounder.player),
+      headlineValue: `${rebounder.rebounds} REB`,
+      supportingStats: [`${rebounder.offensiveRebounds} OREB`, ...supportingStats(rebounder).slice(1, 3)],
+      score: rebounder.rebounds,
+    });
+  }
+
+  const defender = pick(
+    stats.players.filter((row) => row.steals >= 1),
+    (a, b) => b.steals - a.steals || a.fouls - b.fouls || winnerFirst(a, b) || byName(a, b),
+  );
+  if (defender) {
+    trophies.push({
+      id: 'defensive_anchor',
+      tier: 'bronze',
+      player: defender.player,
+      team: teamFor(defender.player),
+      headlineValue: `${defender.steals} STL`,
+      supportingStats: supportingStats(defender),
+      score: defender.steals,
+    });
+  }
+
+  return trophies;
 }

@@ -313,6 +313,9 @@ export const ptBR = {
     stat: 'Estatística',
     field_goals: 'Arremessos de quadra',
     three_pointers: 'Arremessos de 3 pontos',
+    rebounds: 'Rebotes',
+    assists: 'Assistências',
+    steals: 'Roubos de bola',
     passes_completed: 'Passes completos',
     turnovers: 'Erros de posse',
     fouls: 'Faltas',
@@ -366,6 +369,6 @@ export const ptBR = {
     first_step: 'Início',
     last_step: 'Fim',
     data_note:
-      'Ainda não registrados: rebotes individuais, assistências, roubos de bola, tocos, minutos jogados e estatísticas por quarto. Os rebotes acima são contagens de eventos do time.',
+      'Rebotes individuais, assistências e roubos de bola são registrados a partir dos eventos da partida. Ainda não registrados: tocos, minutos jogados e estatísticas por quarto.',
   },
 } as const;
