@@ -92,18 +92,14 @@ def resolve_pass_outcome(
     return True, None
 
 
-def resolve_inbound_receiver(
-    attacking_team: LiveTeam, inbounder_id: str
-) -> LivePlayer:
+def resolve_inbound_receiver(attacking_team: LiveTeam, inbounder_id: str) -> LivePlayer:
     """Escolhe o recebedor da reposição: o companheiro em quadra mais próximo
     do repositor, desempatando por menor ``usage_rate`` e depois pela ordem no
     quinteto (mantém o passe curto e legível)."""
     inbounder = attacking_team.get_player(inbounder_id)
     order = attacking_team.on_court
     teammates = [
-        p
-        for p in attacking_team.get_on_court_players()
-        if p.player_id != inbounder_id
+        p for p in attacking_team.get_on_court_players() if p.player_id != inbounder_id
     ]
 
     def key(player: LivePlayer) -> tuple[float, float, int]:
