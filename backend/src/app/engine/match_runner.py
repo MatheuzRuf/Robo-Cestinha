@@ -8,6 +8,7 @@ from app.engine.grid import GRID_HEIGHT, GRID_WIDTH, CourtPosition
 from app.engine.state_machine import StateMachine
 from app.engine.schemas import (
     BallState,
+    BallTrajectory,
     EngineSimulationResult,
     FinalScore,
     MatchLog,
@@ -93,8 +94,8 @@ class MatchRunner:
         events: list[SimulationEvent] = []
         sequence = 0
 
-        def capture(iteration: int) -> None:
-            frames.append(self._capture_frame(iteration))
+        def capture(iteration: int, trajectory: BallTrajectory | None = None) -> None:
+            frames.append(self._capture_frame(iteration, trajectory))
 
         def emit(
             iteration: int,
@@ -127,7 +128,7 @@ class MatchRunner:
             self._refill_clock()
             transition = self.fsm.resolve_next_transition(self.state)
             completed += 1
-            capture(completed)
+            capture(completed, transition.trajectory)
             self._append_transition_events(transition, completed, emit)
 
         termination_reason = "iteration_limit"
@@ -139,7 +140,7 @@ class MatchRunner:
                 transition = self.fsm.resolve_next_transition(self.state)
                 completed += 1
                 overtime_iterations += 1
-                capture(completed)
+                capture(completed, transition.trajectory)
                 self._append_transition_events(transition, completed, emit)
 
         winner_team_id = (
@@ -172,7 +173,9 @@ class MatchRunner:
         if self.state.clock.game_clock_remaining < 60.0:
             self.state.clock.start_next_period(is_overtime=False)
 
-    def _capture_frame(self, iteration: int) -> SimulationFrame:
+    def _capture_frame(
+        self, iteration: int, trajectory: BallTrajectory | None = None
+    ) -> SimulationFrame:
         """Build a dense frame snapshot for the current game state."""
         state = self.state
         players: list[PlayerPosition] = []
@@ -183,6 +186,7 @@ class MatchRunner:
                         player_id=player.player_id,
                         x=player.court_pos.x,
                         y=player.court_pos.y,
+                        stamina=round(player.current_stamina, 3),
                     )
                 )
 
@@ -199,7 +203,7 @@ class MatchRunner:
             iteration=iteration,
             player_with_ball_id=holder,
             players=players,
-            ball=BallState(x=ball_position.x, y=ball_position.y),
+            ball=BallState(x=ball_position.x, y=ball_position.y, trajectory=trajectory),
             score=ScoreSnapshot(home=state.home_team.score, away=state.away_team.score),
             possession_team_id=state.possession_team_id,
         )
@@ -216,7 +220,7 @@ class MatchRunner:
                 "turnover",
                 transition.acting_team_id,
                 transition.player_id,
-                None,
+                transition.defender_id,
                 {},
             )
             if action_type == "pass":
@@ -225,7 +229,7 @@ class MatchRunner:
                     "pass_intercepted",
                     transition.acting_team_id,
                     transition.player_id,
-                    None,
+                    transition.defender_id,
                     {},
                 )
             emit(
@@ -253,7 +257,7 @@ class MatchRunner:
                 "foul",
                 transition.acting_team_id,
                 transition.player_id,
-                None,
+                transition.defender_id,
                 {},
             )
         elif action_type == "shoot":
@@ -271,7 +275,7 @@ class MatchRunner:
                     "shot_made",
                     transition.acting_team_id,
                     transition.player_id,
-                    None,
+                    transition.assist_player_id,
                     {
                         "pointsScored": transition.points,
                         "scoreAfter": {
@@ -290,13 +294,25 @@ class MatchRunner:
                     {"shotValue": transition.shot_value},
                 )
                 emit(
-                    iteration, "rebound", transition.possession_team_id, None, None, {}
+                    iteration,
+                    "rebound",
+                    transition.possession_team_id,
+                    transition.rebounder_id,
+                    None,
+                    {
+                        "reboundType": (
+                            "offensive"
+                            if transition.is_offensive_rebound
+                            else "defensive"
+                        )
+                    },
                 )
-            emit(
-                iteration,
-                "possession_changed",
-                transition.possession_team_id,
-                None,
-                None,
-                {"previousTeamId": transition.acting_team_id},
-            )
+            if transition.possession_changed:
+                emit(
+                    iteration,
+                    "possession_changed",
+                    transition.possession_team_id,
+                    None,
+                    None,
+                    {"previousTeamId": transition.acting_team_id},
+                )

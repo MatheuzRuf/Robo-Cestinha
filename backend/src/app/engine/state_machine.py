@@ -12,6 +12,7 @@ from app.engine.heuristics import (
     resolve_move_outcome,
     resolve_pass_outcome,
     resolve_pass_teammate,
+    resolve_rebound,
     resolve_shot,
 )
 from app.engine.movement import reposition_players
@@ -165,6 +166,10 @@ class StateMachine:
         trajectory = None
         duration_s = 2.0
         possession_intact = True
+        rebounder_id = None
+        is_offensive_rebound = False
+        assist_player_id = None
+        defender_id = None
 
         if action_type == "PASS":
             receiver = resolve_pass_teammate(
@@ -187,6 +192,7 @@ class StateMachine:
                 state.last_passer_id = handler.player_id
                 outcome = "success"
             else:
+                defender_id = stealer.player_id if stealer is not None else None
                 state.flip_possession(new_handler_id=stealer.player_id)
                 outcome = "turnover"
                 possession_intact = False
@@ -200,10 +206,12 @@ class StateMachine:
                 handler.court_pos = handler.court_pos.move(direction)
                 outcome = "success"
             elif outcome_type == "STRIPPED":
+                defender_id = intercepter.player_id if intercepter is not None else None
                 state.flip_possession(new_handler_id=intercepter.player_id)
                 outcome = "turnover"
                 possession_intact = False
             elif outcome_type == "FOUL_DRAWN":
+                defender_id = intercepter.player_id if intercepter is not None else None
                 outcome = "foul"
             else:
                 outcome = "holds"
@@ -224,18 +232,41 @@ class StateMachine:
                 to_player_id=None,
             )
             if is_made:
+                assist_player_id = (
+                    state.last_passer_id
+                    if state.last_passer_id
+                    and state.last_passer_id != handler.player_id
+                    else None
+                )
                 if state.is_attacking_team_home():
                     state.home_team.score += pts
                 else:
                     state.away_team.score += pts
-            state.flip_possession(rng=self.rng)
-            possession_intact = False
+                state.flip_possession(rng=self.rng)
+                possession_intact = False
+            else:
+                rebounder, is_offensive = resolve_rebound(state, self.rng)
+                rebounder_id = rebounder.player_id
+                is_offensive_rebound = is_offensive
+                if is_offensive:
+                    # Offensive rebounds keep the attacking possession alive.
+                    state.active_handler_id = rebounder.player_id
+                    state.last_passer_id = None
+                    state.clock.reset_for_new_possession(is_offensive_rebound=True)
+                    possession_intact = True
+                else:
+                    state.flip_possession(new_handler_id=rebounder.player_id)
+                    possession_intact = False
 
-        _, violation = state.clock.tick(duration_s)
+        elapsed, violation = state.clock.tick(duration_s)
         if violation and possession_intact:
             state.flip_possession(rng=self.rng)
             outcome = "turnover"
+            possession_intact = False
 
+        state.tick_players_on_court(
+            elapsed, active_player_id=handler.player_id, active_multiplier=1.35
+        )
         reposition_players(state, self.rng)
 
         return TransitionResult(
@@ -254,4 +285,9 @@ class StateMachine:
             score_home=state.home_team.score,
             score_away=state.away_team.score,
             trajectory=trajectory,
+            rebounder_id=rebounder_id,
+            is_offensive_rebound=is_offensive_rebound,
+            assist_player_id=assist_player_id,
+            defender_id=defender_id,
+            duration_s=elapsed,
         )
