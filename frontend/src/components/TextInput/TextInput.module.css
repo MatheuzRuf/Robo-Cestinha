@@ -31,6 +31,18 @@
   background: var(--color-surface-raised);
   color: var(--color-text);
   padding: var(--space-3) var(--space-4);
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .trailing {
@@ -42,8 +54,3 @@
   padding: 0 var(--space-4);
 }
 
-:global(:root[data-theme='light']) .input:focus-visible,
-:global(:root[data-theme='light']) .trailing:focus-visible {
-  outline: 2px solid var(--color-border-input);
-  outline-offset: 2px;
-}
