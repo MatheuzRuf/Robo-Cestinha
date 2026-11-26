@@ -83,8 +83,15 @@ def test_off_ball_players_reposition_with_varied_directions():
     result = _make_runner(seed=7).run_simulation(50)
     moved_players = set()
     varied_transition = False
+    # Kickoff/period resets intentionally reposition players over many cells
+    # (>1), so consecutive-frame step checks only apply to normal transitions.
+    reset_iterations = {
+        event.iteration for event in result.events if event.type == "kickoff"
+    }
 
     for previous, current in zip(result.frames, result.frames[1:]):
+        if current.iteration in reset_iterations:
+            continue
         before = {player.player_id: (player.x, player.y) for player in previous.players}
         after = {player.player_id: (player.x, player.y) for player in current.players}
         deltas = [
@@ -241,7 +248,7 @@ def test_transition_frames_attach_a_ball_trajectory():
         trajectory = frame.ball.trajectory
         if trajectory is None:
             continue
-        assert trajectory.type in ("pass", "shot")
+        assert trajectory.type in ("pass", "shot", "inbound")
         assert trajectory.from_position is not None
         assert trajectory.to_position is not None
         assert trajectory.from_player_id is not None

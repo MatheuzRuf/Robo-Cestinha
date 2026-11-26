@@ -9,6 +9,7 @@ from app.engine.grid import get_target_rim
 from app.engine.heuristics import (
     decide_handler_action,
     decide_move_direction,
+    resolve_inbound_receiver,
     resolve_move_outcome,
     resolve_pass_outcome,
     resolve_pass_teammate,
@@ -45,6 +46,38 @@ class StateMachine:
 
         # Ações curtas consomem o relógio até produzirem um resultado final.
         while outcome == "continue":
+            # Pós-cesta, duas transições consecutivas resolvem a reorganização.
+            if state.pending_kickoff:
+                reset = self._resolve_kickoff_reset(state)
+                actions.append(
+                    ActionLog(
+                        type="kickoff",
+                        player=reset.player_id,
+                        result="kickoff",
+                        duration_s=reset.duration_s,
+                    )
+                )
+                if state.clock.is_quarter_ended():
+                    outcome = "quarter_end"
+                continue
+
+            if state.awaiting_inbound:
+                inbound = self._resolve_inbound_pass(state)
+                action = ActionLog(
+                    type="inbound_pass",
+                    player=inbound.player_id,
+                    target_player=inbound.target_player_id,
+                    result=inbound.outcome,
+                    duration_s=inbound.duration_s,
+                )
+                if inbound.outcome == "turnover":
+                    action.player = inbound.defender_id
+                    outcome = "turnover"
+                actions.append(action)
+                if state.clock.is_quarter_ended():
+                    outcome = "quarter_end"
+                continue
+
             handler = state.attacking_team.get_player(state.active_handler_id)
             action_type = decide_handler_action(state, self.rng)
             action_log = ActionLog(type=action_type, player=handler.player_id)
@@ -108,7 +141,8 @@ class StateMachine:
                         state.home_team.score += pts
                     else:
                         state.away_team.score += pts
-                    state.flip_possession(rng=self.rng)
+                    state.flip_possession(rng=self.rng, pick_handler=False)
+                    state.pending_kickoff = True
                 else:
                     outcome = "missed"
                     # O rebote ainda é simplificado: por enquanto a posse troca.
@@ -123,7 +157,8 @@ class StateMachine:
                 outcome = "turnover"
                 state.flip_possession(rng=self.rng)
 
-            reposition_players(state, self.rng)
+            if not state.pending_kickoff:
+                reposition_players(state, self.rng)
             actions.append(action_log)
             if state.clock.is_quarter_ended():
                 outcome = "quarter_end"
@@ -151,6 +186,12 @@ class StateMachine:
             The resolved transition, including the effect on the score and
             possession.
         """
+
+        if state.pending_kickoff:
+            return self._resolve_kickoff_reset(state)
+
+        if state.awaiting_inbound:
+            return self._resolve_inbound_pass(state)
 
         if not state.active_handler_id:
             state.active_handler_id = state.attacking_team.select_ball_handler(self.rng)
@@ -242,7 +283,8 @@ class StateMachine:
                     state.home_team.score += pts
                 else:
                     state.away_team.score += pts
-                state.flip_possession(rng=self.rng)
+                state.flip_possession(rng=self.rng, pick_handler=False)
+                state.pending_kickoff = True
                 possession_intact = False
             else:
                 rebounder, is_offensive = resolve_rebound(state, self.rng)
@@ -267,7 +309,10 @@ class StateMachine:
         state.tick_players_on_court(
             elapsed, active_player_id=handler.player_id, active_multiplier=1.35
         )
-        reposition_players(state, self.rng)
+        # Após cesta o punho da bola é definido pela reposição; a formação
+        # (com condutor válido) é aplicada na transição seguinte.
+        if not state.pending_kickoff:
+            reposition_players(state, self.rng)
 
         return TransitionResult(
             action_type=action_type.lower(),
@@ -290,4 +335,99 @@ class StateMachine:
             assist_player_id=assist_player_id,
             defender_id=defender_id,
             duration_s=elapsed,
+        )
+
+    def _resolve_kickoff_reset(self, state: GameState) -> TransitionResult:
+        """Primeira das duas transições de reposição (D5): reorganiza os times
+        na formação de fundo e coloca a bola no repositor determinístico.
+
+        Esta transição não chama ``reposition_players`` para que os jogadores
+        permaneçam exatamente sobre os slots da formação.
+        """
+        state.pending_kickoff = False
+        state.awaiting_inbound = True
+        inbounder = state.begin_kickoff()
+        duration_s = min(1.0, state.clock.game_clock_remaining)
+        elapsed, _ = state.clock.tick(duration_s)
+        team_id = state.possession_team_id
+        state.tick_players_on_court(elapsed, active_player_id=inbounder.player_id)
+        return TransitionResult(
+            action_type="kickoff",
+            outcome="kickoff",
+            player_id=inbounder.player_id,
+            target_player_id=None,
+            acting_team_id=team_id,
+            possession_team_id=team_id,
+            turnover=False,
+            scored=False,
+            points=0,
+            shot_value=None,
+            is_three=False,
+            possession_changed=False,
+            score_home=state.home_team.score,
+            score_away=state.away_team.score,
+            trajectory=None,
+            rebounder_id=None,
+            is_offensive_rebound=False,
+            assist_player_id=None,
+            defender_id=None,
+            duration_s=elapsed,
+            phase="kickoff",
+        )
+
+    def _resolve_inbound_pass(self, state: GameState) -> TransitionResult:
+        """Segunda transição de reposição (D5): repõe a bola ao recebedor mais
+        próximo, com passe protegido (D4) e trajetória ``inbound``."""
+        state.awaiting_inbound = False
+        handler = state.attacking_team.get_player(state.active_handler_id)
+        receiver = resolve_inbound_receiver(state.attacking_team, handler.player_id)
+        success, stealer = resolve_pass_outcome(
+            handler, receiver, state.defending_team, self.rng, safety_boost=0.5
+        )
+        duration_s = 1.5
+        acting_team_id = state.possession_team_id
+        trajectory = BallTrajectory(
+            type="inbound",
+            from_position=handler.court_pos.to_tuple(),
+            to_position=receiver.court_pos.to_tuple(),
+            from_player_id=handler.player_id,
+            to_player_id=receiver.player_id,
+        )
+        outcome = "success" if success else "turnover"
+        possession_intact = success
+        if success:
+            state.active_handler_id = receiver.player_id
+            state.last_passer_id = handler.player_id
+        else:
+            state.flip_possession(new_handler_id=stealer.player_id)
+
+        elapsed, violation = state.clock.tick(duration_s)
+        if violation and possession_intact:
+            state.flip_possession(rng=self.rng)
+            outcome = "turnover"
+
+        state.tick_players_on_court(elapsed, active_player_id=handler.player_id)
+        reposition_players(state, self.rng)
+        return TransitionResult(
+            action_type="inbound",
+            outcome=outcome,
+            player_id=handler.player_id,
+            target_player_id=receiver.player_id,
+            acting_team_id=acting_team_id,
+            possession_team_id=state.possession_team_id,
+            turnover=outcome == "turnover",
+            scored=False,
+            points=0,
+            shot_value=None,
+            is_three=False,
+            possession_changed=state.possession_team_id != acting_team_id,
+            score_home=state.home_team.score,
+            score_away=state.away_team.score,
+            trajectory=trajectory,
+            rebounder_id=None,
+            is_offensive_rebound=False,
+            assist_player_id=None,
+            defender_id=stealer.player_id if stealer else None,
+            duration_s=elapsed,
+            phase="kickoff",
         )

@@ -40,12 +40,13 @@
   stroke-width: 3;
   transform-box: fill-box;
   transform-origin: center;
-  animation: basketPulse 350ms ease-out both;
+  animation: basketPulse 350ms ease-out var(--basket-pulse-delay, 0ms) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .basketPulse {
     animation-duration: 1ms;
+    animation-delay: 0ms;
   }
 }
 

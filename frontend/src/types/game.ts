@@ -18,10 +18,12 @@ export interface BallState {
   height?: number;
   /** True while the ball is held by a player (rendered beside the portrait). */
   isHeld?: boolean;
+  /** Player holding the ball on this frame, if any. */
+  holderId?: string | null;
 }
 
 export interface BallTrajectory {
-  type: 'pass' | 'shot';
+  type: 'pass' | 'shot' | 'inbound';
   from: BallState;
   to: BallState;
   fromTeam: Team;
@@ -33,4 +35,6 @@ export interface Frame {
   players: PlayerState[];
   ball: BallState;
   trajectory?: BallTrajectory;
+  /** "kickoff" during the inbound reset/pass; missing on stored replays. */
+  phase?: string;
 }

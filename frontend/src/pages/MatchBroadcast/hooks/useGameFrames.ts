@@ -1,7 +1,41 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Frame } from '../../../types/game';
+import {
+  BALL_SPEED_CAP_FT_S,
+  TRANSITION_DURATION_MAX_MS,
+  TRANSITION_DURATION_MIN_MS,
+  TRANSITION_DURATION_MS,
+  ballFlightPath,
+  computeBallFlightPlan,
+  reboundCatch,
+  renderedBallPosition,
+  type BallFlightPlan,
+  type FlightPathPoint,
+  type ReboundCatch,
+  type RenderedBall,
+} from './ballFlight';
 
-export const TRANSITION_DURATION_MS = 800;
+export {
+  BALL_SPEED_CAP_FT_S,
+  TRANSITION_DURATION_MAX_MS,
+  TRANSITION_DURATION_MIN_MS,
+  TRANSITION_DURATION_MS,
+  ballFlightPath,
+  computeBallFlightPlan,
+  reboundCatch,
+  renderedBallPosition,
+  type BallFlightPlan,
+  type FlightPathPoint,
+  type ReboundCatch,
+  type RenderedBall,
+};
+
+function advanceDurationMs(frames: Frame[], index: number): number {
+  const previous = frames[index - 1];
+  const current = frames[index];
+  if (!previous || !current) return TRANSITION_DURATION_MS;
+  return computeBallFlightPlan(previous, current).durationMs;
+}
 
 function clampFrameIndex(frameIndex: number, frameCount: number) {
   return Math.max(0, Math.min(frameIndex, frameCount - 1));
@@ -29,10 +63,12 @@ export function useGameFrames(frames: Frame[], initialFrameIndex = 0, initialHas
   const isCurrentSequence = playbackState.frames === frames;
   const frameIndex = isCurrentSequence ? playbackState.frameIndex : clampFrameIndex(initialFrameIndex, frames.length);
   const isPaused = isCurrentSequence && playbackState.isPaused;
+  const advanceDurations = useMemo(() => frames.map((_, index) => advanceDurationMs(frames, index)), [frames]);
 
   useEffect(() => {
     if (isPaused || frameIndex >= frames.length - 1) return;
 
+    const advanceMs = advanceDurations[frameIndex] ?? TRANSITION_DURATION_MS;
     const timeoutId = window.setTimeout(() => {
       setPlaybackState((currentState) => {
         const isCurrentSequence = currentState.frames === frames;
@@ -52,10 +88,10 @@ export function useGameFrames(frames: Frame[], initialFrameIndex = 0, initialHas
           hasSkippedFrames: currentHasSkippedFrames,
         };
       });
-    }, TRANSITION_DURATION_MS / speed);
+    }, advanceMs / speed);
 
     return () => window.clearTimeout(timeoutId);
-  }, [frameIndex, frames, initialFrameIndex, initialHasSkippedFrames, isPaused, speed]);
+  }, [advanceDurations, frameIndex, frames, initialFrameIndex, initialHasSkippedFrames, isPaused, speed]);
 
   function pause() {
     setPlaybackState({
@@ -119,7 +155,7 @@ export function useGameFrames(frames: Frame[], initialFrameIndex = 0, initialHas
     isComplete: frames.length > 0 && currentFrameIndex === frames.length - 1,
     hasCompletedPlayback: isCurrentSequence && playbackState.hasCompletedPlayback,
     hasSkippedFrames: isCurrentSequence ? playbackState.hasSkippedFrames : initialHasSkippedFrames,
-    transitionDurationMs: TRANSITION_DURATION_MS / speed,
+    transitionDurationMs: (advanceDurations[currentFrameIndex] ?? TRANSITION_DURATION_MS) / speed,
     speed,
     setSpeed,
     isPaused,

@@ -108,6 +108,7 @@ class SimulationFrameSchema(BaseModel):
     ball: BallSchema
     score: ScoreSchema
     possessionTeamId: uuid.UUID | None
+    phase: str | None = None  # "play" (default) | "kickoff"
 
 
 class SimulationEventSchema(BaseModel):

@@ -5,7 +5,8 @@
   display: grid;
   place-items: center;
   padding: var(--space-4);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   border-radius: var(--radius-lg);
   background: radial-gradient(circle at 50% 30%, rgba(240, 113, 31, 0.18), transparent 55%), var(--color-overlay-scrim);
   backdrop-filter: blur(3px);
@@ -56,7 +57,8 @@
 .card {
   position: relative;
   z-index: 1;
-  max-width: 560px;
+  width: min(100%, 620px);
+  margin: auto;
   display: grid;
   justify-items: center;
   gap: var(--space-3);
@@ -172,6 +174,28 @@
   50% {
     opacity: 1;
     transform: scale(1.05);
+  }
+}
+
+@media (max-height: 760px) {
+  .overlay {
+    padding: var(--space-3);
+  }
+
+  .card {
+    gap: var(--space-2);
+    padding: var(--space-4);
+  }
+
+  .crest {
+    width: 84px;
+    height: 84px;
+  }
+
+  .winnerLogo {
+    width: 60px;
+    height: 60px;
+    margin-top: 10px;
   }
 }
 

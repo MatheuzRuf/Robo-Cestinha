@@ -58,6 +58,18 @@ export function SimulationEvents({ events, players, teams, currentIteration }: S
     switch (event.type) {
       case 'game_started':
         return t('match_broadcast.simulation.event_game_started');
+      case 'kickoff': {
+        const inboundTeam = teamAbbreviation(event.teamId);
+        if (event.data.reason === 'quarter_start') {
+          return t('match_broadcast.simulation.event_kickoff_quarter', { team: inboundTeam });
+        }
+        return t('match_broadcast.simulation.event_kickoff', { player: player?.name ?? '' });
+      }
+      case 'inbound_pass':
+        return t('match_broadcast.simulation.event_inbound_pass', {
+          player: player?.name ?? '',
+          target: target?.name ?? '',
+        });
       case 'possession_started':
         return t('match_broadcast.simulation.event_possession_started', { player: player?.name ?? '' });
       case 'dribble':
