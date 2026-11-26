@@ -25,14 +25,24 @@ interface TrophyShowcaseProps {
   variant?: 'compact' | 'full';
 }
 
-function TrophyCard({ trophy, variant, index }: { trophy: MatchTrophy; variant: 'compact' | 'full'; index: number }) {
+function TrophyCard({
+  trophy,
+  variant,
+  index,
+  featured = false,
+}: {
+  trophy: MatchTrophy;
+  variant: 'compact' | 'full';
+  index: number;
+  featured?: boolean;
+}) {
   const { t } = useTranslation();
   const Icon = TROPHY_ICONS[trophy.id];
   const isMvp = trophy.id === 'mvp';
 
   return (
     <motion.article
-      className={`${styles.card} ${TIER_CLASSES[trophy.tier]} ${isMvp ? styles.mvpCard : ''} ${
+      className={`${styles.card} ${TIER_CLASSES[trophy.tier]} ${featured ? styles.mvpCard : ''} ${
         variant === 'compact' ? styles.compactCard : ''
       }`}
       initial={{ opacity: 0, y: 8 }}
@@ -41,7 +51,7 @@ function TrophyCard({ trophy, variant, index }: { trophy: MatchTrophy; variant: 
     >
       <header className={styles.cardHeader}>
         <span className={styles.iconWrap}>
-          <Icon size={isMvp ? 22 : 16} aria-hidden="true" />
+          <Icon size={isMvp ? 20 : 16} aria-hidden="true" />
         </span>
         <div className={styles.cardTitles}>
           <h3>{t(`trophies.${trophy.id}`)}</h3>
@@ -59,7 +69,7 @@ function TrophyCard({ trophy, variant, index }: { trophy: MatchTrophy; variant: 
           className={styles.portrait}
         />
         <div className={styles.playerCopy}>
-          <strong>{trophy.player.name}</strong>
+          <strong title={trophy.player.name}>{trophy.player.name}</strong>
           <span className={styles.teamBadge}>{trophy.team.abbreviation}</span>
         </div>
       </div>
@@ -75,21 +85,21 @@ function TrophyCard({ trophy, variant, index }: { trophy: MatchTrophy; variant: 
 export function TrophyShowcase({ trophies, variant = 'full' }: TrophyShowcaseProps) {
   if (!trophies.length) return null;
 
-  if (variant === 'compact') {
-    return (
-      <div className={styles.compactStrip}>
-        {trophies.map((trophy, index) => (
-          <TrophyCard key={trophy.id} trophy={trophy} variant="compact" index={index} />
-        ))}
-      </div>
-    );
-  }
+  const featuredMvp = trophies.find((trophy) => trophy.id === 'mvp') ?? null;
+  const secondaryTrophies = featuredMvp ? trophies.filter((trophy) => trophy.id !== 'mvp') : trophies;
+  const containerClass = variant === 'compact' ? styles.compactShowcase : styles.fullShowcase;
+  const gridClass = variant === 'compact' ? styles.compactRow : styles.fullGrid;
 
   return (
-    <div className={styles.fullGrid}>
-      {trophies.map((trophy, index) => (
-        <TrophyCard key={trophy.id} trophy={trophy} variant="full" index={index} />
-      ))}
+    <div className={containerClass}>
+      {featuredMvp ? <TrophyCard trophy={featuredMvp} variant={variant} index={0} featured /> : null}
+      {secondaryTrophies.length ? (
+        <div className={gridClass}>
+          {secondaryTrophies.map((trophy, index) => (
+            <TrophyCard key={trophy.id} trophy={trophy} variant={variant} index={featuredMvp ? index + 1 : index} />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
