@@ -13,6 +13,44 @@ export interface RenderedBall {
   y: number;
 }
 
+export type FlightPathPoint = RenderedBall;
+
+/**
+ * True when ``previous`` is a missed-shot frame whose rebound is resolved by
+ * the holder captured on that frame. Made baskets are excluded because their
+ * following frame is the kickoff reset (phase ``"kickoff"``).
+ */
+function isReboundFrame(previous: Frame, current: Frame): boolean {
+  return previous.trajectory?.type === 'shot' && current.phase !== 'kickoff';
+}
+
+/**
+ * Ball flight polyline for the animation displayed with ``current``.
+ *
+ * After a missed shot the ball leaves the rim toward the rebounder (the next
+ * holder, whose catch position is kept on the shot frame's ball data) before
+ * continuing to the next frame's target. All other transitions keep the plain
+ * rendered target so the ball eases directly there (D6a frontend synthesis).
+ */
+export function ballFlightPath(previous: Frame | null | undefined, current: Frame): FlightPathPoint[] {
+  const target = renderedBallPosition(current);
+  if (!previous || !isReboundFrame(previous, current)) return [target];
+  const rim = renderedBallPosition(previous);
+  const rebounder = { x: previous.ball.x, y: previous.ball.y };
+  if (distance(rim, rebounder) < 0.5 || distance(rebounder, target) < 0.5) {
+    return [target];
+  }
+  return [rim, rebounder, target];
+}
+
+function pathLength(path: readonly FlightPathPoint[]): number {
+  let total = 0;
+  for (let index = 1; index < path.length; index += 1) {
+    total += distance(path[index - 1], path[index]);
+  }
+  return total;
+}
+
 /**
  * Position the animated ball should render at for a frame: while a shot
  * trajectory is attached, the ball sits at the trajectory end (the rim)
@@ -46,7 +84,9 @@ function advanceDurationMs(frames: Frame[], index: number): number {
   const next = frames[index + 1];
   if (!current || !next) return TRANSITION_DURATION_MS;
 
-  const ballFeet = distance(renderedBallPosition(current), renderedBallPosition(next));
+  // The ball follows a rim -> rebounder -> target path right after a rebound,
+  // so the advance timing must account for the extra waypoint.
+  const ballFeet = pathLength(ballFlightPath(current, next));
   const nextById = new Map(next.players.map((player) => [player.id, player]));
   let playerFeet = 0;
   for (const player of current.players) {

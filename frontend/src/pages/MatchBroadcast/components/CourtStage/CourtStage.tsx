@@ -1,17 +1,18 @@
 import type { BallTrajectory, Frame } from '../../../../types/game';
-import { renderedBallPosition } from '../../hooks/useGameFrames';
+import { ballFlightPath } from '../../hooks/useGameFrames';
 import styles from './CourtStage.module.css';
-import { Ball, shotArcPeakFt } from './Ball';
+import { Ball, reboundLiftFt, shotArcPeakFt } from './Ball';
 import { Court } from './Court';
 import { Player, STAMINA_LEGEND_TIERS } from './Player';
 import { CourtEffectBanner, CourtEffectsSvg, type FrameEffect } from './CourtEffects';
 import { gameToSvg } from '../../../../config/court';
 import trajectoryStyles from './Ball.module.css';
-import { startTransition, useEffect, useRef, useState } from 'react';
+import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from '../../../../lib/i18n/i18n';
 
 interface CourtStageProps {
   frame: Frame | null;
+  previousFrame?: Frame | null;
   transitionDurationMs: number;
   madeBasketSide?: 'left' | 'right';
   effects?: FrameEffect[];
@@ -20,7 +21,7 @@ interface CourtStageProps {
 const TRAJECTORY_HOLD_MIN_MS = 700;
 const BANNER_HOLD_FACTOR = 1.1;
 
-export function CourtStage({ frame, transitionDurationMs, madeBasketSide, effects }: CourtStageProps) {
+export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBasketSide, effects }: CourtStageProps) {
   const { t } = useTranslation();
   const transitionDuration = transitionDurationMs / 1000;
   const [visibleTrajectory, setVisibleTrajectory] = useState<BallTrajectory | null>(null);
@@ -66,8 +67,10 @@ export function CourtStage({ frame, transitionDurationMs, madeBasketSide, effect
   }, []);
 
   const hasStamina = frame?.players.some((player) => player.stamina !== undefined && player.stamina !== null) ?? false;
-  const renderedBall = frame ? renderedBallPosition(frame) : null;
+  const flightPath = useMemo(() => (frame ? ballFlightPath(previousFrame, frame) : null), [frame, previousFrame]);
   const arcPeakFt = frame?.trajectory?.type === 'shot' ? shotArcPeakFt(frame.trajectory.from, frame.trajectory.to) : 0;
+  // A three-point path means the ball comes off the rim to the rebounder first.
+  const reboundLift = flightPath && flightPath.length > 1 ? reboundLiftFt(flightPath[0], flightPath[1]) : 0;
 
   const trajectory = visibleTrajectory;
   const start = trajectory ? gameToSvg(trajectory.from.x, trajectory.from.y) : null;
@@ -99,12 +102,13 @@ export function CourtStage({ frame, transitionDurationMs, madeBasketSide, effect
         {frame?.players.map((player) => (
           <Player key={player.id} player={player} transitionDuration={transitionDuration} />
         ))}
-        {frame && renderedBall ? (
+        {frame && flightPath ? (
           <Ball
-            ball={{ ...frame.ball, x: renderedBall.x, y: renderedBall.y }}
+            path={flightPath}
             transitionDuration={transitionDuration}
             isHeld={frame.ball.isHeld ?? false}
             arcPeakFt={arcPeakFt}
+            reboundLift={reboundLift}
           />
         ) : null}
         {effects && effects.length ? <CourtEffectsSvg effects={effects} /> : null}

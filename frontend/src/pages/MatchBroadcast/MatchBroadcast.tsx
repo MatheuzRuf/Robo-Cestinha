@@ -375,6 +375,7 @@ export default function MatchBroadcast() {
               <div className={styles.courtStageWrap}>
                 <CourtStage
                   frame={playback.frame}
+                  previousFrame={courtFrames[playback.frameIndex - 1] ?? null}
                   transitionDurationMs={playback.transitionDurationMs}
                   madeBasketSide={madeBasketSide}
                   effects={frameEffects}
