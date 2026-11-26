@@ -4,6 +4,39 @@
   stroke-width: 2;
 }
 
+.courtApron {
+  fill: var(--color-court-apron);
+  stroke: var(--color-court-apron-border);
+  stroke-width: 2;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+}
+
+.plankJoint {
+  stroke: var(--color-court-wood-seam);
+  stroke-width: 1.2;
+  opacity: 0.5;
+}
+
+.dashedLine {
+  stroke-dasharray: 7 6;
+}
+
+.keyAccent {
+  fill: var(--color-court-key-accent);
+  stroke: none;
+}
+
+.neutralZoneBlock {
+  stroke-width: 4;
+}
+
+.emblem {
+  fill: none;
+  stroke: var(--color-court-emblem);
+  opacity: 0.16;
+  pointer-events: none;
+}
+
 .boundary {
   fill: none;
   stroke: var(--color-court-line);
@@ -65,4 +98,97 @@
 .backboard {
   stroke: var(--color-court-line);
   stroke-width: 3;
+}
+
+.stanchion {
+  fill: var(--color-court-stanchion);
+  stroke: var(--color-court-stanchion);
+  stroke-width: 1;
+  opacity: 0.95;
+}
+
+.stanchionBoom {
+  fill: none;
+  stroke: var(--color-court-stanchion);
+  stroke-width: 8;
+  opacity: 0.95;
+}
+
+.backboardGlass {
+  fill: var(--color-court-backboard-glass);
+}
+
+.backboardFrame {
+  fill: none;
+  stroke: var(--color-court-backboard-frame);
+  stroke-width: 2;
+  opacity: 0.9;
+}
+
+.shootersSquare {
+  fill: none;
+  stroke: var(--color-court-backboard-frame);
+  stroke-width: 1.4;
+  opacity: 0.85;
+}
+
+.rimNeck {
+  stroke: var(--color-court-rim);
+  stroke-width: 5;
+}
+
+.rimShadow {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.45);
+  stroke-width: 4.6;
+}
+
+.rim {
+  fill: none;
+  stroke: var(--color-court-rim);
+  stroke-width: 3.2;
+}
+
+.rimInner {
+  fill: none;
+  stroke: var(--color-court-rim-inner);
+  stroke-width: 1.1;
+  opacity: 0.85;
+}
+
+.net {
+  stroke: var(--color-court-net);
+  stroke-width: 1.3;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.netSwish {
+  animation: netSwish 420ms ease-out var(--net-swish-delay, 0ms) both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .netSwish {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+}
+
+@keyframes netSwish {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  45% {
+    opacity: 0.9;
+    transform: translateY(4px) scale(1.06);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

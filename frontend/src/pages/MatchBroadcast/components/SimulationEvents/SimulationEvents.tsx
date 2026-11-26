@@ -28,12 +28,24 @@ export function SimulationEvents({ events, players, teams, currentIteration }: S
   const panelRef = useRef<HTMLElement>(null);
   const isFollowingLatest = useRef(true);
   const playersById = useMemo(() => new Map(players.map((player) => [player.playerId, player])), [players]);
+  // An intercepted pass emits both a `turnover` and a `pass_intercepted` at the
+  // same iteration; keep the single crisp intercept row and drop the duplicate
+  // steal row. Raw events passed to stats/commentary remain untouched.
+  const interceptIterations = useMemo(
+    () => new Set(events.filter((event) => event.type === 'pass_intercepted').map((event) => event.iteration)),
+    [events],
+  );
   const visibleEvents = useMemo(
     () =>
       events
-        .filter((event) => event.iteration <= currentIteration && !TECHNICAL_EVENTS.has(event.type))
+        .filter(
+          (event) =>
+            event.iteration <= currentIteration &&
+            !TECHNICAL_EVENTS.has(event.type) &&
+            !(event.type === 'turnover' && interceptIterations.has(event.iteration)),
+        )
         .sort((first, second) => second.sequence - first.sequence),
-    [currentIteration, events],
+    [currentIteration, events, interceptIterations],
   );
 
   useLayoutEffect(() => {

@@ -7,4 +7,4 @@ export const TEAM_COLORS: Record<Team, string> = {
 
 export const BALL_COLOR = '#f97316';
 export const PLAYER_RADIUS = 18;
-export const BALL_RADIUS = 6;
+export const BALL_RADIUS = 8;
