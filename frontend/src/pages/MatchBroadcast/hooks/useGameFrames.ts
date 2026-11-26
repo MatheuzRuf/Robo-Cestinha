@@ -27,9 +27,18 @@ function reboundLiftFt(from: FlightPathPoint, to: FlightPathPoint): number {
   return Math.max(3, Math.min(6, length * 0.2));
 }
 
+const PARABOLA_SAMPLES = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1];
+
+/**
+ * Leg sampled along a smooth parabola peaking at ``liftFt`` in the middle
+ * (D8a): ``4*lift*t*(1-t)`` over the horizontal travel, so the ball follows a
+ * real arc instead of a linear sawtooth.
+ */
 function liftedLeg(from: FlightPathPoint, to: FlightPathPoint, liftFt: number): FlightPathPoint[] {
-  const apex = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 - liftFt };
-  return [from, apex, to];
+  return PARABOLA_SAMPLES.map((t) => ({
+    x: from.x + (to.x - from.x) * t,
+    y: from.y + (to.y - from.y) * t - 4 * liftFt * t * (1 - t),
+  }));
 }
 
 /**
@@ -99,6 +108,42 @@ function pathLength(path: readonly FlightPathPoint[]): number {
     total += distance(path[index - 1], path[index]);
   }
   return total;
+}
+
+export interface ReboundCatch {
+  /** Feet position where the ball comes off the rim to the rebounder. */
+  point: FlightPathPoint;
+  /** Fraction of the frame duration at which the ball reaches the catch point. */
+  timeFraction: number;
+}
+
+/**
+ * Catch point and timing for the frame right after a missed shot: the ball
+ * leaves the rim and reaches the rebounder partway through that frame. Used to
+ * hold the rebounder still until the ball arrives instead of gliding away.
+ */
+export function reboundCatch(previous: Frame | null | undefined, current: Frame): ReboundCatch | null {
+  if (!previous || !isReboundFrame(previous, current)) return null;
+  const start = renderedBallPosition(previous);
+  const point = { x: previous.ball.x, y: previous.ball.y };
+  if (distance(start, point) < 0.5) return null;
+
+  const path = ballFlightPath(previous, current);
+  const total = pathLength(path);
+  if (total <= 1) return null;
+  let bestIndex = 0;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  path.forEach((candidate, index) => {
+    const candidateDistance = distance(candidate, point);
+    if (candidateDistance < bestDistance) {
+      bestDistance = candidateDistance;
+      bestIndex = index;
+    }
+  });
+  if (bestIndex <= 0 || bestIndex >= path.length - 1) return null;
+  const timeFraction = pathLength(path.slice(0, bestIndex + 1)) / total;
+  if (timeFraction < 0.05 || timeFraction > 0.98) return null;
+  return { point, timeFraction };
 }
 
 /**

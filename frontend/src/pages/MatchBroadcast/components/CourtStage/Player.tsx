@@ -44,9 +44,23 @@ export const STAMINA_LEGEND_TIERS: { tier: StaminaTier; color: string; range: st
   { tier: 'low', color: 'var(--color-stamina-low)', range: '0-39%' },
 ];
 
-export function Player({ player, transitionDuration }: { player: PlayerState; transitionDuration: number }) {
+export function Player({
+  player,
+  transitionDuration,
+  motionDelay = 0,
+}: {
+  player: PlayerState;
+  transitionDuration: number;
+  /** Seconds the player waits before starting to move (e.g. to catch a rebound). */
+  motionDelay?: number;
+}) {
   const { t } = useTranslation();
   const { cx, cy } = gameToSvg(player.x ?? 0, player.y ?? 0);
+  const playerTransition = {
+    duration: Math.max(transitionDuration - motionDelay, 0.01),
+    ease: 'linear' as const,
+    delay: motionDelay,
+  };
   const nameParts = player.name.trim().split(/\s+/);
   const shortName =
     nameParts.length > 1 ? `${nameParts[0].charAt(0)}. ${nameParts[nameParts.length - 1]}` : player.name.trim();
@@ -95,14 +109,14 @@ export function Player({ player, transitionDuration }: { player: PlayerState; tr
           className={styles.player}
           style={headshotStyle}
           animate={{ cx, cy }}
-          transition={{ duration: transitionDuration, ease: 'linear' }}
+          transition={playerTransition}
         />
         {!hasImage ? (
           <motion.text
             textAnchor="middle"
             className={styles.number}
             animate={{ x: cx, y: cy + 4 }}
-            transition={{ duration: transitionDuration, ease: 'linear' }}
+            transition={playerTransition}
           >
             {player.number ?? player.position}
           </motion.text>
@@ -111,14 +125,14 @@ export function Player({ player, transitionDuration }: { player: PlayerState; tr
           r={PLAYER_RADIUS + 3}
           className={styles.playerRing}
           animate={{ cx, cy }}
-          transition={{ duration: transitionDuration, ease: 'linear' }}
+          transition={playerTransition}
         />
         {stamina?.tier === 'low' ? (
           <motion.circle
             r={PLAYER_RADIUS + 6}
             className={styles.lowStaminaPulse}
             animate={{ cx, cy }}
-            transition={{ duration: transitionDuration, ease: 'linear' }}
+            transition={playerTransition}
           />
         ) : null}
         <motion.rect
@@ -127,13 +141,13 @@ export function Player({ player, transitionDuration }: { player: PlayerState; tr
           height={21}
           rx={4}
           animate={{ x: cx - 39, y: plateTop }}
-          transition={{ duration: transitionDuration, ease: 'linear' }}
+          transition={playerTransition}
         />
         <motion.text
           textAnchor="middle"
           className={styles.labelText}
           animate={{ x: cx, y: plateTop + 12 }}
-          transition={{ duration: transitionDuration, ease: 'linear' }}
+          transition={playerTransition}
         >
           {shortName.toUpperCase()}
         </motion.text>
@@ -145,7 +159,7 @@ export function Player({ player, transitionDuration }: { player: PlayerState; tr
               height={3.5}
               rx={1.75}
               animate={{ x: cx - STAMINA_BAR_WIDTH / 2, y: barTop }}
-              transition={{ duration: transitionDuration, ease: 'linear' }}
+              transition={playerTransition}
             />
             <motion.rect
               width={staminaWidth}
@@ -153,7 +167,7 @@ export function Player({ player, transitionDuration }: { player: PlayerState; tr
               rx={1.75}
               style={{ fill: stamina.color }}
               animate={{ x: cx - STAMINA_BAR_WIDTH / 2, y: barTop, width: staminaWidth }}
-              transition={{ duration: transitionDuration, ease: 'linear' }}
+              transition={playerTransition}
             />
           </>
         ) : null}

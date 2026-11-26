@@ -267,8 +267,19 @@ export default function MatchBroadcast() {
     if (!simulation || !currentSimulationFrame) return [];
 
     const iteration = currentSimulationFrame.iteration;
-    const frameEvents = simulation.events.filter((event) => event.iteration === iteration);
-    if (!frameEvents.length) return [];
+    // Rim-contact effects (miss flash, rebound pulse) should play when the ball
+    // actually reaches the rim, which happens at the end of the shot frame's
+    // display — so attach them to the frame after their events.
+    const rimContactEvents = new Set(['rebound', 'shot_missed']);
+    const frameEvents = simulation.events.filter(
+      (event) => event.iteration === iteration && !rimContactEvents.has(event.type),
+    );
+    const priorRimEvents =
+      iteration > 0
+        ? simulation.events.filter((event) => event.iteration === iteration - 1 && rimContactEvents.has(event.type))
+        : [];
+    const events = [...frameEvents, ...priorRimEvents];
+    if (!events.length) return [];
 
     const playersById = new Map(simulation.players.map((player) => [player.playerId, player]));
     const positionsById = new Map(currentSimulationFrame.players.map((position) => [position.playerId, position]));
@@ -284,7 +295,7 @@ export default function MatchBroadcast() {
     };
 
     const effects: FrameEffect[] = [];
-    for (const event of frameEvents) {
+    for (const event of events) {
       if (event.type === 'shot_made') {
         const shooter = event.playerId ? playersById.get(event.playerId) : undefined;
         const shooterPosition = event.playerId ? positionsById.get(event.playerId) : undefined;

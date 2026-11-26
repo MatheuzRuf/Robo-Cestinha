@@ -1,5 +1,5 @@
 import type { BallTrajectory, Frame } from '../../../../types/game';
-import { ballFlightPath } from '../../hooks/useGameFrames';
+import { ballFlightPath, reboundCatch } from '../../hooks/useGameFrames';
 import styles from './CourtStage.module.css';
 import { Ball } from './Ball';
 import { Court } from './Court';
@@ -69,6 +69,24 @@ export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBas
   const hasStamina = frame?.players.some((player) => player.stamina !== undefined && player.stamina !== null) ?? false;
   // Full ball flight for this frame, including shot arcs and the rebound waypoint.
   const flightPath = useMemo(() => (frame ? ballFlightPath(previousFrame, frame) : null), [frame, previousFrame]);
+  // The rebounder must hold his spot until the ball arrives instead of gliding away.
+  const catchInfo = useMemo(
+    () => (frame && previousFrame ? reboundCatch(previousFrame, frame) : null),
+    [frame, previousFrame],
+  );
+  const rebounderId = useMemo(() => {
+    if (!catchInfo || !previousFrame) return null;
+    let bestId: string | null = null;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (const player of previousFrame.players) {
+      const distance = Math.hypot(player.x - catchInfo.point.x, player.y - catchInfo.point.y);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestId = player.id;
+      }
+    }
+    return bestDistance < 3 ? bestId : null;
+  }, [catchInfo, previousFrame]);
 
   const trajectory = visibleTrajectory;
   const start = trajectory ? gameToSvg(trajectory.from.x, trajectory.from.y) : null;
@@ -98,7 +116,12 @@ export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBas
           />
         ) : null}
         {frame?.players.map((player) => (
-          <Player key={player.id} player={player} transitionDuration={transitionDuration} />
+          <Player
+            key={player.id}
+            player={player}
+            transitionDuration={transitionDuration}
+            motionDelay={player.id === rebounderId && catchInfo ? catchInfo.timeFraction * transitionDuration : 0}
+          />
         ))}
         {frame && flightPath ? (
           <Ball path={flightPath} transitionDuration={transitionDuration} isHeld={frame.ball.isHeld ?? false} />
