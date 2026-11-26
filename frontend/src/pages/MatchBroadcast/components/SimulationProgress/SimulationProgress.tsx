@@ -34,12 +34,13 @@ export function SimulationProgress({
   return (
     <section className={styles.progress}>
       {isComplete ? (
-        <Button variant="outline" icon={<RotateCcw size={16} aria-hidden="true" />} onClick={onRestart}>
+        <Button variant="outline" size="sm" icon={<RotateCcw size={16} aria-hidden="true" />} onClick={onRestart}>
           {t('match_broadcast.simulation.replay')}
         </Button>
       ) : (
         <Button
           variant="outline"
+          size="sm"
           icon={isPaused ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}
           onClick={onTogglePause}
         >

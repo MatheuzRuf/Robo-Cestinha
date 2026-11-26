@@ -198,6 +198,10 @@ export const ptBR = {
   match_broadcast: {
     clock: {
       speed_label: 'VELOCIDADE DA PARTIDA',
+      speed_short: 'VELOC.',
+      live: 'AO VIVO',
+      paused: 'PAUSADO',
+      final: 'FINAL',
       pause: 'PAUSAR',
       resume: 'REPRODUZIR',
     },
@@ -277,6 +281,17 @@ export const ptBR = {
       rebound_def: 'REBOTE · {player}',
       rebound_def_team: 'REBOTE · {team}',
       missed: 'ARREMESSO ERRADO',
+      tag_2pt: '+2',
+      tag_3pt: '3PT +3',
+      tag_oreb: 'REB OF',
+      tag_dreb: 'REB DEF',
+      tag_steal: 'ROUBO',
+      tag_intercept: 'INTERCEPT.',
+      tag_foul: 'FALTA',
+      assist_tag: 'AST · {player}',
+      steal: 'ROUBO · {player}',
+      intercept: 'INTERCEPTAÇÃO · {player}',
+      foul: 'FALTA · {player}',
     },
   },
   bracket_tree: {

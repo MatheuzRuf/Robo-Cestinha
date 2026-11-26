@@ -198,6 +198,10 @@ export const enUS = {
   match_broadcast: {
     clock: {
       speed_label: 'PLAYBACK SPEED',
+      speed_short: 'SPEED',
+      live: 'LIVE',
+      paused: 'PAUSED',
+      final: 'FINAL',
       pause: 'PAUSE',
       resume: 'PLAY',
     },
@@ -277,6 +281,17 @@ export const enUS = {
       rebound_def: 'REBOUND · {player}',
       rebound_def_team: 'REBOUND · {team}',
       missed: 'MISSED SHOT',
+      tag_2pt: '+2',
+      tag_3pt: '3PT +3',
+      tag_oreb: 'OREB',
+      tag_dreb: 'DREB',
+      tag_steal: 'STEAL',
+      tag_intercept: 'INTERCEPT',
+      tag_foul: 'FOUL',
+      assist_tag: 'AST · {player}',
+      steal: 'STEAL · {player}',
+      intercept: 'INTERCEPT · {player}',
+      foul: 'FOUL · {player}',
     },
   },
   bracket_tree: {

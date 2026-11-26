@@ -27,7 +27,8 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-1) var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  box-shadow: var(--shadow-sm);
 }
 
 .teamSummary {
@@ -38,6 +39,12 @@
   align-items: center;
   border-inline-start: 3px solid var(--color-team-blue);
   padding-inline-start: var(--space-2);
+  transition: background-color 160ms ease;
+}
+
+.hasPossession {
+  background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+  border-radius: var(--radius-sm);
 }
 
 .teamIdentity {
@@ -118,6 +125,7 @@
 .score {
   color: var(--color-primary);
   font: 700 clamp(2rem, 4vh, 2.5rem)/1 var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 .awaySummary .scoreWrap {
@@ -132,13 +140,22 @@
 
 .scoreDelta {
   position: absolute;
-  inset-block-end: 100%;
-  inset-inline-start: 50%;
+  inset-block-start: -4px;
+  inset-inline-end: calc(100% + var(--space-1));
   color: var(--color-primary);
   font: 700 0.8rem var(--font-mono);
   letter-spacing: 0.06em;
   pointer-events: none;
   animation: scoreDelta 900ms ease-out both;
+}
+
+.awaySummary .scoreDelta {
+  inset-inline-end: auto;
+  inset-inline-start: calc(100% + var(--space-1));
+}
+
+.scoreDeltaThree {
+  color: var(--color-effect-score-3pt);
 }
 
 @keyframes scorePop {
@@ -159,18 +176,18 @@
 @keyframes scoreDelta {
   0% {
     opacity: 0;
-    transform: translate(-50%, 6px);
+    transform: translateY(6px);
   }
 
   20%,
   70% {
     opacity: 1;
-    transform: translate(-50%, 0);
+    transform: translateY(0);
   }
 
   100% {
     opacity: 0;
-    transform: translate(-50%, -8px);
+    transform: translateY(-8px);
   }
 }
 
@@ -182,33 +199,84 @@
 }
 
 .clockPanel {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface-raised);
-  padding: 0 var(--space-2);
   text-align: center;
 }
 
-.clockPanel > div {
+.clockDivider {
+  width: 1px;
+  height: 20px;
+  flex: 0 0 auto;
+  background: var(--color-border);
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
   gap: var(--space-1);
+  min-height: 28px;
+  padding: 0 var(--space-2);
+  border: 1px solid transparent;
+  border-radius: 99px;
+  font: 700 0.7rem/1 var(--font-mono);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
-.clockPanel button {
-  padding: var(--space-1) var(--space-2);
-  font-size: 0.8rem;
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-live, var(--color-stamina-high));
+  animation: statusPulse 1.6s ease-in-out infinite;
 }
 
-.frameLabel,
+.statusLive {
+  color: var(--color-stamina-high);
+  border-color: color-mix(in srgb, var(--color-stamina-high) 35%, transparent);
+}
+
+.statusPaused {
+  color: var(--color-stamina-mid);
+  border-color: color-mix(in srgb, var(--color-stamina-mid) 35%, transparent);
+}
+
+.statusFinal {
+  color: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+@keyframes statusPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statusDot {
+    animation: none;
+  }
+}
+
 .progressLabel {
   color: var(--color-text-muted);
   font: 700 0.75rem var(--font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .progress {
@@ -219,7 +287,8 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  box-shadow: var(--shadow-sm);
 }
 
 .progressTrack {
@@ -244,14 +313,17 @@
 
 .progressBar::-webkit-progress-bar {
   background: var(--color-border);
+  border-radius: 99px;
 }
 
 .progressBar::-webkit-progress-value {
   background: var(--color-primary);
+  border-radius: 99px;
 }
 
 .progressBar::-moz-progress-bar {
   background: var(--color-primary);
+  border-radius: 99px;
 }
 
 .seekSlider {
@@ -288,6 +360,9 @@
   border: 2px solid var(--color-surface);
   border-radius: 50%;
   background: var(--color-primary);
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease;
 }
 
 .seekSlider::-moz-range-thumb {
@@ -296,6 +371,19 @@
   border: 2px solid var(--color-surface);
   border-radius: 50%;
   background: var(--color-primary);
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.seekSlider:hover::-webkit-slider-thumb {
+  transform: scale(1.18);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 28%, transparent);
+}
+
+.seekSlider:hover::-moz-range-thumb {
+  transform: scale(1.18);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 28%, transparent);
 }
 
 .statusMessage,
@@ -455,8 +543,9 @@
     justify-self: start;
   }
 
-  .awaySummary .score {
+  .awaySummary .scoreWrap {
     grid-column: 2;
+    justify-self: end;
   }
 
   .awaySummary .teamMeta {
@@ -488,6 +577,12 @@
 
   .progressTrack {
     grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .clockDivider {
+    display: none;
   }
 }
 
