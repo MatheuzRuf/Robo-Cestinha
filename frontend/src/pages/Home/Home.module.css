@@ -45,7 +45,7 @@
 }
 
 .playersSection {
-  margin-top: calc(var(--space-4) * -1);
+  margin-top: var(--space-4);
 }
 
 .playersCard {
@@ -77,6 +77,11 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface-raised);
+  transition: border-color 140ms ease;
+}
+
+.playerRow:hover {
+  border-color: var(--color-border-input);
 }
 
 .playerSequence {

@@ -76,6 +76,10 @@
   color: var(--color-text-muted);
   text-decoration: none;
   white-space: nowrap;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
 }
 
 .navItem:not([data-active='true']):hover {
@@ -91,7 +95,13 @@
 }
 
 .navItem[aria-disabled='true'] {
+  opacity: 0.45;
   cursor: not-allowed;
+}
+
+.navItem[aria-disabled='true']:hover {
+  background: transparent;
+  color: var(--color-text-muted);
 }
 
 .utilityRow {
@@ -163,6 +173,10 @@
   font-weight: 800;
   white-space: nowrap;
   cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
 }
 
 .userMenuTrigger:hover,
@@ -183,6 +197,7 @@
   z-index: 20;
   min-width: 160px;
   padding: var(--space-1);
+  box-shadow: var(--shadow-md);
 }
 
 .userMenuItem {
@@ -214,6 +229,10 @@
   background: var(--color-surface);
   color: var(--color-primary);
   cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
 }
 
 .themeToggle:hover {
