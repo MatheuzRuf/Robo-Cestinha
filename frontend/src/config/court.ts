@@ -11,6 +11,14 @@ export const HOOP_RADIUS_FT = 0.75;
 export const THREE_POINT_RADIUS_FT = 23.75;
 export const CORNER_THREE_SIDELINE_GAP_FT = 3;
 
+// NBA basket & court geometry used by the basket assembly and court markings.
+export const BACKBOARD_FROM_BASELINE_FT = 4;
+export const BACKBOARD_WIDTH_FT = 6;
+export const RESTRICTED_AREA_RADIUS_FT = 4;
+export const CENTER_INNER_CIRCLE_RADIUS_FT = 2;
+export const COACHING_HASH_FROM_BASELINE_FT = 28;
+export const LANE_HASH_POSITIONS_FT = [7, 10, 13, 16] as const;
+
 export const THREE_POINT_CORNER_X_FT =
   HOOP_DISTANCE_FROM_BASELINE_FT +
   Math.sqrt(THREE_POINT_RADIUS_FT ** 2 - (COURT_HEIGHT_FT / 2 - CORNER_THREE_SIDELINE_GAP_FT) ** 2);

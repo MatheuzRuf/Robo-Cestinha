@@ -37,6 +37,20 @@
   --color-court-hoop: #ff8c00;
   --color-court-hoop-stroke: #1c1410;
 
+  /* Broadcast-grade court, basket & ball visuals (Dark). */
+  --color-court-apron: #2a1a12;
+  --color-court-apron-border: #4a2f1d;
+  --color-court-wood-light: #a96132;
+  --color-court-wood-dark: #6e3a1c;
+  --color-court-key-accent: rgba(240, 113, 31, 0.2);
+  --color-court-emblem: #faf0e0;
+  --color-court-stanchion: #2b2b2e;
+  --color-court-backboard-glass: rgba(214, 226, 236, 0.22);
+  --color-court-backboard-frame: #f1f5f9;
+  --color-court-rim: #ff5a1f;
+  --color-court-rim-inner: #ff8c3f;
+  --color-court-net: #f3ede0;
+
   --color-player-stroke: #faf0e0;
   --color-player-label-bg: #18120e;
   --color-player-label-text: #faf3e8;
@@ -112,6 +126,20 @@
   --color-court-key-fill: rgba(184, 71, 6, 0.16);
   --color-court-hoop: #ea580c;
   --color-court-hoop-stroke: #1f1610;
+
+  /* Broadcast-grade court, basket & ball visuals (Light). */
+  --color-court-apron: #6b3b1d;
+  --color-court-apron-border: #8a542e;
+  --color-court-wood-light: #b2703e;
+  --color-court-wood-dark: #7a441f;
+  --color-court-key-accent: rgba(184, 71, 6, 0.24);
+  --color-court-emblem: #fff8ec;
+  --color-court-stanchion: #4b4b50;
+  --color-court-backboard-glass: rgba(226, 236, 244, 0.5);
+  --color-court-backboard-frame: #f8fafc;
+  --color-court-rim: #ea580c;
+  --color-court-rim-inner: #ff7a29;
+  --color-court-net: #fdf6ea;
 
   --color-player-stroke: #fff8ec;
   --color-player-label-bg: #231912;

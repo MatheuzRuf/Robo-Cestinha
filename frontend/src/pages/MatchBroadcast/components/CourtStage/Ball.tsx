@@ -1,16 +1,15 @@
-import { motion } from 'framer-motion';
-import type { CSSProperties } from 'react';
-import { useMemo } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { useId, useMemo } from 'react';
 import type { BallFlightPlan, FlightPathPoint } from '../../hooks/ballFlight';
 import { SCALE, gameToSvg } from '../../../../config/court';
-import { BALL_COLOR, BALL_RADIUS } from '../../../../config/teams';
+import { BALL_RADIUS } from '../../../../config/teams';
 import styles from './Ball.module.css';
 
-const style = { '--ball-color': BALL_COLOR } as CSSProperties;
 const PASS_EASE = [0.22, 0.61, 0.36, 1] as const;
+const RIM = BALL_RADIUS;
 
 /** Offset applied when the ball is held so it does not cover the handler's portrait. */
-export const HELD_BALL_OFFSET = { x: 15, y: 10 };
+export const HELD_BALL_OFFSET = { x: 16, y: 11 };
 
 interface SvgKeyframe {
   x: number;
@@ -46,6 +45,10 @@ export function Ball({
   transitionDuration: number;
   isHeld?: boolean;
 }) {
+  const sphereId = useId();
+  const shadowId = useId();
+  const clipId = useId();
+  const reduceMotion = useReducedMotion();
   const keyframes = useMemo(() => plan.points.map(toSvgKeyframe), [plan.points]);
 
   const ballAnimate = useMemo(() => {
@@ -88,13 +91,47 @@ export function Ball({
     [transitionDuration, plan.hasArc, plan.times, keyframes.length],
   );
 
+  // Flight spin: full 360° on parabolic shots/rebounds, 180° on passes, 0° held.
+  const spinning = keyframes.length > 1 && !reduceMotion;
+  const spin = !spinning ? 0 : plan.hasArc ? 360 : 180;
+
   return (
     <>
       <motion.g animate={shadowAnimate} transition={transition} aria-hidden="true">
-        <ellipse rx={BALL_RADIUS * 1.05} ry={BALL_RADIUS * 0.55} className={styles.ballShadow} />
+        <ellipse rx={BALL_RADIUS * 1.05} ry={BALL_RADIUS * 0.55} fill={`url(#${shadowId})`} className={styles.ballShadow} />
       </motion.g>
       <motion.g animate={ballAnimate} transition={transition}>
-        <circle r={BALL_RADIUS} className={`${styles.ball} ${isHeld ? styles.held : ''}`.trim()} style={style} />
+        <defs>
+          <radialGradient id={sphereId} cx="34%" cy="30%" r="75%">
+            <stop offset="0%" stopColor="#ffb347" />
+            <stop offset="50%" stopColor="#ea580c" />
+            <stop offset="100%" stopColor="#9a3412" />
+          </radialGradient>
+          <radialGradient id={shadowId}>
+            <stop offset="0%" stopColor="rgba(10, 8, 6, 0.72)" />
+            <stop offset="100%" stopColor="rgba(10, 8, 6, 0)" />
+          </radialGradient>
+          <clipPath id={clipId}>
+            <circle r={RIM} />
+          </clipPath>
+        </defs>
+        <motion.g
+          animate={{ rotate: spin }}
+          transition={{ duration: transitionDuration, ease: plan.hasArc ? 'linear' : PASS_EASE }}
+        >
+          {isHeld ? <circle r={RIM + 1.6} className={styles.heldHalo} /> : null}
+          <circle r={RIM} fill={`url(#${sphereId})`} />
+          <g clipPath={`url(#${clipId})`}>
+            <g className={styles.ballSeam}>
+              <path d={`M ${-RIM} 0 H ${RIM}`} />
+              <path d={`M 0 ${-RIM} V ${RIM}`} />
+              <path d={`M 0 ${-RIM} C ${-RIM * 0.92} ${-RIM * 0.5} ${-RIM * 0.92} ${RIM * 0.5} 0 ${RIM}`} />
+              <path d={`M 0 ${-RIM} C ${RIM * 0.92} ${-RIM * 0.5} ${RIM * 0.92} ${RIM * 0.5} 0 ${RIM}`} />
+            </g>
+          </g>
+          <ellipse cx={-RIM * 0.3} cy={-RIM * 0.38} rx={RIM * 0.32} ry={RIM * 0.2} className={styles.specular} />
+          <circle r={RIM} className={styles.ballOutline} />
+        </motion.g>
       </motion.g>
     </>
   );

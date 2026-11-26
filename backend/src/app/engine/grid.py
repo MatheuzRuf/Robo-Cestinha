@@ -9,7 +9,6 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from enum import Enum
-from typing import Tuple
 
 
 class Direction(str, Enum):
@@ -26,7 +25,7 @@ class Direction(str, Enum):
     IDLE = "IDLE"
 
 
-DIRECTION_VECTORS: dict[Direction, Tuple[int, int]] = {
+DIRECTION_VECTORS: dict[Direction, tuple[int, int]] = {
     Direction.N: (0, 1),
     Direction.NE: (1, 1),
     Direction.E: (1, 0),
@@ -47,6 +46,25 @@ TOTAL_CELLS = 50
 RIM_A = (0, 2)  # Team A defends Rim A, Team B attacks Rim A
 RIM_B = (9, 2)  # Team B defends Rim B, Team A attacks Rim B
 
+# --- Spatial realism constants ------------------------------------------------
+# On-ball steals / fouls only possible when a defender is within this many
+# grid cells of the ball handler.
+ON_BALL_STEAL_MAX_DIST = 1.5
+# Passes can only be intercepted by defenders within this many grid cells of
+# the passer -> receiver segment.
+PASS_INTERCEPT_MAX_DIST = 1.5
+# Rebounds are primarily contested within this many grid cells of the rim.
+REBOUND_MAX_CELLS = 3.0
+
+# Canonical NBA court geometry in feet (94 x 50 ft).
+COURT_WIDTH_FT = 94.0
+COURT_HEIGHT_FT = 50.0
+LEFT_HOOP_FT = (5.25, 25.0)
+RIGHT_HOOP_FT = (88.75, 25.0)
+THREE_POINT_RADIUS_FT = 23.75
+MAX_NORMAL_SHOT_RANGE_FT = 31.0
+
+# Legacy grid-cell threshold kept for backward compatibility (tests).
 THREE_POINT_DISTANCE_THRESHOLD = 3.0  # Euclidean distance >= 3.0 cells is a 3-pointer
 
 
@@ -70,26 +88,68 @@ class CourtPosition:
         dx, dy = DIRECTION_VECTORS[direction]
         return CourtPosition(self.x + dx, self.y + dy)
 
-    def distance_to(self, other: CourtPosition | Tuple[int, int]) -> float:
+    def distance_to(self, other: CourtPosition | tuple[int, int]) -> float:
         """Calcula a distância euclidiana até outra posição."""
         ox = other[0] if isinstance(other, tuple) else other.x
         oy = other[1] if isinstance(other, tuple) else other.y
         return math.hypot(self.x - ox, self.y - oy)
 
-    def to_tuple(self) -> Tuple[int, int]:
+    def to_tuple(self) -> tuple[int, int]:
         """Converte a posição para o formato usado nos logs JSON."""
         return (self.x, self.y)
 
 
-def get_target_rim(attacking_team_is_a: bool) -> Tuple[int, int]:
+def get_target_rim(attacking_team_is_a: bool) -> tuple[int, int]:
     """Retorna a cesta que o time atacante deve alcançar."""
     return RIM_B if attacking_team_is_a else RIM_A
 
 
+def point_to_segment_distance(
+    point: CourtPosition, start: CourtPosition, end: CourtPosition
+) -> float:
+    """Retorna a menor distância de ``point`` até o segmento ``start``-``end``.
+
+    Se ``start == end``, o segmento degenera em um ponto e ``t`` é zerado.
+    """
+    sx, sy = start.x, start.y
+    vx = end.x - sx
+    vy = end.y - sy
+    if vx == 0 and vy == 0:
+        return point.distance_to(start)
+    t = max(
+        0.0, min(1.0, ((point.x - sx) * vx + (point.y - sy) * vy) / (vx * vx + vy * vy))
+    )
+    closest_x = sx + t * vx
+    closest_y = sy + t * vy
+    return math.hypot(point.x - closest_x, point.y - closest_y)
+
+
+def grid_to_court_ft(position: CourtPosition) -> tuple[float, float]:
+    """Mapeia uma posição da grade 10x5 para coordenadas reais de quadra (ft).
+
+    Idêntico ao mapeamento de :func:`engine_adapter._map_x` / ``_map_y``.
+    """
+    return (
+        float(round(position.x * COURT_WIDTH_FT / (GRID_WIDTH - 1))),
+        float(round(position.y * COURT_HEIGHT_FT / (GRID_HEIGHT - 1))),
+    )
+
+
+def distance_to_hoop_ft(position: CourtPosition, attacking_team_is_a: bool) -> float:
+    """Distância euclidiana (em pés) da posição até a cesta atacada."""
+    hoop = RIGHT_HOOP_FT if attacking_team_is_a else LEFT_HOOP_FT
+    x_ft, y_ft = grid_to_court_ft(position)
+    return math.hypot(x_ft - hoop[0], y_ft - hoop[1])
+
+
 def is_three_pointer(position: CourtPosition, attacking_team_is_a: bool) -> bool:
-    """Informa se a posição está distante o suficiente para uma cesta de três."""
-    rim = get_target_rim(attacking_team_is_a)
-    return position.distance_to(rim) >= THREE_POINT_DISTANCE_THRESHOLD
+    """Informa se a posição está distante o suficiente para uma cesta de três.
+
+    Usa a distância em pés até a cesta atacada comparada ao raio real do arco
+    de 3 pontos (``THREE_POINT_RADIUS_FT``), para que a classificação bata 1:1
+    com a linha branca de 3 pontos desenhada no frontend.
+    """
+    return distance_to_hoop_ft(position, attacking_team_is_a) >= THREE_POINT_RADIUS_FT
 
 
 def get_initial_center_positions(is_team_a: bool) -> list[CourtPosition]:

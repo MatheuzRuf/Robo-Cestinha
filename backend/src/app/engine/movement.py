@@ -14,8 +14,43 @@ LANE_ORDER = (2, 4, 0, 3, 1)
 DEPTH_ORDER = (0, 1, 1, 2, 2)
 
 
+def _offensive_target(
+    player: LivePlayer, handler: LivePlayer, attack_direction: int
+) -> CourtPosition:
+    """Retorna o alvo de espaçamento ofensivo para um jogador sem a bola."""
+    role = player.position5
+    hx = handler.court_pos.x
+    if attack_direction == 1:  # atacando à direita
+        if role in ("PF", "C"):
+            target_x = min(8, max(hx + 2, 7))
+        elif role in ("SG", "SF"):
+            target_x = min(8, max(hx + 1, 6))
+        else:  # PG sem a bola, topo do garrafão
+            target_x = min(7, max(hx, 6))
+    else:  # atacando à esquerda
+        if role in ("PF", "C"):
+            target_x = max(1, min(hx - 2, 2))
+        elif role in ("SG", "SF"):
+            target_x = max(1, min(hx - 1, 3))
+        else:
+            target_x = max(2, min(hx, 3))
+
+    if role in ("PF", "C"):
+        y = 2
+    elif role in ("SG", "SF"):
+        y = 4 if player.court_pos.y >= 2 else 0
+    else:
+        y = 2
+    return CourtPosition(target_x, y)
+
+
 def reposition_players(state: GameState, rng: random.Random) -> None:
-    """Advance players one legal step toward spacing and defensive targets."""
+    """Advance players one legal step toward spacing and defensive targets.
+
+    Compromisso ofensivo: o condutor não se move; os demais sobem para o
+    meio-campo (alas, garrafão e topo) e os defensores ficam entre seu
+    marcado e a cesta defendida.
+    """
     offense = state.attacking_team.get_on_court_players()
     defense = state.defending_team.get_on_court_players()
     handler = state.attacking_team.get_player(state.active_handler_id)
@@ -36,19 +71,46 @@ def reposition_players(state: GameState, rng: random.Random) -> None:
         if lane in used_lanes:
             lane = next(y for y in LANE_ORDER if y not in used_lanes)
         used_lanes.add(lane)
-        if player.player_id != handler.player_id:
-            depth = ROLE_DEPTHS.get(player.position5, DEPTH_ORDER[index])
-            targets[player.player_id] = CourtPosition(
-                handler.court_pos.x + attack_direction * depth, lane
+        if player.player_id == handler.player_id:
+            continue
+        depth = ROLE_DEPTHS.get(player.position5, DEPTH_ORDER[index])
+        frontcourt_target = _offensive_target(player, handler, attack_direction)
+        # Avanço para o meio-campo com perfil de profundidade/função preservado.
+        if attack_direction == 1:
+            target_x = max(
+                handler.court_pos.x + attack_direction * depth, frontcourt_target.x
             )
+        else:
+            target_x = min(
+                handler.court_pos.x + attack_direction * depth, frontcourt_target.x
+            )
+        targets[player.player_id] = CourtPosition(target_x, lane)
 
-    for defender, attacker in zip(
-        sorted(defense, key=lambda player: player.position5),
-        sorted(offense, key=lambda player: player.position5),
+    defenders_sorted = sorted(defense, key=lambda player: player.position5)
+    attackers_sorted = sorted(offense, key=lambda player: player.position5)
+    for defender, attacker in zip(defenders_sorted, attackers_sorted):
+        if attack_direction == 1:
+            target_x = min(attacker.court_pos.x + attack_direction, 8)
+            if attacker.court_pos.x == 9:
+                target_x = 8
+        else:
+            target_x = max(attacker.court_pos.x + attack_direction, 1)
+            if attacker.court_pos.x == 0:
+                target_x = 1
+        targets[defender.player_id] = CourtPosition(target_x, attacker.court_pos.y)
+
+    # Proteção da pintura: puxa o C (e PF, se longe) para perto da cesta quando
+    # a bola entra no meio-campo.
+    if (attack_direction == 1 and handler.court_pos.x >= 4) or (
+        attack_direction == -1 and handler.court_pos.x <= 5
     ):
-        targets[defender.player_id] = CourtPosition(
-            attacker.court_pos.x + attack_direction, attacker.court_pos.y
-        )
+        for defender in defenders_sorted:
+            role = defender.position5
+            backup_x = 8 if attack_direction == 1 else 1
+            if role == "C" or (
+                role == "PF" and defender.court_pos.distance_to((backup_x, 2)) > 4.0
+            ):
+                targets[defender.player_id] = CourtPosition(backup_x, 2)
 
     players = offense + defense
     for player in rng.sample(players, len(players)):

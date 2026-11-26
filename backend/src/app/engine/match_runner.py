@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import random
+
 from app.engine.entities import GameState, LiveTeam
 from app.engine.grid import GRID_HEIGHT, GRID_WIDTH, CourtPosition
-from app.engine.state_machine import StateMachine
 from app.engine.schemas import (
     BallState,
     BallTrajectory,
@@ -19,6 +19,7 @@ from app.engine.schemas import (
     SimulationFrame,
     TransitionResult,
 )
+from app.engine.state_machine import StateMachine
 
 
 class MatchRunner:
@@ -280,6 +281,15 @@ class MatchRunner:
                     transition.defender_id,
                     {},
                 )
+                if transition.defender_id is not None:
+                    emit(
+                        iteration,
+                        "pass_intercepted",
+                        transition.acting_team_id,
+                        transition.player_id,
+                        transition.defender_id,
+                        {},
+                    )
                 emit(
                     iteration,
                     "possession_changed",

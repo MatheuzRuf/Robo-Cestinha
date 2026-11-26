@@ -1,17 +1,33 @@
-.ball {
-  fill: var(--ball-color);
-  stroke: #ffe5a3;
-  stroke-width: 2;
+.ballSeam {
+  fill: none;
+  stroke: #2a1409;
+  stroke-width: 1.15;
+  opacity: 0.85;
 }
 
-.held {
-  stroke-width: 1.75;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+.ballOutline {
+  fill: none;
+  stroke: #1f1209;
+  stroke-width: 1;
+}
+
+.specular {
+  fill: rgba(255, 255, 255, 0.26);
+  transform: rotate(-30deg);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.heldHalo {
+  fill: rgba(255, 229, 163, 0.12);
 }
 
 .ballShadow {
-  fill: rgba(10, 8, 6, 0.72);
   pointer-events: none;
+}
+
+.held {
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
 }
 
 .trajectory {
