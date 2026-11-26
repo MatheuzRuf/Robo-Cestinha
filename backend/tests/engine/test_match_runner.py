@@ -226,7 +226,9 @@ def test_rebound_events_credit_an_on_court_player_and_type():
 
 
 def test_offensive_rebounds_do_not_emit_possession_change():
-    result = _make_runner(seed=7).run_simulation(100)
+    # Realistic shot selection yields far fewer rebounds per 100 iterations, so
+    # we run more iterations to reliably observe at least one offensive board.
+    result = _make_runner(seed=7).run_simulation(400)
     changes_by_iteration = {
         event.iteration for event in result.events if event.type == "possession_changed"
     }

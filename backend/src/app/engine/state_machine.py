@@ -84,7 +84,10 @@ class StateMachine:
 
             if action_type == "PASS":
                 receiver = resolve_pass_teammate(
-                    state.attacking_team, handler.player_id, self.rng
+                    state.attacking_team,
+                    handler.player_id,
+                    self.rng,
+                    attacking_team_is_a=state.is_attacking_team_home(),
                 )
                 success, stealer = resolve_pass_outcome(
                     handler, receiver, state.defending_team, self.rng
@@ -214,19 +217,30 @@ class StateMachine:
 
         if action_type == "PASS":
             receiver = resolve_pass_teammate(
-                state.attacking_team, handler.player_id, self.rng
+                state.attacking_team,
+                handler.player_id,
+                self.rng,
+                attacking_team_is_a=state.is_attacking_team_home(),
             )
             success, stealer = resolve_pass_outcome(
                 handler, receiver, state.defending_team, self.rng
             )
             duration_s = 1.5
             target_player_id = receiver.player_id
+            if not success and stealer is not None:
+                # Trajetória interceptada aponta para o interceptador.
+                to_position = stealer.court_pos.to_tuple()
+                to_player_id = stealer.player_id
+                target_player_id = stealer.player_id
+            else:
+                to_position = receiver.court_pos.to_tuple()
+                to_player_id = receiver.player_id
             trajectory = BallTrajectory(
                 type="pass",
                 from_position=handler.court_pos.to_tuple(),
-                to_position=receiver.court_pos.to_tuple(),
+                to_position=to_position,
                 from_player_id=handler.player_id,
-                to_player_id=receiver.player_id,
+                to_player_id=to_player_id,
             )
             if success:
                 state.active_handler_id = receiver.player_id
@@ -386,12 +400,18 @@ class StateMachine:
         )
         duration_s = 1.5
         acting_team_id = state.possession_team_id
+        if not success and stealer is not None:
+            to_position = stealer.court_pos.to_tuple()
+            to_player_id = stealer.player_id
+        else:
+            to_position = receiver.court_pos.to_tuple()
+            to_player_id = receiver.player_id
         trajectory = BallTrajectory(
             type="inbound",
             from_position=handler.court_pos.to_tuple(),
-            to_position=receiver.court_pos.to_tuple(),
+            to_position=to_position,
             from_player_id=handler.player_id,
-            to_player_id=receiver.player_id,
+            to_player_id=to_player_id,
         )
         outcome = "success" if success else "turnover"
         possession_intact = success

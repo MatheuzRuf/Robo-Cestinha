@@ -12,50 +12,104 @@ import random
 from app.engine.entities import GameState, LivePlayer, LiveTeam
 from app.engine.grid import (
     DIRECTION_VECTORS,
+    MAX_NORMAL_SHOT_RANGE_FT,
+    ON_BALL_STEAL_MAX_DIST,
+    PASS_INTERCEPT_MAX_DIST,
+    REBOUND_MAX_CELLS,
+    THREE_POINT_RADIUS_FT,
     CourtPosition,
     Direction,
+    distance_to_hoop_ft,
     get_target_rim,
     is_three_pointer,
+    point_to_segment_distance,
 )
 
 
 def decide_handler_action(state: GameState, rng: random.Random) -> str:
-    """Escolhe entre ``PASS``, ``MOVE`` e ``SHOOT``.
+    """Escolhe entre ``PASS``, ``MOVE`` e ``SHOOT`` respeitando a distância à cesta.
 
-    Quanto menor o relógio de posse, maior a urgência para arremessar.
+    Arremessos normais só acontecem até ``MAX_NORMAL_SHOT_RANGE_FT``; além disso
+    só há ``SHOOT`` no estouro do relógio (``shot_clock <= 2.0``, arremesso de
+    desespero).
     """
     shot_clock = state.clock.shot_clock_remaining
 
     if shot_clock <= 2.0:
         return "SHOOT"
 
-    # Under 7 seconds, shooting urgency increases
+    handler = state.attacking_team.get_player(state.active_handler_id)
+    dist_ft = distance_to_hoop_ft(handler.court_pos, state.is_attacking_team_home())
+
+    if dist_ft > MAX_NORMAL_SHOT_RANGE_FT:
+        # Fora do alcance normal de arremesso: nada de meia-quadra.
+        return rng.choices(["MOVE", "PASS"], weights=[0.65, 0.35], k=1)[0]
+
+    # Base shoot probability by distance zone.
+    if dist_ft <= 14.0:
+        base_shoot = 0.58  # paint
+    elif dist_ft < THREE_POINT_RADIUS_FT:
+        base_shoot = 0.40  # midrange
+    else:
+        base_shoot = max(
+            0.14, min(0.38, (handler.attributes.three_pt_pct - 0.15) * 1.15)
+        )
+
+    # Shot-clock urgency pushes shooting up toward 0.90 inside 7 seconds.
     if shot_clock <= 7.0:
         urgency = (7.0 - shot_clock) / 7.0
-        p_shoot = 0.35 + 0.55 * urgency
+        base_shoot = min(0.92, base_shoot + (0.90 - base_shoot) * urgency)
+
+    p_shoot = base_shoot
+    remaining = 1.0 - p_shoot
+    if dist_ft <= 14.0:
+        p_pass = remaining * 0.75
+        p_move = remaining * 0.25
     else:
-        p_shoot = 0.22
+        p_pass = remaining * 0.50
+        p_move = remaining * 0.50
 
-    remaining_prob = 1.0 - p_shoot
-    p_pass = remaining_prob * 0.52
-    p_move = remaining_prob * 0.48
-
-    choice = rng.choices(
+    return rng.choices(
         ["SHOOT", "PASS", "MOVE"], weights=[p_shoot, p_pass, p_move], k=1
     )[0]
-    return choice
 
 
 def resolve_pass_teammate(
-    attacking_team: LiveTeam, current_handler_id: str, rng: random.Random
+    attacking_team: LiveTeam,
+    current_handler_id: str,
+    rng: random.Random,
+    attacking_team_is_a: bool | None = None,
 ) -> LivePlayer:
-    """Escolhe um dos quatro companheiros em quadra, ponderando uso."""
+    """Escolhe um dos quatro companheiros em quadra, ponderando uso e progressão.
+
+    Quando ``attacking_team_is_a`` é informado, a escolha privilegia passes para
+    frente (avanço) no fundo de quadra e mantém arremessos dentro do alcance
+    normal no meio-campo.
+    """
+    handler = attacking_team.get_player(current_handler_id)
     teammates = [
         p
         for p in attacking_team.get_on_court_players()
         if p.player_id != current_handler_id
     ]
     weights = [max(0.05, p.attributes.usage_rate) for p in teammates]
+
+    if attacking_team_is_a is not None:
+        handler_dist = distance_to_hoop_ft(handler.court_pos, attacking_team_is_a)
+        for i, mate in enumerate(teammates):
+            teammate_dist = distance_to_hoop_ft(mate.court_pos, attacking_team_is_a)
+            if handler_dist > 30.0:
+                # Backcourt / transition: reward outlet passes, punish backward.
+                if teammate_dist < handler_dist - 4.0:
+                    weights[i] *= 3.0
+                elif teammate_dist > handler_dist + 4.0:
+                    weights[i] *= 0.35
+            else:
+                # Half-court: keep shots in range, avoid launching from 36+ ft.
+                if teammate_dist <= MAX_NORMAL_SHOT_RANGE_FT:
+                    weights[i] *= 1.3
+                elif teammate_dist > 36.0:
+                    weights[i] *= 0.4
     return rng.choices(teammates, weights=weights, k=1)[0]
 
 
@@ -72,21 +126,45 @@ def resolve_pass_outcome(
         safety_boost: Reduz a chance de interceptação; usada na reposição para
             garantir no mínimo ~95% de sucesso (erro com piso de 5%).
     """
-    avg_steal = (
-        sum(p.attributes.steal_rate for p in defending_team.get_on_court_players())
-        / 5.0
+    # Somente defensores perto do corredor do passe podem interceptar.
+    lane_defenders = [
+        (
+            d,
+            point_to_segment_distance(
+                d.court_pos, passer.court_pos, receiver.court_pos
+            ),
+        )
+        for d in defending_team.get_on_court_players()
+        if point_to_segment_distance(d.court_pos, passer.court_pos, receiver.court_pos)
+        <= PASS_INTERCEPT_MAX_DIST
+    ]
+    if not lane_defenders:
+        return True, None
+
+    lane_pressure = sum(
+        d.attributes.steal_rate / (0.5 + dist) for d, dist in lane_defenders
     )
+    pass_dist = passer.court_pos.distance_to(receiver.court_pos)
+    len_factor = 1.0 + max(0.0, pass_dist - 2.0) * 0.12
     p_turnover = min(
-        0.35, max(0.04, passer.attributes.turnover_rate * 0.7 + avg_steal * 1.5)
+        0.32,
+        max(
+            0.03,
+            (passer.attributes.turnover_rate * 0.45 + lane_pressure * 1.1) * len_factor,
+        ),
     )
     if safety_boost:
         p_turnover = min(0.05, p_turnover * (1.0 - min(1.0, safety_boost)))
 
     if rng.random() < p_turnover:
-        # Em uma falha, o defensor é sorteado pela taxa de roubos.
-        defenders = defending_team.get_on_court_players()
-        steal_weights = [max(0.01, d.attributes.steal_rate) for d in defenders]
-        stealer = rng.choices(defenders, weights=steal_weights, k=1)[0]
+        # Interceptor escolhido estritamente entre os defensores do corredor.
+        steal_weights = [
+            max(0.005, d.attributes.steal_rate) / (0.5 + dist)
+            for d, dist in lane_defenders
+        ]
+        stealer = rng.choices(
+            [d for d, _ in lane_defenders], weights=steal_weights, k=1
+        )[0]
         return False, stealer
 
     return True, None
@@ -138,6 +216,11 @@ def decide_move_direction(
     return rng.choice(options) if options else Direction.IDLE
 
 
+def _prox(dist: float) -> float:
+    """Proximidade de marcação: máxima quando colado, reduzida além de 1.05."""
+    return 1.0 if dist <= 1.05 else 0.65
+
+
 def resolve_move_outcome(
     handler: LivePlayer,
     defending_team: LiveTeam,
@@ -146,33 +229,63 @@ def resolve_move_outcome(
 ) -> tuple[str, LivePlayer | None]:
     """Resolve o movimento: ``SUCCESS``, ``STRIPPED``, ``FOUL_DRAWN`` ou
     ``HOLDS_BALL``.
+
+    Roubos e faltas só podem ocorrer quando há um defensor a menos de
+    ``ON_BALL_STEAL_MAX_DIST`` células do condutor.
     """
+    nearby = [
+        (d, d.court_pos.distance_to(handler.court_pos))
+        for d in defending_team.get_on_court_players()
+        if d.court_pos.distance_to(handler.court_pos) <= ON_BALL_STEAL_MAX_DIST
+    ]
+    if not nearby:
+        # Sem marcação próxima: a bola não é roubada nem falta sofrida.
+        if direction == Direction.IDLE:
+            return "HOLDS_BALL", None
+        return "SUCCESS", None
+
+    local_steal = sum(d.attributes.steal_rate * _prox(dist) for d, dist in nearby)
+
     if direction == Direction.IDLE:
         # Parado, o jogador pode sofrer falta, ser desarmado ou manter a bola.
+        p_foul = 0.08
+        p_strip = min(0.14, 0.03 + local_steal * 1.6)
         roll = rng.random()
-        if roll < 0.10:
-            defenders = defending_team.get_on_court_players()
-            weights = [max(0.01, d.attributes.foul_rate) for d in defenders]
-            fouler = rng.choices(defenders, weights=weights, k=1)[0]
+        if roll < p_foul:
+            fouler = rng.choices(
+                [d for d, _ in nearby],
+                weights=[
+                    max(0.005, d.attributes.foul_rate) * _prox(dist)
+                    for d, dist in nearby
+                ],
+                k=1,
+            )[0]
             return "FOUL_DRAWN", fouler
-        elif roll < 0.18:
-            defenders = defending_team.get_on_court_players()
-            weights = [max(0.01, d.attributes.steal_rate) for d in defenders]
-            stealer = rng.choices(defenders, weights=weights, k=1)[0]
+        if roll < p_foul + p_strip:
+            stealer = rng.choices(
+                [d for d, _ in nearby],
+                weights=[
+                    max(0.005, d.attributes.steal_rate) * _prox(dist)
+                    for d, dist in nearby
+                ],
+                k=1,
+            )[0]
             return "STRIPPED", stealer
-        else:
-            return "HOLDS_BALL", None
+        return "HOLDS_BALL", None
 
     # Um movimento ativo também pode terminar em perda de bola.
-    avg_steal = (
-        sum(p.attributes.steal_rate for p in defending_team.get_on_court_players())
-        / 5.0
+    p_strip = min(
+        0.22,
+        max(0.02, handler.attributes.turnover_rate * 0.35 + local_steal * 1.5),
     )
-    p_strip = min(0.25, max(0.03, handler.attributes.turnover_rate * 0.5 + avg_steal))
     if rng.random() < p_strip:
-        defenders = defending_team.get_on_court_players()
-        weights = [max(0.01, d.attributes.steal_rate) for d in defenders]
-        stealer = rng.choices(defenders, weights=weights, k=1)[0]
+        stealer = rng.choices(
+            [d for d, _ in nearby],
+            weights=[
+                max(0.005, d.attributes.steal_rate) * _prox(dist) for d, dist in nearby
+            ],
+            k=1,
+        )[0]
         return "STRIPPED", stealer
 
     return "SUCCESS", None
@@ -190,16 +303,27 @@ def resolve_shot(
     """
     is_three = is_three_pointer(shooter.court_pos, is_team_a)
     points = 3 if is_three else 2
+    dist_ft = distance_to_hoop_ft(shooter.court_pos, is_team_a)
 
     # A distância define se usamos o aproveitamento de dois ou três pontos.
     base_pct = (
         shooter.attributes.three_pt_pct if is_three else shooter.attributes.two_pt_pct
     )
 
+    # Bônus de finalização perto da cesta (pintura).
+    if not is_three and dist_ft <= 10.0:
+        base_pct = min(0.78, base_pct + 0.04)
+
+    # Decaimento de distância para arremessos de desespero (heaves).
+    if dist_ft > 30.0:
+        heave_factor = max(0.12, 1.0 - (dist_ft - 30.0) / 22.0)
+        base_pct = max(0.04, base_pct * heave_factor)
+
     # A fadiga abaixo de 0,4 reduz gradualmente a chance de conversão.
     if shooter.current_stamina < 0.40:
         stamina_penalty = (0.40 - shooter.current_stamina) * 0.25
-        base_pct = max(0.15, base_pct - stamina_penalty)
+        floor = 0.03 if dist_ft > 30.0 else 0.15
+        base_pct = max(floor, base_pct - stamina_penalty)
 
     # Em momentos decisivos, o atributo de clutch ajusta a probabilidade.
     score_diff = abs(game_state.home_team.score - game_state.away_team.score)
@@ -218,19 +342,25 @@ def resolve_rebound(
 
     Retorna ``(rebotador, e_rebote_ofensivo)``.
     """
+    rim = get_target_rim(game_state.is_attacking_team_home())
     off_players = game_state.attacking_team.get_on_court_players()
     def_players = game_state.defending_team.get_on_court_players()
 
-    # O peso defensivo inclui a vantagem média de rebote da defesa.
-    off_weights = [max(0.02, p.attributes.rebound_rate * 1.0) for p in off_players]
-    def_weights = [
-        max(0.05, (0.15 + (1.0 - p.attributes.rebound_rate * 0.5)) * 1.8)
-        for p in def_players
+    candidates = [(p, True, p.court_pos.distance_to(rim)) for p in off_players] + [
+        (p, False, p.court_pos.distance_to(rim)) for p in def_players
     ]
 
-    all_players = off_players + def_players
-    all_weights = off_weights + def_weights
+    eligible = [entry for entry in candidates if entry[2] <= REBOUND_MAX_CELLS]
+    if not eligible:
+        min_dist = min(entry[2] for entry in candidates)
+        eligible = [entry for entry in candidates if entry[2] <= min_dist + 1.0]
 
-    rebounder = rng.choices(all_players, weights=all_weights, k=1)[0]
-    is_offensive = rebounder.team_id == game_state.attacking_team.team_id
+    weights = []
+    for player, is_offensive, dist in eligible:
+        skill = 0.04 + player.attributes.rebound_rate
+        side_mult = 1.0 if is_offensive else 2.4
+        prox = 1.0 / (0.5 + dist**2.2)
+        weights.append(max(0.001, skill * side_mult * prox))
+
+    rebounder, is_offensive, _ = rng.choices(eligible, weights=weights, k=1)[0]
     return rebounder, is_offensive

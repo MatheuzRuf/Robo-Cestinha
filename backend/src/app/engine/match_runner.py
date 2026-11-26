@@ -280,6 +280,15 @@ class MatchRunner:
                     transition.defender_id,
                     {},
                 )
+                if transition.defender_id is not None:
+                    emit(
+                        iteration,
+                        "pass_intercepted",
+                        transition.acting_team_id,
+                        transition.player_id,
+                        transition.defender_id,
+                        {},
+                    )
                 emit(
                     iteration,
                     "possession_changed",
