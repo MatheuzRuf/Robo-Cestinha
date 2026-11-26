@@ -9,21 +9,34 @@ interface SimulationEventsProps {
   players: SimulationPlayer[];
   teams: SimulationResponse['teams'];
   currentIteration: number;
+  isLastFrame?: boolean;
 }
 
 const TECHNICAL_EVENTS = new Set(['possession_changed']);
-const SCORING_EVENTS = new Set(['shot_made']);
-const REBOUND_EVENTS = new Set(['rebound']);
-const TURNOVER_EVENTS = new Set(['turnover', 'pass_intercepted']);
+// Rim-contact rows (made/missed shots, rebounds) are spoilers while the ball is
+// still in the air, so they only surface once the following frame has begun.
+const RIM_CONTACT_EVENTS = new Set(['shot_made', 'shot_missed', 'rebound']);
 
-function eventAccentClass(type: string) {
-  if (SCORING_EVENTS.has(type)) return styles.eventScore;
-  if (REBOUND_EVENTS.has(type)) return styles.eventRebound;
-  if (TURNOVER_EVENTS.has(type)) return styles.eventTurnover;
+function eventAccentClass(event: SimulationEvent) {
+  if (event.type === 'shot_made') {
+    const points = Number(event.data.pointsScored ?? event.data.shotValue ?? 2);
+    return points === 3 ? styles.eventThree : styles.eventScore;
+  }
+  if (event.type === 'rebound') {
+    return event.data.reboundType === 'offensive' ? styles.eventOreb : styles.eventRebound;
+  }
+  if (event.type === 'turnover' || event.type === 'pass_intercepted') return styles.eventTurnover;
+  if (event.type === 'foul') return styles.eventFoul;
   return '';
 }
 
-export function SimulationEvents({ events, players, teams, currentIteration }: SimulationEventsProps) {
+export function SimulationEvents({
+  events,
+  players,
+  teams,
+  currentIteration,
+  isLastFrame = false,
+}: SimulationEventsProps) {
   const { t } = useTranslation();
   const panelRef = useRef<HTMLElement>(null);
   const isFollowingLatest = useRef(true);
@@ -38,14 +51,18 @@ export function SimulationEvents({ events, players, teams, currentIteration }: S
   const visibleEvents = useMemo(
     () =>
       events
-        .filter(
-          (event) =>
-            event.iteration <= currentIteration &&
-            !TECHNICAL_EVENTS.has(event.type) &&
-            !(event.type === 'turnover' && interceptIterations.has(event.iteration)),
-        )
+        .filter((event) => {
+          if (TECHNICAL_EVENTS.has(event.type)) return false;
+          if (event.type === 'turnover' && interceptIterations.has(event.iteration)) return false;
+          if (RIM_CONTACT_EVENTS.has(event.type)) {
+            return (
+              event.iteration < currentIteration || (isLastFrame && event.iteration <= currentIteration)
+            );
+          }
+          return event.iteration <= currentIteration;
+        })
         .sort((first, second) => second.sequence - first.sequence),
-    [currentIteration, events, interceptIterations],
+    [currentIteration, events, interceptIterations, isLastFrame],
   );
 
   useLayoutEffect(() => {
@@ -176,7 +193,7 @@ export function SimulationEvents({ events, players, teams, currentIteration }: S
             const player = playersById.get(event.playerId ?? '');
             return (
               <li
-                className={`${styles.event} ${eventAccentClass(event.type)} ${
+                className={`${styles.event} ${eventAccentClass(event)} ${
                   event.iteration === currentIteration ? styles.currentEvent : ''
                 }`}
                 key={event.sequence}
