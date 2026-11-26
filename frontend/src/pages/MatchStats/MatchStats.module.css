@@ -320,6 +320,10 @@
   background: var(--color-bg);
 }
 
+.playerTable tbody tr:hover {
+  background: var(--color-surface-raised);
+}
+
 .playerTable tbody tr:last-child td {
   border-bottom: 0;
 }
@@ -458,6 +462,11 @@
   color: var(--color-text-inverse);
 }
 
+.statsTab:not([aria-selected='true']):hover {
+  color: var(--color-text);
+  background: var(--color-surface-raised);
+}
+
 .statsTab:focus-visible,
 .tabPanel:focus-visible {
   outline: 2px solid var(--color-primary);
@@ -544,6 +553,7 @@
   background: var(--color-surface);
   color: var(--color-text);
   pointer-events: none;
+  box-shadow: var(--shadow-md);
 }
 
 .frameHoverCard[data-anchor='top-left'] {
@@ -775,6 +785,7 @@
   background: var(--color-surface);
   color: var(--color-text);
   pointer-events: none;
+  box-shadow: var(--shadow-md);
 }
 
 .networkHoverCard[data-anchor='top-left'] {

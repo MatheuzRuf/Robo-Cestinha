@@ -6,11 +6,17 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  padding: 0 var(--space-4) var(--space-4);
 }
 
 .heading {
-  margin: 0 0 var(--space-3);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0 calc(-1 * var(--space-4)) var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-2);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
   color: var(--color-text-muted);
   font: 700 0.8rem var(--font-mono);
   letter-spacing: 0.08em;
@@ -34,6 +40,7 @@
   color: var(--color-text-muted);
   font-size: 0.85rem;
   line-height: 1.4;
+  transition: background-color 120ms ease;
 }
 
 .eventPlayer {
@@ -53,8 +60,11 @@
 }
 
 .eventScore,
+.eventThree,
 .eventRebound,
-.eventTurnover {
+.eventOreb,
+.eventTurnover,
+.eventFoul {
   border-inline-start: 3px solid transparent;
   padding-inline-start: var(--space-2);
   color: var(--color-text);
@@ -64,17 +74,30 @@
   border-inline-start-color: var(--color-effect-score-2pt);
 }
 
+.eventThree {
+  border-inline-start-color: var(--color-effect-score-3pt);
+}
+
 .eventRebound {
   border-inline-start-color: var(--color-effect-rebound-def);
 }
 
+.eventOreb {
+  border-inline-start-color: var(--color-effect-rebound-off);
+}
+
 .eventTurnover {
-  border-inline-start-color: var(--color-stamina-low);
+  border-inline-start-color: var(--color-effect-steal);
+}
+
+.eventFoul {
+  border-inline-start-color: var(--color-effect-foul);
 }
 
 .sequence {
   color: var(--color-primary);
   font: 700 0.75rem var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 .empty {

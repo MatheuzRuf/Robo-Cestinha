@@ -24,7 +24,9 @@ function TeamSummaryBlock({
   delta: number | null;
 }) {
   return (
-    <div className={`${styles.teamSummary} ${side === 'away' ? styles.awaySummary : ''}`}>
+    <div className={`${styles.teamSummary} ${hasPossession ? styles.hasPossession : ''} ${
+      side === 'away' ? styles.awaySummary : ''
+    }`.trim()}>
       <div className={styles.teamIdentity}>
         <NbaImage
           kind="team"
@@ -43,7 +45,7 @@ function TeamSummaryBlock({
       </div>
       <span className={styles.scoreWrap}>
         {delta !== null ? (
-          <span className={styles.scoreDelta} key={`${side}-${score}`}>
+          <span className={`${styles.scoreDelta} ${delta === 3 ? styles.scoreDeltaThree : ''}`.trim()} key={`${side}-${score}`}>
             +{delta}
           </span>
         ) : null}
@@ -60,10 +62,10 @@ type ScoreboardProps = {
   awayScore: number;
   possessionTeamId: string | null;
   frameNumber: number;
-  totalFrames: number;
   speed: Speed;
   setSpeed: (speed: Speed) => void;
   isComplete: boolean;
+  isPaused: boolean;
   isFullMode: boolean;
   onToggleFullMode: () => void;
 };
@@ -75,10 +77,10 @@ export function Scoreboard({
   awayScore,
   possessionTeamId,
   frameNumber,
-  totalFrames,
   speed,
   setSpeed,
   isComplete,
+  isPaused,
   isFullMode,
   onToggleFullMode,
 }: ScoreboardProps) {
@@ -113,6 +115,9 @@ export function Scoreboard({
     return () => window.clearTimeout(timeoutId);
   }, [awayScore, frameNumber, homeScore]);
 
+  const statusTone: 'live' | 'paused' | 'final' = isComplete ? 'final' : isPaused ? 'paused' : 'live';
+  const statusClass = statusTone === 'live' ? styles.statusLive : statusTone === 'paused' ? styles.statusPaused : styles.statusFinal;
+
   return (
     <section className={styles.scoreboard}>
       <TeamSummaryBlock
@@ -123,24 +128,29 @@ export function Scoreboard({
         delta={deltas.home}
       />
       <div className={styles.clockPanel}>
-        <span className={styles.frameLabel}>
-          {isComplete
-            ? t('match_broadcast.simulation.completed')
-            : t('match_broadcast.simulation.frame_progress', { current: frameNumber, total: totalFrames })}
+        <span className={`${styles.statusBadge} ${statusClass}`.trim()}>
+          {statusTone === 'live' ? <span className={styles.statusDot} aria-hidden="true" /> : null}
+          <span>{t(`match_broadcast.clock.${statusTone}`)}</span>
         </span>
+        <span className={styles.clockDivider} aria-hidden="true" />
         <SegmentedControl
-          label={t('match_broadcast.clock.speed_label')}
+          label={t('match_broadcast.clock.speed_short')}
+          hideLabel
+          layout="inline"
+          size="sm"
           options={[
-            { value: '1', label: '1.0X' },
-            { value: '1.5', label: '1.5X' },
-            { value: '2', label: '2.0X' },
+            { value: '1', label: '1×' },
+            { value: '1.5', label: '1.5×' },
+            { value: '2', label: '2×' },
           ]}
           value={String(speed)}
           onChange={(value) => setSpeed(Number(value) as Speed)}
         />
+        <span className={styles.clockDivider} aria-hidden="true" />
         <Button
           variant="outline"
-          icon={isFullMode ? <Minimize size={16} aria-hidden="true" /> : <Maximize size={16} aria-hidden="true" />}
+          size="sm"
+          icon={isFullMode ? <Minimize size={14} aria-hidden="true" /> : <Maximize size={14} aria-hidden="true" />}
           onClick={onToggleFullMode}
         >
           {t(isFullMode ? 'match_broadcast.simulation.exit_full_mode' : 'match_broadcast.simulation.full_mode')}

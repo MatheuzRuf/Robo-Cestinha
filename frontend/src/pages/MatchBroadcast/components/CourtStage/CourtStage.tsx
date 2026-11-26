@@ -21,6 +21,17 @@ interface CourtStageProps {
 const TRAJECTORY_HOLD_MIN_MS = 700;
 const BANNER_HOLD_FACTOR = 1.1;
 
+// Lower number = higher banner priority. A missed shot + rebound frame now
+// always surfaces the rebound banner instead of being hidden behind "MISSED".
+const EFFECT_BANNER_PRIORITY: Record<FrameEffect['kind'], number> = {
+  score: 0,
+  rebound: 1,
+  intercept: 2,
+  steal: 3,
+  foul: 4,
+  miss: 5,
+};
+
 export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBasketSide, effects }: CourtStageProps) {
   const { t } = useTranslation();
   const transitionDuration = transitionDurationMs / 1000;
@@ -28,6 +39,7 @@ export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBas
   const [visibleBanner, setVisibleBanner] = useState<FrameEffect | null>(null);
   const trajectoryTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const bannerTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const startBannerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     if (!frame?.trajectory) return;
@@ -41,38 +53,72 @@ export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBas
     }, transitionDurationMs);
   }, [frame, transitionDurationMs]);
 
-  const primaryEffect = effects?.[0] ?? null;
+  const primaryEffect = effects?.length
+    ? effects.reduce<FrameEffect | null>((best, effect) => {
+        if (!best) return effect;
+        return EFFECT_BANNER_PRIORITY[effect.kind] < EFFECT_BANNER_PRIORITY[best.kind] ? effect : best;
+      }, null)
+    : null;
   const primaryEffectKey = primaryEffect ? `${primaryEffect.kind}-${primaryEffect.sequence}` : null;
   const bannerHoldMs = Math.max(TRAJECTORY_HOLD_MIN_MS, Math.round(transitionDurationMs * BANNER_HOLD_FACTOR));
 
-  useEffect(() => {
-    if (!primaryEffect) return;
-
-    setVisibleBanner(primaryEffect);
-    if (bannerTimeoutRef.current) clearTimeout(bannerTimeoutRef.current);
-
-    bannerTimeoutRef.current = setTimeout(() => {
-      setVisibleBanner(null);
-      bannerTimeoutRef.current = undefined;
-    }, bannerHoldMs);
-    // The banner only depends on which effect became active, not on every re-render.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [primaryEffectKey, bannerHoldMs]);
-
-  useEffect(() => {
-    return () => {
-      if (trajectoryTimeoutRef.current) clearTimeout(trajectoryTimeoutRef.current);
-      if (bannerTimeoutRef.current) clearTimeout(bannerTimeoutRef.current);
-    };
-  }, []);
-
-  const hasStamina = frame?.players.some((player) => player.stamina !== undefined && player.stamina !== null) ?? false;
-  // Full per-leg ball flight plan for this frame, including shot arcs, catch dwell, and rebound timing.
+  // Full per-leg ball flight plan for this frame, including shot arcs, catch
+  // dwell, and rebound timing.
   const flightPlan = useMemo(
     () => (frame ? computeBallFlightPlan(previousFrame, frame) : null),
     [frame, previousFrame],
   );
   const catchInfo = flightPlan?.reboundCatch ?? null;
+  const reboundCatchDelayMs = catchInfo ? Math.round(catchInfo.timeFraction * transitionDurationMs * 0.9) : 0;
+
+  const hasScoreEffect = effects?.some((effect) => effect.kind === 'score') ?? false;
+  // Normal made baskets render on the kickoff frame where the ball is already at
+  // the rim at t=0 (delay 0). Only a final-frame overtime game-winner still sits
+  // on a shot frame and needs to wait for its flight.
+  const rimImpactDelayMs =
+    hasScoreEffect && frame?.trajectory?.type === 'shot' ? Math.round(transitionDurationMs * 0.85) : 0;
+  const bannerStartDelayMs = primaryEffect
+    ? primaryEffect.kind === 'rebound'
+      ? reboundCatchDelayMs
+      : primaryEffect.kind === 'score'
+        ? rimImpactDelayMs
+        : 0
+    : 0;
+
+  useEffect(() => {
+    if (!primaryEffect) {
+      setVisibleBanner(null);
+      return;
+    }
+    if (bannerTimeoutRef.current) clearTimeout(bannerTimeoutRef.current);
+    if (startBannerRef.current) clearTimeout(startBannerRef.current);
+
+    if (bannerStartDelayMs > 0) {
+      startBannerRef.current = setTimeout(() => setVisibleBanner(primaryEffect), bannerStartDelayMs);
+      bannerTimeoutRef.current = setTimeout(() => {
+        setVisibleBanner(null);
+        bannerTimeoutRef.current = undefined;
+      }, bannerStartDelayMs + bannerHoldMs);
+    } else {
+      setVisibleBanner(primaryEffect);
+      bannerTimeoutRef.current = setTimeout(() => {
+        setVisibleBanner(null);
+        bannerTimeoutRef.current = undefined;
+      }, bannerHoldMs);
+    }
+    // The banner only depends on which effect became active, not on every re-render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [primaryEffectKey, bannerHoldMs, bannerStartDelayMs]);
+
+  useEffect(() => {
+    return () => {
+      if (trajectoryTimeoutRef.current) clearTimeout(trajectoryTimeoutRef.current);
+      if (bannerTimeoutRef.current) clearTimeout(bannerTimeoutRef.current);
+      if (startBannerRef.current) clearTimeout(startBannerRef.current);
+    };
+  }, []);
+
+  const hasStamina = frame?.players.some((player) => player.stamina !== undefined && player.stamina !== null) ?? false;
 
   // The rebounder holds position until the ball arrives and is secured before starting the next move.
   const rebounderId = useMemo(() => {
@@ -114,8 +160,6 @@ export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBas
     : undefined;
 
   const isKickoffReset = frame?.phase === 'kickoff';
-  const rimImpactDelayMs = frame?.trajectory?.type === 'shot' ? Math.round(transitionDurationMs * 0.85) : 0;
-  const reboundCatchDelayMs = catchInfo ? Math.round(catchInfo.timeFraction * transitionDurationMs * 0.9) : 0;
 
   return (
     <div className={styles.stage}>

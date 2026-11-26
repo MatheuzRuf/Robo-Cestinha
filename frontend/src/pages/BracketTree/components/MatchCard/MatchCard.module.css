@@ -4,6 +4,14 @@
   gap: var(--space-2);
   padding: var(--space-3);
   border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.card:hover {
+  border-color: var(--color-border-input);
 }
 
 .matchNumber {

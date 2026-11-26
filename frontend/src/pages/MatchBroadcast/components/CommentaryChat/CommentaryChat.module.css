@@ -71,12 +71,21 @@
 }
 
 .collapsed {
-  height: 1.5rem;
+  max-height: 3.1rem;
+  overflow: hidden;
+}
+
+.collapsed .messageText {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
 }
 
 .expanded {
   max-height: 15rem;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
 }
 
 .message {
@@ -96,6 +105,7 @@
 .frameNumber {
   color: var(--color-primary);
   font: 700 0.75rem var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 .messageText {

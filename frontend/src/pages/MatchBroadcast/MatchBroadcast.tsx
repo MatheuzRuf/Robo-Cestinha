@@ -25,6 +25,10 @@ import styles from './MatchBroadcast.module.css';
 
 const DEFAULT_ITERATIONS_LIMIT = 1000;
 
+// Effects that must only fire when the ball physically reaches the rim: an
+// intercepted or scored basket is tied to the start of the *following* frame.
+const RIM_CONTACT_EVENTS = new Set(['shot_made', 'shot_missed', 'rebound']);
+
 export default function MatchBroadcast() {
   const { matchId: routeMatchId } = useParams();
   const navigate = useNavigate();
@@ -41,6 +45,7 @@ export default function MatchBroadcast() {
   const [initialFrameIndex, setInitialFrameIndex] = useState(0);
   const [isFullMode, setIsFullMode] = useState(false);
   const [isVictoryDismissed, setIsVictoryDismissed] = useState(false);
+  const [victoryDelayDone, setVictoryDelayDone] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(true);
   const [isPreparingCommentary, setIsPreparingCommentary] = useState(false);
@@ -271,24 +276,36 @@ export default function MatchBroadcast() {
     );
   }
 
+  const isFinalFrame = simulation ? playback.frameIndex === simulation.frames.length - 1 : false;
   const frameEffects = useMemo<FrameEffect[]>(() => {
     if (!simulation || !currentSimulationFrame) return [];
 
     const iteration = currentSimulationFrame.iteration;
-    // Rim-contact effects (miss flash, rebound pulse) should play when the ball
-    // actually reaches the rim, which happens at the end of the shot frame's
-    // display — so attach them to the frame after their events.
-    const rimContactEvents = new Set(['rebound', 'shot_missed']);
+    // Rim-mounting events (made baskets, missed shots, rebounds) fire only when
+    // the ball actually reaches the basket — i.e. at t=0 of the *following*
+    // frame. A final-frame game-winning basket is the one exception: its event
+    // lives on the last frame, so include it there so the win still celebrates.
     const frameEvents = simulation.events.filter(
-      (event) => event.iteration === iteration && !rimContactEvents.has(event.type),
+      (event) =>
+        event.iteration === iteration &&
+        !RIM_CONTACT_EVENTS.has(event.type) &&
+        !(isFinalFrame && event.type === 'shot_made'),
     );
+    const finalFrameMadeShots = isFinalFrame
+      ? simulation.events.filter((event) => event.iteration === iteration && event.type === 'shot_made')
+      : [];
     const priorRimEvents =
       iteration > 0
-        ? simulation.events.filter((event) => event.iteration === iteration - 1 && rimContactEvents.has(event.type))
+        ? simulation.events.filter(
+            (event) => event.iteration === iteration - 1 && RIM_CONTACT_EVENTS.has(event.type),
+          )
         : [];
-    const events = [...frameEvents, ...priorRimEvents];
+    const events = [...frameEvents, ...priorRimEvents, ...finalFrameMadeShots];
     if (!events.length) return [];
 
+    const interceptIterations = new Set(
+      simulation.events.filter((event) => event.type === 'pass_intercepted').map((event) => event.iteration),
+    );
     const playersById = new Map(simulation.players.map((player) => [player.playerId, player]));
     const positionsById = new Map(currentSimulationFrame.players.map((position) => [position.playerId, position]));
     const previousPositionsById = new Map(
@@ -299,18 +316,39 @@ export default function MatchBroadcast() {
     const teamSideFor = (teamId: string | null): 'home' | 'away' => (teamId === homeTeamId ? 'home' : 'away');
     const abbreviationFor = (teamId: string | null) =>
       teamId === homeTeamId ? simulation.teams.home.abbreviation : simulation.teams.away.abbreviation;
+    const sideOf = (playerId: string | null | undefined): 'home' | 'away' =>
+      playerId ? (playersById.get(playerId)?.side ?? 'away') : 'away';
+    const abbreviationOf = (playerId: string | null | undefined): string => {
+      const side = sideOf(playerId);
+      return (side === 'home' ? simulation.teams.home : simulation.teams.away).abbreviation;
+    };
     const shortNameFor = (name: string | undefined) => {
       const parts = (name ?? '').trim().split(/\s+/);
       if (!parts[0]) return '';
       return parts.length > 1 ? `${parts[0].charAt(0)}. ${parts[parts.length - 1]}` : parts[0];
     };
+    const playerPos = (playerId: string | null | undefined) => {
+      if (!playerId) return null;
+      const position = positionsById.get(playerId) ?? previousPositionsById.get(playerId);
+      return position ? { x: position.x, y: position.y } : null;
+    };
 
     const effects: FrameEffect[] = [];
     for (const event of events) {
+      const eventIter = event.iteration;
       if (event.type === 'shot_made') {
         const shooter = event.playerId ? playersById.get(event.playerId) : undefined;
-        const shooterPosition = event.playerId ? positionsById.get(event.playerId) : undefined;
+        // On the kickoff frame (K+1) players have already moved toward kickoff
+        // slots; look the shooter up from the previous frame first.
+        const shooterPosition = event.playerId
+          ? (eventIter === iteration
+              ? positionsById.get(event.playerId)
+              : (previousPositionsById.get(event.playerId) ?? positionsById.get(event.playerId)))
+          : undefined;
         const points = Number(event.data.pointsScored ?? event.data.shotValue ?? 2);
+        const assistName = event.targetPlayerId
+          ? shortNameFor(playersById.get(event.targetPlayerId)?.name)
+          : null;
         effects.push({
           kind: 'score',
           sequence: event.sequence,
@@ -321,6 +359,7 @@ export default function MatchBroadcast() {
           shooterName: shortNameFor(shooter?.name),
           shooterPos: shooterPosition ? { x: shooterPosition.x, y: shooterPosition.y } : null,
           teamAbbreviation: abbreviationFor(event.teamId),
+          assistName,
         });
       } else if (event.type === 'rebound') {
         const rebounder = event.playerId ? playersById.get(event.playerId) : undefined;
@@ -346,12 +385,86 @@ export default function MatchBroadcast() {
           sequence: event.sequence,
           hoopSide: hoopSideFor(event.teamId),
         });
+      } else if (event.type === 'turnover' && event.targetPlayerId && !interceptIterations.has(iteration)) {
+        // On-ball steal (no pass interception on the same iteration).
+        const defenderId = event.targetPlayerId;
+        const defenderName = shortNameFor(playersById.get(defenderId)?.name);
+        effects.push({
+          kind: 'steal',
+          sequence: event.sequence,
+          teamSide: sideOf(defenderId),
+          defenderId,
+          defenderName,
+          defenderPos: playerPos(defenderId),
+          victimName: shortNameFor(playersById.get(event.playerId ?? '')?.name),
+          teamAbbreviation: abbreviationOf(defenderId),
+        });
+      } else if (event.type === 'pass_intercepted' && event.targetPlayerId) {
+        const defenderId = event.targetPlayerId;
+        const defenderName = shortNameFor(playersById.get(defenderId)?.name);
+        effects.push({
+          kind: 'intercept',
+          sequence: event.sequence,
+          teamSide: sideOf(defenderId),
+          defenderId,
+          defenderName,
+          defenderPos: playerPos(defenderId),
+          passerName: shortNameFor(playersById.get(event.playerId ?? '')?.name),
+          teamAbbreviation: abbreviationOf(defenderId),
+        });
+      } else if (event.type === 'foul') {
+        effects.push({
+          kind: 'foul',
+          sequence: event.sequence,
+          teamSide: sideOf(event.playerId),
+          playerId: event.playerId ?? null,
+          playerName: shortNameFor(playersById.get(event.playerId ?? '')?.name),
+          playerPos: playerPos(event.playerId),
+          defenderName: event.targetPlayerId
+            ? shortNameFor(playersById.get(event.targetPlayerId)?.name)
+            : null,
+          teamAbbreviation: abbreviationOf(event.playerId),
+        });
       }
     }
     return effects;
-  }, [simulation, currentSimulationFrame, previousSimulationFrame]);
+  }, [simulation, currentSimulationFrame, previousSimulationFrame, isFinalFrame]);
 
   const madeBasketSide = frameEffects.find((effect) => effect.kind === 'score')?.hoopSide;
+
+  // While the winning shot is still in flight on the final frame, delay showing
+  // VictoryOverlay until the viewer watches the ball arc into the hoop.
+  const hasFinalFrameMadeShot = isFinalFrame
+    ? Boolean(
+        currentSimulationFrame &&
+          simulation?.events.some(
+            (event) => event.iteration === currentSimulationFrame.iteration && event.type === 'shot_made',
+          ),
+      )
+    : false;
+  useEffect(() => {
+    if (!hasFinalFrameMadeShot) return;
+    setVictoryDelayDone(false);
+    const id = window.setTimeout(
+      () => setVictoryDelayDone(true),
+      Math.round(playback.transitionDurationMs + 450),
+    );
+    return () => window.clearTimeout(id);
+  }, [hasFinalFrameMadeShot, playback.transitionDurationMs]);
+
+  // No mid-flight score spoilers: while a made shot is still travelling (the
+  // shot frame), hold the previous frame's score so it pops at rim contact.
+  const hasInFlightMadeShot =
+    !isFinalFrame &&
+    Boolean(
+      currentSimulationFrame &&
+        simulation?.events.some(
+          (event) =>
+            event.iteration === currentSimulationFrame.iteration && event.type === 'shot_made',
+        ),
+    );
+  const displayedScore =
+    hasInFlightMadeShot && previousSimulationFrame ? previousSimulationFrame.score : (currentSimulationFrame?.score ?? null);
 
   const matchStats = useMemo(() => (simulation ? deriveMatchStats(simulation) : null), [simulation]);
   const matchTrophies = useMemo(
@@ -385,14 +498,14 @@ export default function MatchBroadcast() {
           <Scoreboard
             homeTeam={simulation.teams.home}
             awayTeam={simulation.teams.away}
-            homeScore={currentSimulationFrame.score.home}
-            awayScore={currentSimulationFrame.score.away}
+            homeScore={displayedScore?.home ?? 0}
+            awayScore={displayedScore?.away ?? 0}
             possessionTeamId={currentSimulationFrame.possessionTeamId}
             frameNumber={playback.frameIndex + 1}
-            totalFrames={simulation.frames.length}
             speed={playback.speed}
             setSpeed={playback.setSpeed}
             isComplete={playback.isComplete}
+            isPaused={playback.isPaused}
             isFullMode={isFullMode}
             onToggleFullMode={toggleFullMode}
           />
@@ -406,7 +519,7 @@ export default function MatchBroadcast() {
                   madeBasketSide={madeBasketSide}
                   effects={frameEffects}
                 />
-                {playback.isComplete && !isVictoryDismissed && simulation.summary.winnerTeamId ? (
+                {playback.isComplete && victoryDelayDone && !isVictoryDismissed && simulation.summary.winnerTeamId ? (
                   <VictoryOverlay
                     homeTeam={simulation.teams.home}
                     awayTeam={simulation.teams.away}
@@ -459,6 +572,7 @@ export default function MatchBroadcast() {
                   players={simulation.players}
                   teams={simulation.teams}
                   currentIteration={currentSimulationFrame.iteration}
+                  isLastFrame={playback.isComplete}
                 />
                 <CommentaryChat
                   messages={visibleCommentary}
