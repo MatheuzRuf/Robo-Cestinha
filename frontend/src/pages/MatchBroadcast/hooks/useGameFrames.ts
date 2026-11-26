@@ -15,6 +15,23 @@ export interface RenderedBall {
 
 export type FlightPathPoint = RenderedBall;
 
+/** Parabolic shot arc peak (feet) scaled by flight length (D8a). */
+function shotArcPeakFt(from: FlightPathPoint, to: FlightPathPoint): number {
+  const length = distance(from, to);
+  return Math.max(6, Math.min(12, length * 0.22));
+}
+
+/** Catch lift (feet) as the ball drops off the rim to the rebounder. */
+function reboundLiftFt(from: FlightPathPoint, to: FlightPathPoint): number {
+  const length = distance(from, to);
+  return Math.max(3, Math.min(6, length * 0.2));
+}
+
+function liftedLeg(from: FlightPathPoint, to: FlightPathPoint, liftFt: number): FlightPathPoint[] {
+  const apex = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 - liftFt };
+  return [from, apex, to];
+}
+
 /**
  * True when ``previous`` is a missed-shot frame whose rebound is resolved by
  * the holder captured on that frame. Made baskets are excluded because their
@@ -25,22 +42,55 @@ function isReboundFrame(previous: Frame, current: Frame): boolean {
 }
 
 /**
- * Ball flight polyline for the animation displayed with ``current``.
+ * The complete ball flight polyline displayed together with ``current``: from
+ * the previous frame's rendered position to this frame's target, with a shot
+ * arc apex on legs reaching the rim and a catch lift on the rebound leg
+ * (rim -> rebounder -> target) after a missed shot (D6a).
  *
- * After a missed shot the ball leaves the rim toward the rebounder (the next
- * holder, whose catch position is kept on the shot frame's ball data) before
- * continuing to the next frame's target. All other transitions keep the plain
- * rendered target so the ball eases directly there (D6a frontend synthesis).
+ * Points are in court feet; the first point equals the position the ball
+ * holds when this frame starts, so the keyframed animation is seamless.
  */
 export function ballFlightPath(previous: Frame | null | undefined, current: Frame): FlightPathPoint[] {
+  if (!previous) return [renderedBallPosition(current)];
+  const start = renderedBallPosition(previous);
   const target = renderedBallPosition(current);
-  if (!previous || !isReboundFrame(previous, current)) return [target];
-  const rim = renderedBallPosition(previous);
-  const rebounder = { x: previous.ball.x, y: previous.ball.y };
-  if (distance(rim, rebounder) < 0.5 || distance(rebounder, target) < 0.5) {
-    return [target];
+  let base: FlightPathPoint[] = [start, target];
+  if (isReboundFrame(previous, current)) {
+    const rebounder = { x: previous.ball.x, y: previous.ball.y };
+    if (distance(start, rebounder) > 0.5 && distance(rebounder, target) > 0.5) {
+      base = [start, rebounder, target];
+    }
   }
-  return [rim, rebounder, target];
+  return withArcs(base, current);
+}
+
+function withArcs(base: FlightPathPoint[], current: Frame): FlightPathPoint[] {
+  const isShot = current.trajectory?.type === 'shot';
+  if (!isShot) {
+    if (base.length === 3) {
+      const [rim, rebounder, target] = base;
+      if (distance(rim, rebounder) > 1) {
+        return [...liftedLeg(rim, rebounder, reboundLiftFt(rim, rebounder)).slice(0, -1), rebounder, target];
+      }
+    }
+    return base;
+  }
+
+  if (base.length === 2) {
+    const [from, to] = base;
+    if (distance(from, to) > 1) return liftedLeg(from, to, shotArcPeakFt(from, to));
+    return base;
+  }
+
+  // Rebound followed by an immediate re-shot: lift off the rim, then arc.
+  const [rim, rebounder, target] = base;
+  const catchLeg =
+    distance(rim, rebounder) > 1 ? liftedLeg(rim, rebounder, reboundLiftFt(rim, rebounder)).slice(0, -1) : [rim];
+  const shotLeg =
+    distance(rebounder, target) > 1
+      ? liftedLeg(rebounder, target, shotArcPeakFt(rebounder, target))
+      : [rebounder, target];
+  return [...catchLeg, ...shotLeg];
 }
 
 function pathLength(path: readonly FlightPathPoint[]): number {
@@ -73,26 +123,30 @@ function playerDistance(a: PlayerState, b: PlayerState): number {
 }
 
 /**
- * Duration of the advance from frame ``index`` to ``index + 1``: the greater
- * of the ball travel and the furthest player travel, capped by a plausible
- * ball speed (D7a). Formation resets therefore take longer, short passes stay
- * near the old 800 ms baseline, and far jumps are slowed instead of
- * teleported. Legacy stored replays benefit without contract changes.
+ * Duration of the movement displayed on frame ``index``: the ball flight and
+ * the furthest player travel from frame ``index - 1`` to frame ``index``,
+ * capped by a plausible ball speed (D7a).
+ *
+ * Using the movement *into* the frame means the ball animation and the frame
+ * advance timeout share the same travelled path, so every flight (including
+ * the waypointed rebound leg and shot arc) completes exactly when the next
+ * frame mounts instead of being interrupted mid-air. Formation resets take
+ * longer, short passes stay near the old 800 ms baseline, and far jumps are
+ * slowed instead of teleported. Legacy stored replays benefit without
+ * contract changes.
  */
 function advanceDurationMs(frames: Frame[], index: number): number {
+  const previous = frames[index - 1];
   const current = frames[index];
-  const next = frames[index + 1];
-  if (!current || !next) return TRANSITION_DURATION_MS;
+  if (!previous || !current) return TRANSITION_DURATION_MS;
 
-  // The ball follows a rim -> rebounder -> target path right after a rebound,
-  // so the advance timing must account for the extra waypoint.
-  const ballFeet = pathLength(ballFlightPath(current, next));
-  const nextById = new Map(next.players.map((player) => [player.id, player]));
+  const ballFeet = pathLength(ballFlightPath(previous, current));
+  const currentById = new Map(current.players.map((player) => [player.id, player]));
   let playerFeet = 0;
-  for (const player of current.players) {
-    const nextPosition = nextById.get(player.id);
-    if (nextPosition) {
-      playerFeet = Math.max(playerFeet, playerDistance(player, nextPosition));
+  for (const player of previous.players) {
+    const currentPosition = currentById.get(player.id);
+    if (currentPosition) {
+      playerFeet = Math.max(playerFeet, playerDistance(player, currentPosition));
     }
   }
 

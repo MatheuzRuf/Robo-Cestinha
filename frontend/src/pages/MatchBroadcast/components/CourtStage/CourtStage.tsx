@@ -1,7 +1,7 @@
 import type { BallTrajectory, Frame } from '../../../../types/game';
 import { ballFlightPath } from '../../hooks/useGameFrames';
 import styles from './CourtStage.module.css';
-import { Ball, reboundLiftFt, shotArcPeakFt } from './Ball';
+import { Ball } from './Ball';
 import { Court } from './Court';
 import { Player, STAMINA_LEGEND_TIERS } from './Player';
 import { CourtEffectBanner, CourtEffectsSvg, type FrameEffect } from './CourtEffects';
@@ -67,10 +67,8 @@ export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBas
   }, []);
 
   const hasStamina = frame?.players.some((player) => player.stamina !== undefined && player.stamina !== null) ?? false;
+  // Full ball flight for this frame, including shot arcs and the rebound waypoint.
   const flightPath = useMemo(() => (frame ? ballFlightPath(previousFrame, frame) : null), [frame, previousFrame]);
-  const arcPeakFt = frame?.trajectory?.type === 'shot' ? shotArcPeakFt(frame.trajectory.from, frame.trajectory.to) : 0;
-  // A three-point path means the ball comes off the rim to the rebounder first.
-  const reboundLift = flightPath && flightPath.length > 1 ? reboundLiftFt(flightPath[0], flightPath[1]) : 0;
 
   const trajectory = visibleTrajectory;
   const start = trajectory ? gameToSvg(trajectory.from.x, trajectory.from.y) : null;
@@ -103,13 +101,7 @@ export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBas
           <Player key={player.id} player={player} transitionDuration={transitionDuration} />
         ))}
         {frame && flightPath ? (
-          <Ball
-            path={flightPath}
-            transitionDuration={transitionDuration}
-            isHeld={frame.ball.isHeld ?? false}
-            arcPeakFt={arcPeakFt}
-            reboundLift={reboundLift}
-          />
+          <Ball path={flightPath} transitionDuration={transitionDuration} isHeld={frame.ball.isHeld ?? false} />
         ) : null}
         {effects && effects.length ? <CourtEffectsSvg effects={effects} /> : null}
       </svg>
