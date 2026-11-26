@@ -48,17 +48,20 @@ export function Player({
   player,
   transitionDuration,
   motionDelay = 0,
+  isKickoffReset = false,
 }: {
   player: PlayerState;
   transitionDuration: number;
   /** Seconds the player waits before starting to move (e.g. to catch a rebound). */
   motionDelay?: number;
+  /** True during kickoff formation resets for a smooth ease-in-out glide. */
+  isKickoffReset?: boolean;
 }) {
   const { t } = useTranslation();
   const { cx, cy } = gameToSvg(player.x ?? 0, player.y ?? 0);
   const playerTransition = {
     duration: Math.max(transitionDuration - motionDelay, 0.01),
-    ease: 'linear' as const,
+    ease: isKickoffReset ? ('easeInOut' as const) : ('linear' as const),
     delay: motionDelay,
   };
   const nameParts = player.name.trim().split(/\s+/);

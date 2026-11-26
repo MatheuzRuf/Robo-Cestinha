@@ -18,6 +18,8 @@ export interface BallState {
   height?: number;
   /** True while the ball is held by a player (rendered beside the portrait). */
   isHeld?: boolean;
+  /** Player holding the ball on this frame, if any. */
+  holderId?: string | null;
 }
 
 export interface BallTrajectory {

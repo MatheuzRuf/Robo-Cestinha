@@ -1,11 +1,11 @@
 import type { BallTrajectory, Frame } from '../../../../types/game';
-import { ballFlightPath, reboundCatch } from '../../hooks/useGameFrames';
+import { computeBallFlightPlan, normalizeShotTarget, shotArcPeakFt } from '../../hooks/ballFlight';
 import styles from './CourtStage.module.css';
 import { Ball } from './Ball';
 import { Court } from './Court';
 import { Player, STAMINA_LEGEND_TIERS } from './Player';
 import { CourtEffectBanner, CourtEffectsSvg, type FrameEffect } from './CourtEffects';
-import { gameToSvg } from '../../../../config/court';
+import { SCALE, gameToSvg, type HoopSide } from '../../../../config/court';
 import trajectoryStyles from './Ball.module.css';
 import { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from '../../../../lib/i18n/i18n';
@@ -14,7 +14,7 @@ interface CourtStageProps {
   frame: Frame | null;
   previousFrame?: Frame | null;
   transitionDurationMs: number;
-  madeBasketSide?: 'left' | 'right';
+  madeBasketSide?: HoopSide;
   effects?: FrameEffect[];
 }
 
@@ -67,15 +67,18 @@ export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBas
   }, []);
 
   const hasStamina = frame?.players.some((player) => player.stamina !== undefined && player.stamina !== null) ?? false;
-  // Full ball flight for this frame, including shot arcs and the rebound waypoint.
-  const flightPath = useMemo(() => (frame ? ballFlightPath(previousFrame, frame) : null), [frame, previousFrame]);
-  // The rebounder must hold his spot until the ball arrives instead of gliding away.
-  const catchInfo = useMemo(
-    () => (frame && previousFrame ? reboundCatch(previousFrame, frame) : null),
+  // Full per-leg ball flight plan for this frame, including shot arcs, catch dwell, and rebound timing.
+  const flightPlan = useMemo(
+    () => (frame ? computeBallFlightPlan(previousFrame, frame) : null),
     [frame, previousFrame],
   );
+  const catchInfo = flightPlan?.reboundCatch ?? null;
+
+  // The rebounder holds position until the ball arrives and is secured before starting the next move.
   const rebounderId = useMemo(() => {
     if (!catchInfo || !previousFrame) return null;
+    if (previousFrame.ball.holderId) return previousFrame.ball.holderId;
+
     let bestId: string | null = null;
     let bestDistance = Number.POSITIVE_INFINITY;
     for (const player of previousFrame.players) {
@@ -89,13 +92,30 @@ export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBas
   }, [catchInfo, previousFrame]);
 
   const trajectory = visibleTrajectory;
+  const trajectoryEndFt = trajectory
+    ? trajectory.type === 'shot'
+      ? normalizeShotTarget(trajectory.to)
+      : trajectory.to
+    : null;
   const start = trajectory ? gameToSvg(trajectory.from.x, trajectory.from.y) : null;
-  const end = trajectory ? gameToSvg(trajectory.to.x, trajectory.to.y) : null;
+  const end = trajectoryEndFt ? gameToSvg(trajectoryEndFt.x, trajectoryEndFt.y) : null;
+  const shotPathD = useMemo(() => {
+    if (!trajectory || trajectory.type !== 'shot' || !start || !end || !trajectoryEndFt) return null;
+    const peakPx = shotArcPeakFt(trajectory.from, trajectoryEndFt) * SCALE;
+    const midX = (start.cx + end.cx) / 2;
+    const controlY = (start.cy + end.cy) / 2 - 2 * peakPx;
+    return `M ${start.cx} ${start.cy} Q ${midX} ${controlY} ${end.cx} ${end.cy}`;
+  }, [trajectory, start, end, trajectoryEndFt]);
+
   const trajectoryClass = trajectory
     ? trajectory.fromTeam !== trajectory.toTeam
       ? trajectoryStyles.opponentTrajectory
       : trajectoryStyles.sameTeamTrajectory
     : undefined;
+
+  const isKickoffReset = frame?.phase === 'kickoff';
+  const rimImpactDelayMs = frame?.trajectory?.type === 'shot' ? Math.round(transitionDurationMs * 0.85) : 0;
+  const reboundCatchDelayMs = catchInfo ? Math.round(catchInfo.timeFraction * transitionDurationMs * 0.9) : 0;
 
   return (
     <div className={styles.stage}>
@@ -105,8 +125,10 @@ export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBas
         role="img"
         aria-label={t('match_broadcast.simulation.court_label')}
       >
-        <Court madeBasketSide={madeBasketSide} />
-        {start && end ? (
+        <Court madeBasketSide={madeBasketSide} basketPulseDelayMs={rimImpactDelayMs} />
+        {shotPathD ? (
+          <path d={shotPathD} className={`${trajectoryStyles.trajectory} ${trajectoryClass ?? ''}`.trim()} />
+        ) : start && end ? (
           <line
             x1={start.cx}
             y1={start.cy}
@@ -120,13 +142,24 @@ export function CourtStage({ frame, previousFrame, transitionDurationMs, madeBas
             key={player.id}
             player={player}
             transitionDuration={transitionDuration}
-            motionDelay={player.id === rebounderId && catchInfo ? catchInfo.timeFraction * transitionDuration : 0}
+            motionDelay={
+              player.id === rebounderId && catchInfo && catchInfo.moveDelayFraction < 0.99
+                ? catchInfo.moveDelayFraction * transitionDuration
+                : 0
+            }
+            isKickoffReset={isKickoffReset}
           />
         ))}
-        {frame && flightPath ? (
-          <Ball path={flightPath} transitionDuration={transitionDuration} isHeld={frame.ball.isHeld ?? false} />
+        {frame && flightPlan ? (
+          <Ball plan={flightPlan} transitionDuration={transitionDuration} isHeld={frame.ball.isHeld ?? false} />
         ) : null}
-        {effects && effects.length ? <CourtEffectsSvg effects={effects} /> : null}
+        {effects && effects.length ? (
+          <CourtEffectsSvg
+            effects={effects}
+            rimImpactDelayMs={rimImpactDelayMs}
+            reboundCatchDelayMs={reboundCatchDelayMs}
+          />
+        ) : null}
       </svg>
       {hasStamina ? (
         <div className={styles.staminaLegend} aria-label={t('match_broadcast.stamina.label')}>

@@ -1,9 +1,9 @@
 import type { CSSProperties } from 'react';
-import { COURT_HEIGHT_FT, COURT_WIDTH_FT, HOOP_DISTANCE_FROM_BASELINE_FT, ft } from '../../../../config/court';
+import { gameToSvg, hoopPositionFt, type HoopSide } from '../../../../config/court';
 import { useTranslation } from '../../../../lib/i18n/i18n';
 import styles from './CourtEffects.module.css';
 
-export type HoopSide = 'left' | 'right';
+export type { HoopSide };
 export type TeamSide = 'home' | 'away';
 
 export interface EffectPosition {
@@ -43,37 +43,33 @@ export interface MissEffect {
 
 export type FrameEffect = ScoreEffect | ReboundEffect | MissEffect;
 
-const SCALE = 10;
-const COURT_MID_Y = ft(COURT_HEIGHT_FT) / 2;
-const HOOP_LEFT_X = ft(HOOP_DISTANCE_FROM_BASELINE_FT);
-const HOOP_RIGHT_X = ft(COURT_WIDTH_FT) - HOOP_LEFT_X;
-
-function hoopX(side: HoopSide) {
-  return side === 'left' ? HOOP_LEFT_X : HOOP_RIGHT_X;
-}
-
 function hoopPoint(side: HoopSide) {
-  return { x: hoopX(side), y: COURT_MID_Y };
+  const pos = hoopPositionFt(side);
+  const { cx, cy } = gameToSvg(pos.x, pos.y);
+  return { x: cx, y: cy };
 }
 
 function toSvg(position: EffectPosition) {
-  return { x: position.x * SCALE, y: position.y * SCALE };
+  const { cx, cy } = gameToSvg(position.x, position.y);
+  return { x: cx, y: cy };
 }
 
 function ScoreBurst({
   effect,
   hoop,
   shooter,
+  impactDelayMs,
 }: {
   effect: ScoreEffect;
   hoop: EffectPosition;
   shooter: EffectPosition | null;
+  impactDelayMs: number;
 }) {
   const isThree = effect.points === 3;
   const rayCount = isThree ? 12 : 8;
   const rayLength = isThree ? 34 : 24;
   const color = isThree ? 'var(--color-effect-score-3pt)' : 'var(--color-effect-score-2pt)';
-  const style = { '--effect-color': color } as CSSProperties;
+  const style = { '--effect-color': color, '--impact-delay': `${impactDelayMs}ms` } as CSSProperties;
 
   return (
     <g className={styles.effectLayer} style={style} aria-hidden="true">
@@ -103,12 +99,12 @@ function ScoreBurst({
   );
 }
 
-function ReboundPulse({ effect }: { effect: ReboundEffect }) {
+function ReboundPulse({ effect, catchDelayMs }: { effect: ReboundEffect; catchDelayMs: number }) {
   const rim = hoopPoint(effect.hoopSide);
   const target = effect.playerPos ? toSvg(effect.playerPos) : rim;
   const isOffensive = effect.reboundType === 'offensive';
   const color = isOffensive ? 'var(--color-effect-rebound-off)' : 'var(--color-effect-rebound-def)';
-  const style = { '--effect-color': color } as CSSProperties;
+  const style = { '--effect-color': color, '--impact-delay': `${catchDelayMs}ms` } as CSSProperties;
   const midX = (rim.x + target.x) / 2;
   const midY = Math.min(rim.y, target.y) - 34;
 
@@ -133,7 +129,15 @@ function MissFlash({ hoopSide }: { hoopSide: HoopSide }) {
   );
 }
 
-export function CourtEffectsSvg({ effects }: { effects: FrameEffect[] }) {
+export function CourtEffectsSvg({
+  effects,
+  rimImpactDelayMs = 0,
+  reboundCatchDelayMs = 0,
+}: {
+  effects: FrameEffect[];
+  rimImpactDelayMs?: number;
+  reboundCatchDelayMs?: number;
+}) {
   return (
     <>
       {effects.map((effect) => {
@@ -144,11 +148,12 @@ export function CourtEffectsSvg({ effects }: { effects: FrameEffect[] }) {
               effect={effect}
               hoop={hoopPoint(effect.hoopSide)}
               shooter={effect.shooterPos ? toSvg(effect.shooterPos) : null}
+              impactDelayMs={rimImpactDelayMs}
             />
           );
         }
         if (effect.kind === 'rebound') {
-          return <ReboundPulse key={`rebound-${effect.sequence}`} effect={effect} />;
+          return <ReboundPulse key={`rebound-${effect.sequence}`} effect={effect} catchDelayMs={reboundCatchDelayMs} />;
         }
         return <MissFlash key={`miss-${effect.sequence}`} hoopSide={effect.hoopSide} />;
       })}

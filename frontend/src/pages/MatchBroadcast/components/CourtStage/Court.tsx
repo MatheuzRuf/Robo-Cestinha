@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import styles from './Court.module.css';
 import {
   COURT_WIDTH_FT,
@@ -6,15 +7,24 @@ import {
   KEY_WIDTH_FT,
   KEY_LENGTH_FT,
   FREE_THROW_RADIUS_FT,
-  HOOP_DISTANCE_FROM_BASELINE_FT,
   HOOP_RADIUS_FT,
+  LEFT_HOOP_FT,
+  RIGHT_HOOP_FT,
   THREE_POINT_RADIUS_FT,
   THREE_POINT_CORNER_X_FT,
   CORNER_THREE_SIDELINE_GAP_FT,
   ft,
+  gameToSvg,
+  type HoopSide,
 } from '../../../../config/court';
 
-export function Court({ madeBasketSide }: { madeBasketSide?: 'left' | 'right' }) {
+export function Court({
+  madeBasketSide,
+  basketPulseDelayMs = 0,
+}: {
+  madeBasketSide?: HoopSide;
+  basketPulseDelayMs?: number;
+}) {
   const w = ft(COURT_WIDTH_FT);
   const h = ft(COURT_HEIGHT_FT);
   const midY = h / 2;
@@ -23,8 +33,10 @@ export function Court({ madeBasketSide }: { madeBasketSide?: 'left' | 'right' })
   const freeThrowR = ft(FREE_THROW_RADIUS_FT);
   const centerR = ft(CENTER_CIRCLE_RADIUS_FT);
   const hoopR = ft(HOOP_RADIUS_FT);
-  const hoopX = ft(HOOP_DISTANCE_FROM_BASELINE_FT);
-  const hoopXRight = w - hoopX;
+  const leftHoop = gameToSvg(LEFT_HOOP_FT.x, LEFT_HOOP_FT.y);
+  const rightHoop = gameToSvg(RIGHT_HOOP_FT.x, RIGHT_HOOP_FT.y);
+  const hoopX = leftHoop.cx;
+  const hoopXRight = rightHoop.cx;
   const threeR = ft(THREE_POINT_RADIUS_FT);
   const cornerX = ft(THREE_POINT_CORNER_X_FT);
   const cornerY = ft(CORNER_THREE_SIDELINE_GAP_FT);
@@ -86,6 +98,7 @@ export function Court({ madeBasketSide }: { madeBasketSide?: 'left' | 'right' })
           cy={midY}
           r={hoopR + 1.2}
           className={styles.basketPulse}
+          style={{ '--basket-pulse-delay': `${basketPulseDelayMs}ms` } as CSSProperties}
         />
       ) : null}
       <line x1={hoopX - 8} y1={midY - 8} x2={hoopX - 8} y2={midY + 8} className={styles.backboard} />
