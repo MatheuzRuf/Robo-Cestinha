@@ -8,7 +8,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-4);
 }
 
 .header {
@@ -19,23 +19,39 @@
 }
 
 .heading {
+  min-width: 0;
   margin: 0;
   color: var(--color-text-muted);
-  font: 700 0.75rem var(--font-mono);
+  font: 700 0.75rem / 1.2 var(--font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .toggle {
-  display: grid;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
   width: var(--space-6);
   height: var(--space-6);
-  place-items: center;
+  padding: 0;
+  line-height: 1;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface-raised);
   color: var(--color-primary);
   cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.toggle svg {
+  display: block;
+}
+
+.toggle:hover {
+  border-color: var(--color-primary);
 }
 
 .toggle:focus-visible {

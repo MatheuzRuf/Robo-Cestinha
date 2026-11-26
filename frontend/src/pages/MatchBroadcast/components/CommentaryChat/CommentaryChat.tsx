@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from '../../../../lib/i18n/i18n';
 import styles from './CommentaryChat.module.css';
 
@@ -34,11 +35,9 @@ export function CommentaryChat({ messages, currentFrame, isTyping }: CommentaryC
           type="button"
           onClick={() => setIsExpanded((expanded) => !expanded)}
           aria-expanded={isExpanded}
-          aria-label={t(
-            isExpanded ? 'match_broadcast.commentary.collapse' : 'match_broadcast.commentary.expand',
-          )}
+          aria-label={t(isExpanded ? 'match_broadcast.commentary.collapse' : 'match_broadcast.commentary.expand')}
         >
-          {isExpanded ? '▼' : '▲'}
+          {isExpanded ? <ChevronDown size={14} aria-hidden="true" /> : <ChevronUp size={14} aria-hidden="true" />}
         </button>
       </header>
       <ol
